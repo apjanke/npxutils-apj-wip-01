@@ -3,11 +3,11 @@ classdef KilosortMetrics < handle
     % particularly regarding template shapes, depths, and spiking drift
     % Note that this code borrows heavily from the math in github.com/cortex-lab/spikes
     
-    properties(Transient) % not saved with metrics
+    properties (Transient) % not saved with metrics
         ks % npxutils.KilosortDataset
     end
     
-    properties(Dependent)
+    properties (Dependent)
         nSpikes
         nChannelsSorted
         nTemplates
@@ -26,10 +26,10 @@ classdef KilosortMetrics < handle
     
     properties
         % applied during construction
-        ampRelativeThreshCentroid (1, 1) single
+        ampRelativeThreshCentroid (1,1) single
         centroidMethod char
-        extThreshLocalizedTemplate (1, 1) single
-        distThreshLocalizedTemplate (1, 1) single
+        extThreshLocalizedTemplate (1,1) single
+        distThreshLocalizedTemplate (1,1) single
         
         % copied over from ks
         fs
@@ -38,7 +38,7 @@ classdef KilosortMetrics < handle
         concatenationInfo
         
         % nChannelsSorted x nChannelsSorted
-        whitening_mat_inv(:, :) single
+        whitening_mat_inv (:,:) single
         
         % per template properties
         
@@ -51,45 +51,45 @@ classdef KilosortMetrics < handle
         template_centroid % single x,y,z, coords for each template's center of mass
         
         % nTemplates x 1
-        template_is_localized(:, 1) logical
+        template_is_localized (:,1) logical
         
         % nTemplates x nTimepoints
         template_waveform single % single, maximum amplitude waveform
         
         % nTemplates x 1
-        template_waveform_ch(:, 1) uint32 % channel where the maximum amplitude part of the template lives
-        template_amplitude(:, 1) single % in uV
-        template_ttp(:, 1) single % trough to peak
+        template_waveform_ch (:,1) uint32 % channel where the maximum amplitude part of the template lives
+        template_amplitude (:, 1) single % in uV
+        template_ttp (:,1) single % trough to peak
         
         % nTemplates x nChannelsSorted
         template_best_channels uint32 % nTemplates x nChannelsSorted matrix indicating the closest channels to the max (typically take first 20 cols)
         
         % [nTemplates, nTemplates] = same as  similar_templates but updated using the final post-split, post-merge templates
-        similar_templates_recomputed(:, :) single
-        similar_templates_best_lag(:, :) int16
+        similar_templates_recomputed (:,:) single
+        similar_templates_best_lag (:,:) int16
         
         % per spike properties
         
         % nSpikes x 1
-        spike_times(:,1) uint64
+        spike_times (:,1) uint64
         
         % nSpikes x 1
-        spike_amplitude(:, 1) single % in Uv,  product of template's largest amplitude over channels and scaling of each template (by ks.amplitudes)
+        spike_amplitude (:,1) single % in Uv,  product of template's largest amplitude over channels and scaling of each template (by ks.amplitudes)
         
         % nSpikes x nSpatialCoord
         spike_centroid single % single x,y,z coords for each spike's center of mass based on private PCs
         
         % nSpikes x 1
-        spike_templates(:, 1) uint32
-        spike_clusters(:, 1) uint32
+        spike_templates (:,1) uint32
+        spike_clusters (:,1) uint32
         
         % per template properties
         
         % unique cluster ids corresponding to each slot in the other cluster properties
-        cluster_ids(:, 1) uint32
+        cluster_ids (:,1) uint32
         
         % nClusters x 1
-        cluster_template_mostUsed(:, 1) uint32 % nClusters x 1 which template is most used by each cluster
+        cluster_template_mostUsed (:,1) uint32 % nClusters x 1 which template is most used by each cluster
         
         % nClusters x maxTemplatesPerCluster
         cluster_template_list cell
@@ -106,18 +106,18 @@ classdef KilosortMetrics < handle
         cluster_centroid single
         
         % nClusters x 1 logical
-        cluster_is_localized(:, 1) logical
+        cluster_is_localized (:,1) logical
         
         % nClusters x nTimePoint x maxTemplatesPerCluster
         cluster_waveform single
         
         % [nClusters, nClusters] single matrix giving the similarity score (larger is more similar) between each pair of clusters, based on similar_templates
-        similar_clusters(:, :) single
+        similar_clusters (:,:) single
         
         % this version is based on similar_templates_recomputed and factors in adjusted
         % templates after splits are made
-        similar_clusters_recomputed(:, :) single
-        similar_clusters_best_lag(:, :) int16
+        similar_clusters_recomputed (:,:) single
+        similar_clusters_best_lag (:,:) int16
         
         % nClusters x maxTemplatesPerCluster
         cluster_waveform_ch uint32
@@ -127,33 +127,33 @@ classdef KilosortMetrics < handle
     
     properties % batch-wise versions
         % per template properties
-        batchesComputed (:, 1) uint32
+        batchesComputed (:,1) uint32
         
         % nTemplates x nBatchesComputed
-        template_useCount_batchwise(:, :) single
+        template_useCount_batchwise (:,:) single
         
         % nTemplates x nSpatialCoord x nBatchesComputed
-        template_centroid_batchwise(:, :, :) single % x,y,z, coords for each template's center of mass
+        template_centroid_batchwise (:,:,:) single % x,y,z, coords for each template's center of mass
         
         % nTemplates x nTemplateTime x nBatchesComputed
-        template_waveform_batchwise(:, :, :) single % template waveform on channel template_waveform_ch
+        template_waveform_batchwise (:,:,:) single % template waveform on channel template_waveform_ch
         
         % nTemplates x nBatchesComputed
-        template_amplitude_batchwise(:, :) single % in uV, per-batch template amplitude (max - min) on ALL channels, not just template_waveform_ch
+        template_amplitude_batchwise (:,:) single % in uV, per-batch template amplitude (max - min) on ALL channels, not just template_waveform_ch
         
         % per cluster properties
         
         % nClusters x nTemplates x nBatchesComputed
-        cluster_template_useCount_batchwise(:, :, :) uint32 % nClusters x nTemplates x nBatches number of spikes in cluster i using template j in batch k
+        cluster_template_useCount_batchwise (:,:,:) uint32 % nClusters x nTemplates x nBatches number of spikes in cluster i using template j in batch k
         
         % nClusters x nSpatialCoord x nBatchesComputed
-        cluster_centroid_batchwise(:, :, :) single
+        cluster_centroid_batchwise (:,:,:) single
         
         % nClusters x nTimePoint x maxTemplatesPerCluster x nBatchesComputed
-        cluster_waveform_batchwise(:, :, :) single
+        cluster_waveform_batchwise (:,:,:) single
         
         % nClusters x maxTemplatesPerCluster x nBatchesComputed
-        cluster_amplitude_batchwise(:, :) single
+        cluster_amplitude_batchwise (:,:) single
     end
     
     properties(Dependent)
@@ -171,7 +171,7 @@ classdef KilosortMetrics < handle
     end
     
     methods % Constructor / metrics and batchwise metrics computation
-        function m = KilosortMetrics(ks, varargin)
+        function this = KilosortMetrics(ks, varargin)
             p = inputParser();
             p.addParameter('ampRelativeThreshCentroid', 0.3, @isscalar);
             p.addParameter('centroidMethod', 'com_best_timepoint', @ischar);
@@ -198,60 +198,60 @@ classdef KilosortMetrics < handle
             end
             
             % store configurable settings
-            m.centroidMethod = p.Results.centroidMethod;
-            m.ampRelativeThreshCentroid = p.Results.ampRelativeThreshCentroid;
-            m.extThreshLocalizedTemplate = p.Results.extThreshLocalizedTemplate;
-            m.distThreshLocalizedTemplate = p.Results.distThreshLocalizedTemplate;
+            this.centroidMethod = p.Results.centroidMethod;
+            this.ampRelativeThreshCentroid = p.Results.ampRelativeThreshCentroid;
+            this.extThreshLocalizedTemplate = p.Results.extThreshLocalizedTemplate;
+            this.distThreshLocalizedTemplate = p.Results.distThreshLocalizedTemplate;
             
-            m.ks = ks;
-            m.fs = ks.fsAP;
-            m.spike_templates = ks.spike_templates;
-            m.spike_clusters = ks.spike_clusters;
-            m.cluster_ids = ks.cluster_ids;
-            m.channelMap = ks.channelMap;
-            m.channel_ids_sorted = ks.channel_ids_sorted;
+            this.ks = ks;
+            this.fs = ks.fsAP;
+            this.spike_templates = ks.spike_templates;
+            this.spike_clusters = ks.spike_clusters;
+            this.cluster_ids = ks.cluster_ids;
+            this.channelMap = ks.channelMap;
+            this.channel_ids_sorted = ks.channel_ids_sorted;
             
-            m.concatenationInfo = ks.concatenationInfo;
+            this.concatenationInfo = ks.concatenationInfo;
             
-            m.spike_times = ks.spike_times;
+            this.spike_times = ks.spike_times;
             
             % A. compute unwhitened templates
             % ks.templates is potentially only specified on a subset of channels which may differ across templates.
             % although for Kilosort this is every channel
-            ks = m.ks; ks.checkLoaded(); %#ok<*PROP>
+            ks = this.ks; ks.checkLoaded(); %#ok<*PROP>
             templates = ks.templates;
             template_unw = zeros(size(templates, 1), size(templates, 2), ks.nChannelsSorted, 'like', templates);
             wmi = single(ks.whitening_mat_inv);
-            m.whitening_mat_inv = wmi;
+            this.whitening_mat_inv = wmi;
             assert(size(wmi, 1) == size(template_unw, 3), 'dim 3 of templates must match whitening matrix inverse');
             for iT = 1:size(templates, 1)
                 whichChannels = ks.templates_ind(iT, :);
                 template_unw(iT, :, whichChannels) = templates(iT, :, :);
             end
             sz = size(template_unw);
-            m.template_unw = reshape(reshape(template_unw, sz(1)*sz(2), sz(3)) * wmi, sz);
+            this.template_unw = reshape(reshape(template_unw, sz(1)*sz(2), sz(3)) * wmi, sz);
             
             % for each channel i, list other channels in order of spatial proximity
             % nChannelsSorted x nChannelsSorted, include each channel in its own closest list
             closest_lookup = [ks.channel_ids_sorted, ks.channelMap.getClosestChannels(ks.nChannelsSorted-1, ks.channel_ids_sorted, ks.channel_ids_sorted)];
-            m.template_best_channels = nan(ks.nClusters, ks.nChannelsSorted);
+            this.template_best_channels = nan(ks.nClusters, ks.nChannelsSorted);
             for iT = 1:ks.nTemplates
-                [~, bestChannelInd] = max(range(m.template_unw(iT, :, :), 2));
-                m.template_best_channels(iT, :) = closest_lookup(bestChannelInd, :)';
+                [~, bestChannelInd] = max(range(this.template_unw(iT, :, :), 2));
+                this.template_best_channels(iT, :) = closest_lookup(bestChannelInd, :)';
             end
             
             progIncrFn('Template center of mass');
             % B. determine template center of mass
             %   1. compute template amp on each channel, zeroing out small (< 0.3 max) faraway channels
-            templateUnscaledAmps = squeeze(max(m.template_unw,[],2) - min(m.template_unw,[],2)); % nTemplates x nTemplateChannels
+            templateUnscaledAmps = squeeze(max(this.template_unw,[],2) - min(this.template_unw,[],2)); % nTemplates x nTemplateChannels
             [templateUnscaledMaxAmp, templateMaxChInd] = max(templateUnscaledAmps, [], 2);
             %             threshAmp = templateUnscaledMaxAmp * ampRelativeThreshCentroid;
             %             templateUnscaledAmps(templateUnscaledAmps < threshAmp) = 0;
             
             %   2. compute template channel Centroids (nTemplates x nCh x nSpatialDim)
-            m.template_centroid = npxutils.util.computeWaveformImageCentroid(m.template_unw, ...
+            this.template_centroid = npxutils.util.computeWaveformImageCentroid(this.template_unw, ...
                 1:ks.nChannelsSorted, ks.channel_positions_sorted, ...
-                'method', m.centroidMethod, 'relativeThreshold', m.ampRelativeThreshCentroid);
+                'method', this.centroidMethod, 'relativeThreshold', this.ampRelativeThreshCentroid);
             
             %             templateChannelPos = reshape(ks.channel_positions_sorted(ks.templates_ind(:), :), [size(ks.templates_ind), size(ks.channel_positions_sorted, 2)]);
             
@@ -260,29 +260,29 @@ classdef KilosortMetrics < handle
             %                 sum(templateUnscaledAmps, 2), 2);
             
             % C. determine which templates are localized
-            m.template_is_localized = false(ks.nTemplates, 1);
+            this.template_is_localized = false(ks.nTemplates, 1);
             for iT = 1:ks.nTemplates
                 % find channels where the template has weight at least 0.5 of max
-                threshExt = max(abs(m.template_unw(iT, :))) * m.extThreshLocalizedTemplate;
-                maskCh = squeeze(max(abs(m.template_unw(iT, :, :)), [], 2)) >= threshExt; % nChannelsSorted x 1
+                threshExt = max(abs(this.template_unw(iT, :))) * this.extThreshLocalizedTemplate;
+                maskCh = squeeze(max(abs(this.template_unw(iT, :, :)), [], 2)) >= threshExt; % nChannelsSorted x 1
                 
                 if nnz(maskCh) < 2
-                    m.template_is_localized(iT) = true;
+                    this.template_is_localized(iT) = true;
                 else
                     distMat = pdist(ks.channel_positions_sorted(maskCh, :));
-                    m.template_is_localized(iT) = max(distMat(:)) < m.distThreshLocalizedTemplate;
+                    this.template_is_localized(iT) = max(distMat(:)) < this.distThreshLocalizedTemplate;
                 end
             end
             
             % D. scale the spikes by both templates's largest intrinsic amplitude and then ks.amplitudes
             progIncrFn('Spike / template amplitude scaling');
-            m.spike_amplitude = ks.amplitudes .* templateUnscaledMaxAmp(ks.spike_templates) * ks.apScaleToUv;
+            this.spike_amplitude = ks.amplitudes .* templateUnscaledMaxAmp(ks.spike_templates) * ks.apScaleToUv;
             
             % E. determine template scale by averaging ks.amplitudes that use that template
             assert(~isnan(ks.apScaleToUv));
             mean_template_amplitude = accumarray(ks.spike_templates, ks.amplitudes, [ks.nTemplates, 1], @mean);
-            m.template_scale_factor = mean_template_amplitude * ks.apScaleToUv;
-            m.template_scaled = m.template_unw .* m.template_scale_factor;
+            this.template_scale_factor = mean_template_amplitude * ks.apScaleToUv;
+            this.template_scaled = this.template_unw .* this.template_scale_factor;
             
             % F. determine template largest scaled waveform
             progIncrFn('Template waveforms');
@@ -290,17 +290,17 @@ classdef KilosortMetrics < handle
             template_waveform = nan(ks.nTemplates, size(ks.templates, 2));
             for iT = 1:ks.nTemplates
                 template_waveform_ch(iT) = ks.templates_ind(iT, templateMaxChInd(iT));
-                template_waveform(iT, :) = m.template_scaled(iT, :, template_waveform_ch(iT));
+                template_waveform(iT, :) = this.template_scaled(iT, :, template_waveform_ch(iT));
             end
-            m.template_waveform_ch = template_waveform_ch;
-            m.template_waveform = template_waveform;
-            m.template_amplitude = templateUnscaledMaxAmp .* m.template_scale_factor;
+            this.template_waveform_ch = template_waveform_ch;
+            this.template_waveform = template_waveform;
+            this.template_amplitude = templateUnscaledMaxAmp .* this.template_scale_factor;
             
             % G. determine trough to peak time of each waveform, this should be refined
-            [~, time_template_trough] = min(m.template_waveform, [], 2);
-            [~, time_template_peak] = max(m.template_waveform, [], 2);
-            m.template_ttp = (time_template_peak - time_template_trough) / ks.fsAP * 1000;
-            m.template_ttp(m.template_ttp <= 0) = NaN;
+            [~, time_template_trough] = min(this.template_waveform, [], 2);
+            [~, time_template_peak] = max(this.template_waveform, [], 2);
+            this.template_ttp = (time_template_peak - time_template_trough) / ks.fsAP * 1000;
+            this.template_ttp(this.template_ttp <= 0) = NaN;
             
             if ks.hasFeaturesLoaded
                 progIncrFn('Individual spike center of mass');
@@ -312,9 +312,9 @@ classdef KilosortMetrics < handle
                 
                 %   2. compute center of mass. (spikeFeatureChannelPos is nSpikes x nCh x nSpatialDim)
                 spike_pcfeat_chind = ks.pc_feature_ind(ks.spike_templates, :);
-                m.spike_centroid = npxutils.util.computeWaveformImageCentroid(reshape(pc1weight, [size(pc1weight, 1), 1, size(pc1proj, 2)]), ...
+                this.spike_centroid = npxutils.util.computeWaveformImageCentroid(reshape(pc1weight, [size(pc1weight, 1), 1, size(pc1proj, 2)]), ...
                     spike_pcfeat_chind, ks.channel_positions_sorted, ...
-                    'method', 'com_via_provided_amplitudes', 'relativeThreshold', m.ampRelativeThreshCentroid);
+                    'method', 'com_via_provided_amplitudes', 'relativeThreshold', this.ampRelativeThreshCentroid);
                 %                 spikeFeatureChannelPos = reshape(ks.channel_positions_sorted(spike_pcfeat_chind(:), :), [size(spike_pcfeat_chind), size(ks.channel_positions_sorted, 2)]);
                 %                 m.spike_centroid = npxutils.util.TensorUtils.squeezeDims(sum(pc1weight .* spikeFeatureChannelPos, 2) ./ ...
                 %                     sum(pc1weight, 2), 2);
@@ -324,78 +324,78 @@ classdef KilosortMetrics < handle
             if ks.hasFeaturesLoaded && ~isempty(ks.W)
                 progIncrFn('Recomputing template similarity scores');
                 % recompute cluster similarity from W and U
-                [m.similar_templates_recomputed, m.similar_templates_best_lag] = ...
+                [this.similar_templates_recomputed, this.similar_templates_best_lag] = ...
                     npxutils.util.computeTemplateSimilarity(ks.W, ks.U);
             else
-                m.similar_templates_recomputed = [];
-                m.similar_templates_best_lag = zeros(size(ks.similar_templates), 'int16');
+                this.similar_templates_recomputed = [];
+                this.similar_templates_best_lag = zeros(size(ks.similar_templates), 'int16');
             end
             % I. compute cluster weighting over templates and list of templates used by each cluster, sorted by number of uses
             progIncrFn('Cluster weighting over templates');
             [mask_spike_in_cluster, cluster_ind_each_spike] = ismember(ks.spike_clusters, ks.cluster_ids);
-            m.cluster_template_useCount = accumarray([cluster_ind_each_spike(mask_spike_in_cluster), ks.spike_templates(mask_spike_in_cluster)], ...
+            this.cluster_template_useCount = accumarray([cluster_ind_each_spike(mask_spike_in_cluster), ks.spike_templates(mask_spike_in_cluster)], ...
                 ones(ks.nSpikes, 1), [ks.nClusters, ks.nTemplates]);
-            m.cluster_template_weight = single(m.cluster_template_useCount) ./ single(ks.cluster_spike_counts);
-            m.cluster_template_weight(isnan(m.cluster_template_weight)) = 0;
+            this.cluster_template_weight = single(this.cluster_template_useCount) ./ single(ks.cluster_spike_counts);
+            this.cluster_template_weight(isnan(this.cluster_template_weight)) = 0;
             
-            [~, m.cluster_template_mostUsed] = max(m.cluster_template_useCount, [], 2);
-            m.cluster_best_channels = m.template_best_channels(m.cluster_template_mostUsed, :);
+            [~, this.cluster_template_mostUsed] = max(this.cluster_template_useCount, [], 2);
+            this.cluster_best_channels = this.template_best_channels(this.cluster_template_mostUsed, :);
             
-            m.cluster_num_templates = sum(m.cluster_template_useCount > 0, 2);
-            maxTemplatesPerCluster = max(m.cluster_num_templates);
-            m.cluster_template_list = cell(ks.nClusters, 1);
+            this.cluster_num_templates = sum(this.cluster_template_useCount > 0, 2);
+            maxTemplatesPerCluster = max(this.cluster_num_templates);
+            this.cluster_template_list = cell(ks.nClusters, 1);
             for iC = 1:ks.nClusters
-                inds = find(m.cluster_template_useCount(iC, :));
-                [~, sortIdx] = sort(m.cluster_template_useCount(iC, inds), 'descend');
-                m.cluster_template_list{iC} = inds(sortIdx)';
+                inds = find(this.cluster_template_useCount(iC, :));
+                [~, sortIdx] = sort(this.cluster_template_useCount(iC, inds), 'descend');
+                this.cluster_template_list{iC} = inds(sortIdx)';
             end
             
             % J. cluster is localized if all templates used are localized
-            m.cluster_is_localized = arrayfun(@(iC) all(m.template_is_localized(m.cluster_template_list{iC})), 1:ks.nClusters);
+            this.cluster_is_localized = arrayfun(@(iC) all(this.template_is_localized(this.cluster_template_list{iC})), 1:ks.nClusters);
             
             progIncrFn('Cluster center of mass');
             % K. find cluster center of mass
-            m.cluster_centroid = npxutils.util.TensorUtils.linearCombinationAlongDimension(m.template_centroid, 1, ...
-                m.cluster_template_weight, 'replaceNaNWithZero', true); % needed in case any templates have nan centroid
+            this.cluster_centroid = npxutils.util.TensorUtils.linearCombinationAlongDimension(this.template_centroid, 1, ...
+                this.cluster_template_weight, 'replaceNaNWithZero', true); % needed in case any templates have nan centroid
             
             % L. cluster waveforms
             progIncrFn('Cluster waveform');
-            cluster_waveform = nan(ks.nClusters, size(m.template_waveform, 2), maxTemplatesPerCluster);
+            cluster_waveform = nan(ks.nClusters, size(this.template_waveform, 2), maxTemplatesPerCluster);
             cluster_waveform_ch = nan(ks.nClusters);
             for iC = 1:ks.nClusters
-                cluster_waveform(iC, :, 1:m.cluster_num_templates(iC)) = permute(m.template_waveform(m.cluster_template_list{iC}, :), [3 2 1]);
-                cluster_waveform_ch(iC, 1:m.cluster_num_templates(iC)) = m.template_waveform_ch(m.cluster_template_list{iC})';
+                cluster_waveform(iC, :, 1:this.cluster_num_templates(iC)) = permute(this.template_waveform(this.cluster_template_list{iC}, :), [3 2 1]);
+                cluster_waveform_ch(iC, 1:this.cluster_num_templates(iC)) = this.template_waveform_ch(this.cluster_template_list{iC})';
             end
-            m.cluster_waveform = cluster_waveform;
-            m.cluster_waveform_ch = cluster_waveform_ch;
+            this.cluster_waveform = cluster_waveform;
+            this.cluster_waveform_ch = cluster_waveform_ch;
             % J. cluster_amplitudes and ttp - weighted mean of template amplitude / ttp
             progIncrFn('Cluster amplitudes');
-            m.cluster_amplitude = accumarray(cluster_ind_each_spike(mask_spike_in_cluster), m.spike_amplitude(mask_spike_in_cluster), [ks.nClusters, 1], @mean);
-            template_mask = ~isnan(m.template_ttp);
-            m.cluster_ttp = (double(m.cluster_template_useCount(:, template_mask)) * m.template_ttp(template_mask)) ./ sum(m.cluster_template_useCount(:, template_mask), 2);
+            this.cluster_amplitude = accumarray(cluster_ind_each_spike(mask_spike_in_cluster), this.spike_amplitude(mask_spike_in_cluster), [ks.nClusters, 1], @mean);
+            template_mask = ~isnan(this.template_ttp);
+            this.cluster_ttp = (double(this.cluster_template_useCount(:, template_mask)) * this.template_ttp(template_mask)) ./ sum(this.cluster_template_useCount(:, template_mask), 2);
             
             progIncrFn('Cluster similarity');
             % computed template_use_count weighted similarity to other templates
             % similar_clusters_i,j = sum_t1 sum_t2 [ template_weight(i, t1) * template_weight(j, t2) * similar_templates(t1, t2) ]
-            m.similar_clusters = m.cluster_template_weight * (m.cluster_template_weight * ks.similar_templates)';
-            if ~isempty(m.similar_templates_recomputed)
-                tw = m.cluster_template_weight;
-                tsim = m.similar_templates_recomputed;
-                tlag = m.similar_templates_best_lag;
+            this.similar_clusters = this.cluster_template_weight * (this.cluster_template_weight * ks.similar_templates)';
+            if ~isempty(this.similar_templates_recomputed)
+                tw = this.cluster_template_weight;
+                tsim = this.similar_templates_recomputed;
+                tlag = this.similar_templates_best_lag;
                 
-                m.similar_clusters_recomputed = tw * tsim * tw';
-                m.similar_clusters_best_lag = round(tw * single(tlag) * tw') .* (m.similar_clusters_recomputed >= 0.1);
+                this.similar_clusters_recomputed = tw * tsim * tw';
+                this.similar_clusters_best_lag = round(tw * single(tlag) * tw') .* (this.similar_clusters_recomputed >= 0.1);
                 
             else
-                m.similar_clusters_recomputed = [];
-                m.similar_clusters_best_lag = zeros(size(m.similar_clusters), 'int16');
+                this.similar_clusters_recomputed = [];
+                this.similar_clusters_best_lag = zeros(size(this.similar_clusters), 'int16');
             end
             if exist('prog', 'var')
                 prog.finish();
             end
         end
         
-        function computeBatchwiseMetrics(m, varargin)
+        function computeBatchwiseMetrics(this, varargin)
             p = inputParser();
             p.addParameter('recompute', false, @islogical);
             p.addParameter('every_n_batches', 10, @islogical);
@@ -405,21 +405,21 @@ classdef KilosortMetrics < handle
             p.parse(varargin{:});
             
             % decide if we need to recompute anything
-            ks = m.ks;
+            ks = this.ks;
             recompute = p.Results.recompute;
             batchesComputed = uint32(1:p.Results.every_n_batches:ks.nBatches)';
-            if ~isequal(batchesComputed, m.batchesComputed)
+            if ~isequal(batchesComputed, this.batchesComputed)
                 recompute = true; % ensure we recompute everything if batch indices have changed
             end
-            if m.has_computed_batchwise && ~p.Results.recompute
+            if this.has_computed_batchwise && ~p.Results.recompute
                 return;
             end
-            m.batchesComputed = batchesComputed;
-            nBatchesComputed = numel(m.batchesComputed);
+            this.batchesComputed = batchesComputed;
+            nBatchesComputed = numel(this.batchesComputed);
             
             average_skipped_batches = p.Results.average_skipped_batches;
             
-            nSteps = 1 + m.nTemplates + m.nClusters;
+            nSteps = 1 + this.nTemplates + this.nClusters;
             initStr = 'Computing batchwise KilosortMetrics for dataset';
             if isempty(p.Results.progressInitializeFn) && isempty(p.Results.progressIncrementFn)
                 prog = npxutils.util.ProgressBar(nSteps, initStr);
@@ -431,7 +431,7 @@ classdef KilosortMetrics < handle
                 progIncrFn = p.Results.progressIncrementFn;
             end
             
-            if recompute || isempty(m.cluster_template_useCount_batchwise)
+            if recompute || isempty(this.cluster_template_useCount_batchwise)
                 progIncrFn('Computing batchwise cluster weighting over templates');
                 batch_each_spike = ks.compute_which_batch(ks.spike_times);
                 % compute batch membership to include all spikes until the next counted batch
@@ -440,72 +440,72 @@ classdef KilosortMetrics < handle
                 %                 [mask_spike_in_batch, batch_ind_each_spike] = ismember(batch_each_spike, m.batchesComputed);
                 
                 mask_spike = mask_spike_in_batch;
-                m.template_useCount_batchwise = accumarray(...
+                this.template_useCount_batchwise = accumarray(...
                     [ks.spike_templates(mask_spike), batch_ind_each_spike(mask_spike)], ...
-                    ones(nnz(mask_spike), 1, 'uint64'), [m.nTemplates, nBatchesComputed]);
+                    ones(nnz(mask_spike), 1, 'uint64'), [this.nTemplates, nBatchesComputed]);
                 
                 [mask_spike_in_cluster, cluster_ind_each_spike] = ismember(ks.spike_clusters, ks.cluster_ids);
                 mask_spike = mask_spike_in_batch & mask_spike_in_cluster;
-                m.cluster_template_useCount_batchwise = accumarray(...
+                this.cluster_template_useCount_batchwise = accumarray(...
                     [cluster_ind_each_spike(mask_spike), ks.spike_templates(mask_spike), batch_ind_each_spike(mask_spike)], ...
-                    ones(nnz(mask_spike), 1, 'uint64'), [m.nClusters, m.nTemplates, nBatchesComputed]);
+                    ones(nnz(mask_spike), 1, 'uint64'), [this.nClusters, this.nTemplates, nBatchesComputed]);
             end
             
-            if recompute || isempty(m.template_centroid_batchwise)
-                template_centroid_batchwise = nan(m.nTemplates, nBatchesComputed, m.nSpatialDims, 'single');
-                template_waveform_batchwise = nan(m.nTemplates, m.nTemplateTimepoints, nBatchesComputed, 'single');
-                template_amplitude_batchwise =  nan(m.nTemplates, nBatchesComputed, 'single');
+            if recompute || isempty(this.template_centroid_batchwise)
+                template_centroid_batchwise = nan(this.nTemplates, nBatchesComputed, this.nSpatialDims, 'single');
+                template_waveform_batchwise = nan(this.nTemplates, this.nTemplateTimepoints, nBatchesComputed, 'single');
+                template_amplitude_batchwise =  nan(this.nTemplates, nBatchesComputed, 'single');
                 
-                for iT = 1:m.nTemplates
+                for iT = 1:this.nTemplates
                     progIncrFn();
                     
                     % 1 x time x channels x batch --> batch x time x channels
                     % these templates are all on all channel_ids_sorted
-                    template_batch_time_channel = permute(m.construct_scaled_template_batchwise(iT, 'batches', m.batchesComputed, ...
+                    template_batch_time_channel = permute(this.construct_scaled_template_batchwise(iT, 'batches', this.batchesComputed, ...
                         'average_skipped_batches', average_skipped_batches), [4 2 3 1]);
                     
                     % some of these can be nan if the template is entirely zero
                     template_centroid_batchwise(iT, :, :) = npxutils.util.computeWaveformImageCentroid(...
-                        template_batch_time_channel, 1:m.nChannelsSorted, m.ks.channel_positions_sorted);
+                        template_batch_time_channel, 1:this.nChannelsSorted, this.ks.channel_positions_sorted);
                     
-                    template_waveform_batchwise(iT, :, :) = template_batch_time_channel(:, :, m.template_waveform_ch(iT))';
+                    template_waveform_batchwise(iT, :, :) = template_batch_time_channel(:, :, this.template_waveform_ch(iT))';
                     
                     % for amplitude, we take the global max range over all channels, not just the best tempalte_waveform_ch
                     template_amplitude_batchwise(iT, :) = max(max(template_batch_time_channel, [], 2) - min(template_batch_time_channel, [], 2), [], 3);
                 end
                 
-                m.template_centroid_batchwise = template_centroid_batchwise;
-                m.template_waveform_batchwise = template_waveform_batchwise;
-                m.template_amplitude_batchwise = template_amplitude_batchwise;
+                this.template_centroid_batchwise = template_centroid_batchwise;
+                this.template_waveform_batchwise = template_waveform_batchwise;
+                this.template_amplitude_batchwise = template_amplitude_batchwise;
             end
             
-            if recompute || isempty(m.cluster_centroid_batchwise)
-                cluster_centroid_batchwise  = nan(m.nClusters, m.nBatchesComputed, m.nSpatialDims, 'single');
-                cluster_waveform_batchwise = nan(m.nClusters, m.nTemplateTimepoints, m.nBatches, 'single');
-                cluster_amplitude_batchwise =  nan(m.nClusters, m.nBatchesComputed, 'single');
+            if recompute || isempty(this.cluster_centroid_batchwise)
+                cluster_centroid_batchwise  = nan(this.nClusters, this.nBatchesComputed, this.nSpatialDims, 'single');
+                cluster_waveform_batchwise = nan(this.nClusters, this.nTemplateTimepoints, this.nBatches, 'single');
+                cluster_amplitude_batchwise =  nan(this.nClusters, this.nBatchesComputed, 'single');
                 
                 % nClusters x nSpatialCoord x nBatches
-                for iC = 1:m.nClusters
+                for iC = 1:this.nClusters
                     progIncrFn();
-                    for iB = 1:m.nBatchesComputed
-                        if any(m.cluster_template_useCount_batchwise(iC, :, iB) > 0)
+                    for iB = 1:this.nBatchesComputed
+                        if any(this.cluster_template_useCount_batchwise(iC, :, iB) > 0)
                             % some weights will be nan where no spikes found for cluster, that's okay as we don't know where the cluster is then anyway
                             % this is a row vector of weights over templates
-                            weights_temp_batch = single(m.cluster_template_useCount_batchwise(iC, :, iB)) ./ sum(m.cluster_template_useCount_batchwise(iC, :, iB), 2);
+                            weights_temp_batch = single(this.cluster_template_useCount_batchwise(iC, :, iB)) ./ sum(this.cluster_template_useCount_batchwise(iC, :, iB), 2);
                             
                             % we have to mask over templates because unusued templates will have NaN centroids and the product will be NaN even where weight is 0
                             mask_template = weights_temp_batch ~= 0;
-                            cluster_centroid_batchwise(iC, iB, :) =  weights_temp_batch(mask_template) * permute(m.template_centroid_batchwise(mask_template, iB, :), [1 3 2]);
+                            cluster_centroid_batchwise(iC, iB, :) =  weights_temp_batch(mask_template) * permute(this.template_centroid_batchwise(mask_template, iB, :), [1 3 2]);
                             
-                            cluster_waveform_batchwise(iC, :, iB) = weights_temp_batch(mask_template) * m.template_waveform_batchwise(mask_template, :, iB);
-                            cluster_amplitude_batchwise(iC, iB) = weights_temp_batch(mask_template) * m.template_amplitude_batchwise(mask_template, iB);
+                            cluster_waveform_batchwise(iC, :, iB) = weights_temp_batch(mask_template) * this.template_waveform_batchwise(mask_template, :, iB);
+                            cluster_amplitude_batchwise(iC, iB) = weights_temp_batch(mask_template) * this.template_amplitude_batchwise(mask_template, iB);
                         end
                     end
                 end
                 
-                m.cluster_centroid_batchwise = cluster_centroid_batchwise;
-                m.cluster_waveform_batchwise = cluster_waveform_batchwise;
-                m.cluster_amplitude_batchwise = cluster_amplitude_batchwise;
+                this.cluster_centroid_batchwise = cluster_centroid_batchwise;
+                this.cluster_waveform_batchwise = cluster_waveform_batchwise;
+                this.cluster_amplitude_batchwise = cluster_amplitude_batchwise;
             end
             
             if exist('prog', 'var')
@@ -513,151 +513,152 @@ classdef KilosortMetrics < handle
             end
         end
         
-        function templates = construct_scaled_template_batchwise(m, template_inds, varargin)
-            templates = m.ks.construct_batchwise_templates(template_inds, varargin{:});
-            templates = templates .* m.template_scale_factor(template_inds);
+        function templates = construct_scaled_template_batchwise(this, template_inds, varargin)
+            templates = this.ks.construct_batchwise_templates(template_inds, varargin{:});
+            templates = templates .* this.template_scale_factor(template_inds);
         end
     end
     
     methods % Dependent prop get impl
-        function n = get.nSpikes(m)
-            n = size(m.spike_times, 1);
+        function n = get.nSpikes(this)
+            n = size(this.spike_times, 1);
         end
         
-        function n = get.nChannelsSorted(m)
-            n = size(m.template_unw, 3);
+        function n = get.nChannelsSorted(this)
+            n = size(this.template_unw, 3);
         end
         
-        function n = get.nTemplates(m)
-            n = size(m.template_unw, 1);
+        function n = get.nTemplates(this)
+            n = size(this.template_unw, 1);
         end
         
-        function n = get.nTemplateTimepoints(m)
-            n = size(m.template_unw, 2);
+        function n = get.nTemplateTimepoints(this)
+            n = size(this.template_unw, 2);
         end
         
-        function n = get.nTemplateChannels(m)
-            n = size(m.template_unw, 3);
+        function n = get.nTemplateChannels(this)
+            n = size(this.template_unw, 3);
         end
         
-        function n = get.nBatches(m)
-            n = m.ks.nBatches;
+        function n = get.nBatches(this)
+            n = this.ks.nBatches;
         end
         
-        function n = get.nBatchesComputed(m)
-            n = numel(m.batchesComputed);
+        function n = get.nBatchesComputed(this)
+            n = numel(this.batchesComputed);
         end
         
-        function n = get.nSpatialDims(m)
-            n = m.channelMap.nSpatialDims;
-            if size(m.ks.channel_positions_sorted, 2) < 2
-                n = size(m.ks.channel_positions_sorted, 2);
+        function n = get.nSpatialDims(this)
+            n = this.channelMap.nSpatialDims;
+            if size(this.ks.channel_positions_sorted, 2) < 2
+                n = size(this.ks.channel_positions_sorted, 2);
             end
         end
         
-        function n = get.nClusters(m)
-            n = size(m.cluster_ids, 1);
+        function n = get.nClusters(this)
+            n = size(this.cluster_ids, 1);
         end
         
-        function n = get.maxTemplatesPerCluster(m)
-            n = size(m.cluster_waveform, 3);
+        function n = get.maxTemplatesPerCluster(this)
+            n = size(this.cluster_waveform, 3);
         end
         
-        function d = get.spike_depth(m)
-            d = m.spike_centroid(:, 2);
+        function d = get.spike_depth(this)
+            d = this.spike_centroid(:, 2);
         end
         
-        function d = get.cluster_depth(m)
-            d = m.cluster_centroid(:, 2);
+        function d = get.cluster_depth(this)
+            d = this.cluster_centroid(:, 2);
         end
         
-        function amp = get.cluster_signed_peak(m)
+        function amp = get.cluster_signed_peak(this)
             % take a min and max over time dimension of the most used cluster waveform
             % and return either the min or the max, depending on which absolute value is larger
-            hi = max(m.cluster_waveform(:, :, 1), [], 2, 'omitnan');
-            lo = min(m.cluster_waveform(:, :, 1), [], 2, 'omitnan');
+            hi = max(this.cluster_waveform(:,:,1), [], 2, 'omitnan');
+            lo = min(this.cluster_waveform(:,:,1), [], 2, 'omitnan');
             
             amp = hi;
             amp(-lo > hi) = lo(-lo > hi);
         end
         
-        function ratio = get.cluster_signed_extr_ratio(m)
+        function ratio = get.cluster_signed_extr_ratio(this)
             % take a min and max over time dimension of the most used cluster waveform
             % and return either the min or the max, depending on which absolute value is larger
-            hi = max(m.cluster_waveform(:, :, 1), [], 2, 'omitnan');
-            lo = min(m.cluster_waveform(:, :, 1), [], 2, 'omitnan');
+            hi = max(this.cluster_waveform(:,:,1), [], 2, 'omitnan');
+            lo = min(this.cluster_waveform(:,:,1), [], 2, 'omitnan');
             
             ratio = hi ./ -lo; % will be positive (typically axonal spikes)
-            m = -lo > hi;
-            ratio(m) = lo(m) ./ hi(m); % will be negative
+            this = -lo > hi;
+            ratio(this) = lo(this) ./ hi(this); % will be negative
         end
         
-        function tvec = get.templateTimeRelative(m)
-            T = int64(m.nTemplateTimepoints);
-            off = int64(m.ks.template_sample_offset);
+        function tvec = get.templateTimeRelative(this)
+            T = int64(this.nTemplateTimepoints);
+            off = int64(this.ks.template_sample_offset);
             start = -off + int64(1);
             stop = start + T - int64(1);
             tvec = (start:stop)';
         end
         
-        function tvec = get.templateTimeRelativeMs(m)
-            tvec = single(m.templateTimeRelative) / m.fs * 1000;
+        function tvec = get.templateTimeRelativeMs(this)
+            tvec = single(this.templateTimeRelative) / this.fs * 1000;
         end
         
-        function tf = get.spike_is_localized(m)
-            tf = m.template_is_localized(m.spike_templates);
+        function tf = get.spike_is_localized(this)
+            tf = this.template_is_localized(this.spike_templates);
         end
         
-        function tf = get.has_computed_batchwise(m)
-            tf = ~isempty(m.template_centroid_batchwise) && ~isempty(m.cluster_centroid_batchwise);
+        function tf = get.has_computed_batchwise(this)
+            tf = ~isempty(this.template_centroid_batchwise) && ~isempty(this.cluster_centroid_batchwise);
         end
         
-        function assertHasKs(m)
-            assert(~isempty(m.ks), 'Must set .ks to KilosortDataset');
+        function assertHasKs(this)
+            assert(~isempty(this.ks), 'Must set .ks to KilosortDataset');
         end
     end
     
     methods % Convenience methods
-        function [channel_ids_unique, channel_ids_by_cluster] = gather_best_channels_multiple_clusters(m, cluster_ids, n_best_each)
+        function [channel_ids_unique, channel_ids_by_cluster] = ...
+                gather_best_channels_multiple_clusters(this, cluster_ids, n_best_each)
             if nargin < 3
                 n_best_each = 24;
             end
             
-            cluster_inds = m.lookup_clusterIds(cluster_ids);
+            cluster_inds = this.lookup_clusterIds(cluster_ids);
             
-            channel_ids_by_cluster = m.cluster_best_channels(cluster_inds, 1:n_best_each);
+            channel_ids_by_cluster = this.cluster_best_channels(cluster_inds, 1:n_best_each);
             channel_ids_unique = unique(channel_ids_by_cluster(:));
         end
     end
     
     methods % Cluster distance stats
-        function cc_dist = computeClusterDistanceMatrix(m, varargin)
+        function cc_dist = computeClusterDistanceMatrix(this, varargin)
             p = inputParser();
-            p.addParameter('cluster_ids', m.cluster_ids, @isvector);
+            p.addParameter('cluster_ids', this.cluster_ids, @isvector);
             p.parse(varargin{:});
             
-            cluster_inds = m.lookup_clusterIds(p.Results.cluster_ids);
+            cluster_inds = this.lookup_clusterIds(p.Results.cluster_ids);
             
-            pos = m.cluster_centroid(cluster_inds, :);
+            pos = this.cluster_centroid(cluster_inds, :);
             cc_dist = squareform(pdist(pos));
         end
     end
     
     methods % Cluster similarity statistics and CCGs
-        function [similar_cluster_ids, similarity, best_lag] = computeSimilarClusters(m, cluster_ids, varargin)
+        function [similar_cluster_ids, similarity, best_lag] = computeSimilarClusters(this, cluster_ids, varargin)
             p = inputParser();
-            p.addParameter('max_similar', m.nClusters-1, @isscalar);
+            p.addParameter('max_similar', this.nClusters-1, @isscalar);
             p.addParameter('min_similarity', 0, @isscalar);
             p.parse(varargin{:});
             
             cluster_ids = npxutils.util.makecol(cluster_ids);
-            [cluster_inds, ~] = m.lookup_clusterIds(cluster_ids);
-            if isempty(m.similar_clusters_recomputed)
-                sim = m.similar_clusters;
+            [cluster_inds, ~] = this.lookup_clusterIds(cluster_ids);
+            if isempty(this.similar_clusters_recomputed)
+                sim = this.similar_clusters;
             else
-                sim = m.similar_clusters_recomputed;
+                sim = this.similar_clusters_recomputed;
             end
-            lags = m.similar_clusters_best_lag;
+            lags = this.similar_clusters_best_lag;
             
             [similar_clusters, which_input_clusters] = max(sim(:, cluster_inds), [], 2);
             similar_clusters(cluster_inds) = -1; % clear the self-similarity terms within group so they aren't considered
@@ -668,7 +669,7 @@ classdef KilosortMetrics < handle
             [similarity,  similar_cluster_inds] = maxk(similar_clusters, max_similar);
             mask = similarity >= min_similarity;
             similar_cluster_inds = similar_cluster_inds(mask);
-            similar_cluster_ids = m.cluster_ids(similar_cluster_inds);
+            similar_cluster_ids = this.cluster_ids(similar_cluster_inds);
             similarity = similarity(mask);
             
             % figure out best lag using the
@@ -681,28 +682,28 @@ classdef KilosortMetrics < handle
             end
         end
         
-        function best_lag = computeBestLagForSimilarClusters(m, cluster_ids, similar_cluster_ids)
-            if isempty(m.similar_clusters_best_lag) || isempty(cluster_ids) || isempty(similar_cluster_ids)
+        function best_lag = computeBestLagForSimilarClusters(this, cluster_ids, similar_cluster_ids)
+            if isempty(this.similar_clusters_best_lag) || isempty(cluster_ids) || isempty(similar_cluster_ids)
                 best_lag = zeros(size(similar_cluster_ids), 'int16');
                 return;
             end
             
-            cluster_inds = m.lookup_clusterIds(cluster_ids);
-            sim_cluster_inds = m.lookup_clusterIds(similar_cluster_ids);
+            cluster_inds = this.lookup_clusterIds(cluster_ids);
+            sim_cluster_inds = this.lookup_clusterIds(similar_cluster_ids);
             
-            if isempty(m.similar_clusters_recomputed)
-                sim = m.similar_clusters(sim_cluster_inds, cluster_inds);
+            if isempty(this.similar_clusters_recomputed)
+                sim = this.similar_clusters(sim_cluster_inds, cluster_inds);
             else
-                sim = m.similar_clusters_recomputed(sim_cluster_inds, cluster_inds);
+                sim = this.similar_clusters_recomputed(sim_cluster_inds, cluster_inds);
             end
-            lags = m.similar_clusters_best_lag(sim_cluster_inds, cluster_inds);
+            lags = this.similar_clusters_best_lag(sim_cluster_inds, cluster_inds);
             
             [~, which_primary_cluster] = max(sim, [], 2);
             lag_idx = sub2ind(size(lags), (1:numel(sim_cluster_inds))', which_primary_cluster);
             best_lag = lags(lag_idx);
         end
         
-        function [K, bins] = computeCCG(m, cluster_ids1, cluster_ids2, varargin)
+        function [K, bins] = computeCCG(this, cluster_ids1, cluster_ids2, varargin)
             p = inputParser();
             p.addParameter('windowMs', 25, @isscalar);
             p.addParameter('binMs', 1, @isscalar);
@@ -713,13 +714,13 @@ classdef KilosortMetrics < handle
             binMs = p.Results.binMs;
             include_cutoff_spikes = p.Results.include_cutoff_spikes;
             
-            st1 = m.internal_getSpikes(cluster_ids1, include_cutoff_spikes);
-            st2 = m.internal_getSpikes(cluster_ids2, include_cutoff_spikes);
+            st1 = this.internal_getSpikes(cluster_ids1, include_cutoff_spikes);
+            st2 = this.internal_getSpikes(cluster_ids2, include_cutoff_spikes);
             
-            [K, bins] = m.internal_computeCCG(st1, st2, windowMs, binMs);
+            [K, bins] = this.internal_computeCCG(st1, st2, windowMs, binMs);
         end
         
-        function [K, bins] = computeACG(m, cluster_ids, varargin)
+        function [K, bins] = computeACG(this, cluster_ids, varargin)
             p = inputParser();
             p.addParameter('windowMs', 25, @isscalar);
             p.addParameter('binMs', 1, @isscalar);
@@ -730,29 +731,29 @@ classdef KilosortMetrics < handle
             binMs = p.Results.binMs;
             include_cutoff_spikes = p.Results.include_cutoff_spikes;
             
-            st = m.internal_getSpikes(cluster_ids, include_cutoff_spikes);
-            [K, bins] = m.internal_computeCCG(st, [], windowMs, binMs);
+            st = this.internal_getSpikes(cluster_ids, include_cutoff_spikes);
+            [K, bins] = this.internal_computeCCG(st, [], windowMs, binMs);
         end
         
-        function st = internal_getSpikes(m, cluster_ids, include_cutoff_spikes)
+        function st = internal_getSpikes(this, cluster_ids, include_cutoff_spikes)
             if isscalar(cluster_ids)
-                mask = m.ks.spike_clusters == cluster_ids;
+                mask = this.ks.spike_clusters == cluster_ids;
             else
-                mask = ismember(m.ks.spike_clusters, cluster_ids);
+                mask = ismember(this.ks.spike_clusters, cluster_ids);
             end
-            st = m.ks.spike_times(mask);
+            st = this.ks.spike_times(mask);
             
             if include_cutoff_spikes
                 if isscalar(cluster_ids)
-                    mask = m.ks.cutoff_spike_clusters == cluster_ids;
+                    mask = this.ks.cutoff_spike_clusters == cluster_ids;
                 else
-                    mask = ismember(m.ks.cutoff_spike_clusters, cluster_ids);
+                    mask = ismember(this.ks.cutoff_spike_clusters, cluster_ids);
                 end
-                st = sort(cat(1, st, m.ks.cutoff_spike_times(mask)));
+                st = sort(cat(1, st, this.ks.cutoff_spike_times(mask)));
             end
         end
         
-        function [K, bins] = internal_computeCCG(m, st1, st2, windowMs, binWidthMs)
+        function [K, bins] = internal_computeCCG(this, st1, st2, windowMs, binWidthMs)
             % this is based on Marius's ccg() method
             
             if isempty(st2)
@@ -769,8 +770,8 @@ classdef KilosortMetrics < handle
             bins = (-dt_ms : binWidthMs : dt_ms)';
             
             % in samples
-            dt = dt_ms * m.fs / 1000;
-            tbin = binWidthMs * m.fs / 1000;
+            dt = dt_ms * this.fs / 1000;
+            tbin = binWidthMs * this.fs / 1000;
             
             ilow = 1;
             ihigh = 1;
@@ -803,15 +804,15 @@ classdef KilosortMetrics < handle
     end
     
     methods % Computing / plotting stability over time
-        function driftDistanceByCluster = computeClusterDriftDistance(m)
-            driftDistanceByCluster = nan(m.nClusters, 1);
-            for iC = 1:m.nClusters
-                centroids = permute(m.cluster_centroid_batchwise(iC, :, :), [2 3 1]); % nBatch x spatial dim
+        function driftDistanceByCluster = computeClusterDriftDistance(this)
+            driftDistanceByCluster = nan(this.nClusters, 1);
+            for iC = 1:this.nClusters
+                centroids = permute(this.cluster_centroid_batchwise(iC, :, :), [2 3 1]); % nBatch x spatial dim
                 driftDistanceByCluster(iC) = max(pdist2(centroids, centroids, 'euclidean', 'Largest', 1));
             end
         end
         
-        function [fracBinsValid, fracBinsValidExcludingEdges] = computeClusterValidTimeSpan(m, varargin)
+        function [fracBinsValid, fracBinsValidExcludingEdges] = computeClusterValidTimeSpan(this, varargin)
             % fracBinsValid is the total fraction of bins that had at least threshSpikes
             % Then we divide up the day into any zeros at the beginning and end of the file, and the middle region between these bands of zeros
             
@@ -821,7 +822,7 @@ classdef KilosortMetrics < handle
             p.KeepUnmatched = true;
             p.parse(varargin{:});
             
-            [counts, ~] = m.computeClusterBinnedCounts(p.Unmatched);
+            [counts, ~] = this.computeClusterBinnedCounts(p.Unmatched);
             valid = imclose(counts >= p.Results.threshSpikes, ones(1, p.Results.binsClose));
             
             fracBinsValid = mean(valid, 2);
@@ -837,7 +838,7 @@ classdef KilosortMetrics < handle
             end
         end
         
-        function [counts, tvec] = computeClusterBinnedCounts(m, varargin)
+        function [counts, tvec] = computeClusterBinnedCounts(this, varargin)
             p = inputParser();
             p.addParameter('cluster_ids', [], @isvector);
             p.addParameter('tsi', [], @(x) isempty(x) || isa(x, 'npxutils.TrialSegmentationInfo')); % to mark trial boundaries
@@ -847,19 +848,19 @@ classdef KilosortMetrics < handle
             
             tsi = p.Results.tsi;
             if ~isempty(tsi) && p.Results.maskRegionsOutsideTrials
-                mask = m.computeSpikeMaskWithinTrials(tsi);
+                mask = this.computeSpikeMaskWithinTrials(tsi);
             else
-                mask = true(numel(m.spike_times), 1);
+                mask = true(numel(this.spike_times), 1);
             end
             if ~isempty(p.Results.cluster_ids)
                 cluster_ids = p.Results.cluster_ids;
-                mask = mask & ismember(m.spike_clusters, p.Results.cluster_ids);
+                mask = mask & ismember(this.spike_clusters, p.Results.cluster_ids);
             else
-                cluster_ids = m.cluster_ids;
+                cluster_ids = this.cluster_ids;
             end
             
-            spikeTimes = double(m.spike_times(mask)) / m.ks.fsAP; % convert to seconds
-            spikeClu = m.spike_clusters(mask); %#ok<*PROPLC>
+            spikeTimes = double(this.spike_times(mask)) / this.ks.fsAP; % convert to seconds
+            spikeClu = this.spike_clusters(mask); %#ok<*PROPLC>
             
             nClu = numel(cluster_ids);
             
@@ -880,8 +881,8 @@ classdef KilosortMetrics < handle
             % keep only bins within trial regions
             if ~isempty(tsi)
                 mask = false(numel(tvec), 1);
-                tvec_samples = tvec * m.fs;
-                bin_width_samples = p.Results.binWidth * m.fs;
+                tvec_samples = tvec * this.fs;
+                bin_width_samples = p.Results.binWidth * this.fs;
                 [idxStart, idxStop, ~] = tsi.computeActiveRegions();
                 for iR = 1:numel(idxStart)
                     mask(tvec_samples >= idxStart(iR) & tvec_samples+bin_width_samples <= idxStop(iR)) = true;
@@ -891,29 +892,29 @@ classdef KilosortMetrics < handle
             end
         end
         
-        function meanFR = computeClusterMeanFR(m, varargin)
+        function meanFR = computeClusterMeanFR(this, varargin)
             p = inputParser();
             p.addParameter('binWidth', 10, @isscalar);
             p.KeepUnmatched = true;
             p.parse(varargin{:});
             
-            counts = m.computeClusterBinnedCounts('binWidth', p.Results.binWidth, varargin{:});
+            counts = this.computeClusterBinnedCounts('binWidth', p.Results.binWidth, varargin{:});
             meanFR = mean(counts, 2) / p.Results.binWidth;
         end
         
         
-        function mask = computeSpikeMaskWithinTrials(m, tsi)
-            mask = false(numel(m.spike_times), 1);
+        function mask = computeSpikeMaskWithinTrials(this, tsi)
+            mask = false(numel(this.spike_times), 1);
             [idxStart, idxStop, ~] = tsi.computeActiveRegions();
             
             for iR = 1:numel(idxStart)
-                mask(m.spike_times >= idxStart(iR) & m.spike_times <= idxStop(iR)) = true;
+                mask(this.spike_times >= idxStart(iR) & this.spike_times <= idxStop(iR)) = true;
             end
         end
     end
     
     methods % Plotting drift maps
-        function [probe_offsets, time_samples] = computeProbeDrift(m, varargin)
+        function [probe_offsets, time_samples] = computeProbeDrift(this, varargin)
             % compute a single estimate of probe dist along a specific dimension (typically 2)
             p = inputParser();
             p.addParameter('spatial_dimension', 2, @isscalar);
@@ -934,20 +935,20 @@ classdef KilosortMetrics < handle
             spikeAmpStdThresh = erfinv(2*(spikeAmpQuantile-0.5));
             drift_dim = p.Results.spatial_dimension;
             D = p.Results.depth_bin; % um
-            T = p.Results.time_bin_sec * m.ks.fsAP; % samples
+            T = p.Results.time_bin_sec * this.ks.fsAP; % samples
             weight_by_amp = p.Results.weight_by_amp;
             max_drift = p.Results.max_drift;
             
-            time_samples = uint64(0:T:m.spike_times(end)-T)';
+            time_samples = uint64(0:T:this.spike_times(end)-T)';
             n_time_bins = numel(time_samples);
             
-            spikeTimes = m.spike_times;
-            spikeAmps = m.spike_amplitude;
-            spikePos = m.spike_centroid(:, drift_dim);
+            spikeTimes = this.spike_times;
+            spikeAmps = this.spike_amplitude;
+            spikePos = this.spike_centroid(:, drift_dim);
             
             % mask out spikes whose amplitude is >= mean + spikeAmpStdThresh * std
             amp_thresh = mean(spikeAmps) + spikeAmpStdThresh*std(spikeAmps);
-            mask_spikes = m.spike_is_localized & spikeAmps > amp_thresh; % large spikes in current segment
+            mask_spikes = this.spike_is_localized & spikeAmps > amp_thresh; % large spikes in current segment
             spikeAmps = spikeAmps(mask_spikes);
             spikePos = spikePos(mask_spikes);
             spikeTimes = spikeTimes(mask_spikes);
@@ -985,11 +986,11 @@ classdef KilosortMetrics < handle
                 else
                     spike_mask_args = {'spike_mask', mask_spikes};
                 end
-                m.plotSpikesByAmplitude('spatial_dimension', drift_dim, 'timeInSeconds', p.Results.timeInSeconds, ...
+                this.plotSpikesByAmplitude('spatial_dimension', drift_dim, 'timeInSeconds', p.Results.timeInSeconds, ...
                     spike_mask_args{:}, 'localizedOnly',true, 'markerSize', p.Results.markerSize);
                 
                 if p.Results.timeInSeconds
-                    time_plot = [time_samples / m.ks.fsAP; (time_samples(end) + T) / m.ks.fsAP];
+                    time_plot = [time_samples / this.ks.fsAP; (time_samples(end) + T) / this.ks.fsAP];
                 else
                     time_plot = [time_samples; time_samples(end)+T];
                 end
@@ -1003,7 +1004,7 @@ classdef KilosortMetrics < handle
             
         end
         
-        function plotClusterDriftmap(m, varargin)
+        function plotClusterDriftmap(this, varargin)
             p = inputParser();
             p.addParameter('cluster_ids', [], @isvector);
             p.addParameter('spike_mask', [], @(x) isempty(x) || isvector(x));
@@ -1029,20 +1030,20 @@ classdef KilosortMetrics < handle
             p.parse(varargin{:});
             
             mask = p.Results.spike_mask;
-            if isempty(mask), mask = true(m.nSpikes, 1); end
+            if isempty(mask), mask = true(this.nSpikes, 1); end
             tsi = p.Results.tsi;
             if ~isempty(tsi) && (p.Results.maskRegionsOutsideTrials || p.Results.exciseRegionsOutsideTrials)
-                mask = mask & m.computeSpikeMaskWithinTrials(tsi);
+                mask = mask & this.computeSpikeMaskWithinTrials(tsi);
             end
             if p.Results.localizedOnly
-                mask = mask & m.spike_is_localized;
+                mask = mask & this.spike_is_localized;
             end
             if ~isempty(p.Results.cluster_ids)
-                mask = mask & ismember(m.spike_clusters, p.Results.cluster_ids);
+                mask = mask & ismember(this.spike_clusters, p.Results.cluster_ids);
             end
             if p.Results.minAmpQuantile > 0
-                thresh = quantile(m.spike_amplitude, p.Results.minAmpQuantile);
-                mask = mask & m.spike_amplitude >= thresh;
+                thresh = quantile(this.spike_amplitude, p.Results.minAmpQuantile);
+                mask = mask & this.spike_amplitude >= thresh;
             end
             
             showSmooth = p.Results.showSmooth;
@@ -1055,21 +1056,21 @@ classdef KilosortMetrics < handle
             end
             colorByAmplitude = p.Results.colorByAmp;
             
-            spikeTimes = m.spike_times(mask);
+            spikeTimes = this.spike_times(mask);
             if p.Results.exciseRegionsOutsideTrials
                 timeShifts = tsi.computeShiftsExciseRegionsOutsideTrials();
                 spikeTimes = timeShifts.shiftTimes(spikeTimes);
             end
-            spikeTimes = double(spikeTimes) / m.ks.fsAP; % convert to seconds
-            spikeAmps = m.spike_amplitude(mask);
-            spikeYpos = m.spike_depth(mask);
-            spikeClu = m.spike_clusters(mask); %#ok<*PROPLC>
+            spikeTimes = double(spikeTimes) / this.ks.fsAP; % convert to seconds
+            spikeAmps = this.spike_amplitude(mask);
+            spikeYpos = this.spike_depth(mask);
+            spikeClu = this.spike_clusters(mask); %#ok<*PROPLC>
             ampMax = quantile(spikeAmps, 0.95);
             
             uClu = unique(spikeClu);
-            clusterInds = m.lookup_clusterIds(uClu);
+            clusterInds = this.lookup_clusterIds(uClu);
             nClu = numel(uClu);
-            clusterAmps = m.cluster_amplitude(clusterInds);
+            clusterAmps = this.cluster_amplitude(clusterInds);
             [~, clusterAmpsSortOrder] = sort(clusterAmps, 'ascend');
             
             bgcolor = [0.92 0.92 0.95];
@@ -1120,7 +1121,7 @@ classdef KilosortMetrics < handle
                 end
                 
                 ud = struct('cluster_id', uClu(iC), 'cluster_amplitude', sprintf('%.1f uV', clusterAmps(iC)), ...
-                    'cluster_is_localized', m.cluster_is_localized(clusterInds(iC)), ...
+                    'cluster_is_localized', this.cluster_is_localized(clusterInds(iC)), ...
                     'xname', 'Time', 'yname', 'Depth', 'xunits', 'sec', 'yunits', 'um');
                 
                 if showSmooth || onlyGaps
@@ -1222,7 +1223,7 @@ classdef KilosortMetrics < handle
         % Inputs: spikeTimes, spikeAmps, spikeYpos - names self explanatory
         %         opt - optional, empty by default; 'mark' - will mark detected drifts, 'show' - will generate a different plot,
         %               where only large spikes are used, and the detection of drift locations is demonstrated
-        function info = plotDriftmap(m, varargin)
+        function info = plotDriftmap(this, varargin)
             % Note: this is pretty much copied wholesale from cortex-lab/spikes, with some nice annotations added on
             
             p = inputParser();
@@ -1273,27 +1274,27 @@ classdef KilosortMetrics < handle
             
             % mask
             mask = p.Results.spike_mask;
-            if isempty(mask), mask = true(m.nSpikes, 1); end
+            if isempty(mask), mask = true(this.nSpikes, 1); end
             if ~isempty(tsi) && (p.Results.maskRegionsOutsideTrials || p.Results.exciseRegionsOutsideTrials)
-                mask = mask & m.computeSpikeMaskWithinTrials(tsi);
+                mask = mask & this.computeSpikeMaskWithinTrials(tsi);
             end
             if p.Results.localizedOnly
-                mask = mask & m.spike_is_localized;
+                mask = mask & this.spike_is_localized;
             end
             if ~isempty(p.Results.cluster_ids)
-                mask = mask & ismember(m.spike_clusters, p.Results.cluster_ids);
+                mask = mask & ismember(this.spike_clusters, p.Results.cluster_ids);
             end
             
             % this would be present if we're looking at the cleaned file where times have already
             % been shifted around to excise gaps
             timeShiftsFromRaw = [];
-            if ~isempty(m.concatenationInfo)
-                timeShiftsAlreadyApplied = m.concatenationInfo.timeShifts;
+            if ~isempty(this.concatenationInfo)
+                timeShiftsAlreadyApplied = this.concatenationInfo.timeShifts;
             else
                 timeShiftsAlreadyApplied = [];
             end
             
-            spikeTimes = m.spike_times(mask);
+            spikeTimes = this.spike_times(mask);
             
             % this allows us to apply new time shifts to the data to see what the effect would be
             if p.Results.exciseRegionsOutsideTrials
@@ -1311,19 +1312,19 @@ classdef KilosortMetrics < handle
                 mask(mask) = mask_subselect;
             end
             
-            spikeTimesSeconds = double(spikeTimes) / m.fs;
+            spikeTimesSeconds = double(spikeTimes) / this.fs;
             if timeInSeconds
                 spikeTimes = spikeTimesSeconds; % convert to seconds
             end
-            spikeAmps = m.spike_amplitude(mask);
-            spikeYpos = m.spike_depth(mask);
+            spikeAmps = this.spike_amplitude(mask);
+            spikeYpos = this.spike_depth(mask);
             
-            m.plotSpikesByAmplitude('spike_mask', mask, 'time_shifts', timeShiftsAppliedHere, 'nAmpBins', p.Results.nAmpBins, ...
+            this.plotSpikesByAmplitude('spike_mask', mask, 'time_shifts', timeShiftsAppliedHere, 'nAmpBins', p.Results.nAmpBins, ...
                 'ampRange', p.Results.ampRange, 'timeInSeconds', timeInSeconds, ...
                 'localizedOnly', p.Results.localizedOnly, 'tsi', p.Results.tsi, 'xOffset', xOffset, ...
                 'markerSize', p.Results.markerSize, 'configureDataTips', p.Results.configureDataTips);
             
-            ylim(m.channelMap.ylim);
+            ylim(this.channelMap.ylim);
             set(gca, 'XLimSpec', 'tight');
             box off;
             
@@ -1336,7 +1337,7 @@ classdef KilosortMetrics < handle
                     I = spikeAmps > mean(tmp) + spikeAmpStdThresh*std(tmp) & spikeYpos >= d & spikeYpos < d+segDepth; % large spikes in current segment
                     driftEvents = detectDriftEvents(spikeTimesSeconds(I), spikeYpos(I), strcmp(opt, 'show'));
                     if ~timeInSeconds && ~isempty(driftEvents)
-                        driftEvents(:, 1) = driftEvents(:,1) * m.fs;
+                        driftEvents(:, 1) = driftEvents(:,1) * this.fs;
                     end
                     driftEventsAll{iD} = driftEvents;
                     if p.Results.plotDriftEventsInline && ~isempty(driftEvents)
@@ -1390,26 +1391,26 @@ classdef KilosortMetrics < handle
             end
             
             if p.Results.markBoundaries
-                if isempty(m.concatenationInfo)
+                if isempty(this.concatenationInfo)
                     warning('KilosortDataset had empty concatenationInfo, cannot mark excision boundaries');
                 else
                     % the concatenation info struct might contain info on the applied time shifts
                     % but we want them to be shown in the already time shifted time axis
-                    m.concatenationInfo.markExcisionBoundaries('sample_window', sample_window, ...
+                    this.concatenationInfo.markExcisionBoundaries('sample_window', sample_window, ...
                         'timeInSeconds', timeInSeconds, ...
                         'time_shifts', timeShiftsFromRaw, 'xOffset', xOffset);
                 end
             end
             
             if p.Results.exciseRegionsOutsideTrials && p.Results.markBoundaries
-                m.markExcisionBoundaries(timeShiftsAppliedHere, 'sample_window', sample_window, ...
+                this.markExcisionBoundaries(timeShiftsAppliedHere, 'sample_window', sample_window, ...
                     'timeInSeconds', timeInSeconds, 'time_shifts', timeShiftsAppliedHere, ...
                     'xOffset', xOffset);
             end
-            if isempty(m.concatenationInfo)
+            if isempty(this.concatenationInfo)
                 warning('KilosortDataset had empty concatenationInfo, cannot mark concatenation boundaries');
             else
-                m.concatenationInfo.markConcatenatedFileBoundaries('sample_window', sample_window, ...
+                this.concatenationInfo.markConcatenatedFileBoundaries('sample_window', sample_window, ...
                     'timeInSeconds', timeInSeconds, ...
                     'time_shifts', timeShiftsAppliedHere, 'xOffset', xOffset);
             end
@@ -1499,7 +1500,7 @@ classdef KilosortMetrics < handle
             end
         end
         
-        function plotSpikesByAmplitude(m, varargin)
+        function plotSpikesByAmplitude(this, varargin)
             % this plots each clusters' spikes in their own color, either as markers or as a line with smoothing
             p = inputParser();
             p.addParameter('spatial_dimension', 2, @isscalar);
@@ -1517,13 +1518,13 @@ classdef KilosortMetrics < handle
             
             mask = p.Results.spike_mask;
             if isempty(mask)
-                mask = true(numel(m.spike_times), 1);
+                mask = true(numel(this.spike_times), 1);
             end
             if p.Results.localizedOnly
-                mask = mask & m.spike_is_localized;
+                mask = mask & this.spike_is_localized;
             end
             timeShifts =p.Results.time_shifts;
-            spikeTimes = m.spike_times(mask);
+            spikeTimes = this.spike_times(mask);
             spikeTimesOrig = spikeTimes;
             timeInSeconds = p.Results.timeInSeconds;
             spatial_dim = p.Results.spatial_dimension;
@@ -1533,11 +1534,11 @@ classdef KilosortMetrics < handle
             end
             
             if timeInSeconds
-                spikeTimes = double(spikeTimes) / m.ks.fsAP; % convert to seconds
+                spikeTimes = double(spikeTimes) / this.ks.fsAP; % convert to seconds
             end
-            spikeClusters = m.spike_clusters(mask);
-            spikeAmps = m.spike_amplitude(mask);
-            spikeYpos = m.spike_centroid(mask, spatial_dim);
+            spikeClusters = this.spike_clusters(mask);
+            spikeAmps = this.spike_amplitude(mask);
+            spikeYpos = this.spike_centroid(mask, spatial_dim);
             
             nAmpBins = p.Results.nAmpBins;
             if ~isempty(p.Results.ampRange)
@@ -1574,9 +1575,9 @@ classdef KilosortMetrics < handle
                     end
                 end
                 
-                if ~isempty(m.concatenationInfo) && m.concatenationInfo.nDatasets > 1
+                if ~isempty(this.concatenationInfo) && this.concatenationInfo.nDatasets > 1
                     % show original file name and ind
-                    [fileInd, origInd] = m.lookup_sampleIndexInConcatenatedFile(spikeTimesOrig(theseSpikes));
+                    [fileInd, origInd] = this.lookup_sampleIndexInConcatenatedFile(spikeTimesOrig(theseSpikes));
                     
                     % grab associated file name (too slow)
                     %                     fileNames = strings(numel(spikeTimesOrig), 1);
@@ -1600,9 +1601,9 @@ classdef KilosortMetrics < handle
             h.Motion = 'horizontal';
         end
         
-        function [fileInds, origSampleInds] = lookup_sampleIndexInConcatenatedFile(m, inds)
-            if ~isempty(m.concatenationInfo)
-                [fileInds, origSampleInds] = m.concatenationInfo.lookup_sampleIndexInSourceFiles(inds);
+        function [fileInds, origSampleInds] = lookup_sampleIndexInConcatenatedFile(this, inds)
+            if ~isempty(this.concatenationInfo)
+                [fileInds, origSampleInds] = this.concatenationInfo.lookup_sampleIndexInSourceFiles(inds);
             else
                 fileInds = ones(size(inds));
                 origSampleInds = inds;
@@ -1611,17 +1612,17 @@ classdef KilosortMetrics < handle
     end
     
     methods % Cluster amplitudes vs. time
-        function h = plotClusterAmplitudeVsTime(m, cluster_ids, varargin)
-            [tf, which_cluster] = ismember(m.spike_clusters, cluster_ids);
+        function h = plotClusterAmplitudeVsTime(this, cluster_ids, varargin)
+            [tf, which_cluster] = ismember(this.spike_clusters, cluster_ids);
             spike_inds = find(tf);
             which_cluster = which_cluster(tf);
-            value = m.spike_amplitude(tf);
+            value = this.spike_amplitude(tf);
             
-            h = m.internal_plotSpikeVsTime(spike_inds, value, 'color', which_cluster, 'valueLabel', 'amplitude', ...
+            h = this.internal_plotSpikeVsTime(spike_inds, value, 'color', which_cluster, 'valueLabel', 'amplitude', ...
                 'valueFormat', '%.01f', 'valueUnits', 'uV', varargin{:}); %#ok<FNDSB>
         end
         
-        function h = internal_plotSpikeVsTime(m, spike_inds, spike_value, varargin)
+        function h = internal_plotSpikeVsTime(this, spike_inds, spike_value, varargin)
             p = inputParser();
             p.addParameter('color', [], @(x) true); % can be N x 1 or single color / value to map into linear colormap
             p.addParameter('size', 4^2, @isvector); % can be N x 1 or single size
@@ -1637,19 +1638,19 @@ classdef KilosortMetrics < handle
             
             tsi = p.Results.tsi;
             if ~isempty(tsi) && (p.Results.maskRegionsOutsideTrials || p.Results.exciseRegionsOutsideTrials)
-                mask = m.computeSpikeMaskWithinTrials(tsi);
+                mask = this.computeSpikeMaskWithinTrials(tsi);
                 spike_inds = spike_inds(mask);
                 spike_value = spike_value(mask);
             end
-            spike_clusters =m.spike_clusters(spike_inds);
-            spike_times = m.spike_times(spike_inds);
+            spike_clusters =this.spike_clusters(spike_inds);
+            spike_times = this.spike_times(spike_inds);
             
             if p.Results.exciseRegionsOutsideTrials
                 timeShifts = tsi.computeShiftsExciseRegionsOutsideTrials();
                 spike_times = timeShifts.shiftTimes(spike_times);
             end
             if p.Results.timeInSeconds
-                spike_times = double(spike_times) / m.ks.fsAP; % convert to seconds
+                spike_times = double(spike_times) / this.ks.fsAP; % convert to seconds
             end
             
             color = p.Results.color;
@@ -1724,64 +1725,64 @@ classdef KilosortMetrics < handle
     
     methods % Plotting cluster waveforms
         
-        function [clusterInds, cluster_ids] = lookup_clusterIds(m, cluster_ids)
+        function [clusterInds, cluster_ids] = lookup_clusterIds(this, cluster_ids)
             if islogical(cluster_ids)
-                cluster_ids = m.cluster_ids(cluster_ids);
+                cluster_ids = this.cluster_ids(cluster_ids);
             end
-            [tf, clusterInds] = ismember(cluster_ids, m.cluster_ids);
+            [tf, clusterInds] = ismember(cluster_ids, this.cluster_ids);
             assert(all(tf), 'Some cluster ids were not found in ds.clusterids');
         end
         
-        function sortedChannelInds = lookup_sortedChannelIds(m, channel_ids)
+        function sortedChannelInds = lookup_sortedChannelIds(this, channel_ids)
             % lookup channel inds into the subset of sorted channels passed to kilosort
-            [tf, sortedChannelInds] = ismember(channel_ids, m.channel_ids_sorted);
+            [tf, sortedChannelInds] = ismember(channel_ids, this.channel_ids_sorted);
             assert(all(tf(:)), 'Some cluster ids were not found in m.cluster_ids');
         end
         
-        function [channelInds, channel_ids] = lookup_channelIds(m, channel_ids)
+        function [channelInds, channel_ids] = lookup_channelIds(this, channel_ids)
             % lookup channel Inds in the full channelMap, not just sorted channels
-            [channelInds, channel_ids] = m.channelMap.lookup_channelIds(channel_ids);
+            [channelInds, channel_ids] = this.channelMap.lookup_channelIds(channel_ids);
         end
         
-        function cluster_templates = buildClusterTemplateScaled(m, varargin)
+        function cluster_templates = buildClusterTemplateScaled(this, varargin)
             p = inputParser();
-            p.addParameter('cluster_ids', m.cluster_ids, @isvector);
+            p.addParameter('cluster_ids', this.cluster_ids, @isvector);
             p.parse(varargin{:});
             
-            clusterInds = m.lookup_clusterIds(p.Results.cluster_ids);
-            templateInds = m.cluster_template_mostUsed(clusterInds);
-            cluster_templates = m.template_scaled(templateInds, :, :);
+            clusterInds = this.lookup_clusterIds(p.Results.cluster_ids);
+            templateInds = this.cluster_template_mostUsed(clusterInds);
+            cluster_templates = this.template_scaled(templateInds, :, :);
         end
         
-        function plotClusterImage(m, cluster_ids, varargin)
-            clusterInds = m.lookup_clusterIds(cluster_ids);
-            templateLists = m.cluster_template_list(clusterInds);
+        function plotClusterImage(this, cluster_ids, varargin)
+            clusterInds = this.lookup_clusterIds(cluster_ids);
+            templateLists = this.cluster_template_list(clusterInds);
             templateInds = cat(1, templateLists{:});
-            m.plotTemplateImage(templateInds,  varargin{:});
+            this.plotTemplateImage(templateInds,  varargin{:});
         end
         
-        function channel_ids_by_template = plotTemplateImage(m, templateInds, varargin)
-            channel_ids_by_template = m.plotTemplateImageInternal(templateInds, varargin{:});
+        function channel_ids_by_template = plotTemplateImage(this, templateInds, varargin)
+            channel_ids_by_template = this.plotTemplateImageInternal(templateInds, varargin{:});
         end
         
-        function channel_ids_by_template = plotTemplateImageBatchwise(m, templateInds, varargin)
-            channel_ids_by_template = m.plotTemplateImageInternal(templateInds, 'batchwise', true, varargin{:});
+        function channel_ids_by_template = plotTemplateImageBatchwise(this, templateInds, varargin)
+            channel_ids_by_template = this.plotTemplateImageInternal(templateInds, 'batchwise', true, varargin{:});
         end
         
-        function cmap = getDefaultLinearColormap(~, N)
+        function cmap = getDefaultLinearColormap(this, N) %#ok<INUSL>
             %             cmap = npxutils.util.colorcet('CBL2', 'N', N);
             cmap = npxutils.util.cmocean('thermal', N);
         end
         
-        function cmap = getDefaultBatchColormap(m, nBatch)
+        function cmap = getDefaultBatchColormap(this, nBatch)
             if nargin < 2
-                nBatch = m.nBatchesComputed;
+                nBatch = this.nBatchesComputed;
             end
             cmap = npxutils.util.colorcet('d6', 'N', nBatch);
             %             cmap = npxutils.util.cmocean('haline', nBatch);
         end
         
-        function cmap = getDefaultCategoricalColormap(~, nItems)
+        function cmap = getDefaultCategoricalColormap(this, nItems) %#ok<INUSL>
             if nargin < 2
                 nItems = 10;
             end
@@ -1793,12 +1794,12 @@ classdef KilosortMetrics < handle
             end
         end
         
-        function channel_ids_by_template = plotTemplateImageInternal(m, templateInds, varargin)
+        function channel_ids_by_template = plotTemplateImageInternal(this, templateInds, varargin)
             p = inputParser();
             p.addParameter('xmag', 1.5, @isscalar);
             p.addParameter('ymag', 1.5, @isscalar);
             
-            p.addParameter('cluster_ids', m.cluster_ids, @isvector);
+            p.addParameter('cluster_ids', this.cluster_ids, @isvector);
             p.addParameter('template_colormap', [], @(x) true);
             
             p.addParameter('batchwise', false, @islogical);
@@ -1827,21 +1828,21 @@ classdef KilosortMetrics < handle
             
             % figure out actual channels requested
             if isfinite(p.Results.best_n_channels)
-                channel_ids_by_template = m.template_best_channels(templateInds, 1:p.Results.best_n_channels);
+                channel_ids_by_template = this.template_best_channels(templateInds, 1:p.Results.best_n_channels);
             elseif ~isempty(p.Results.channel_ids_by_template)
                 channel_ids_by_template = p.Results.channel_ids_by_template;
             else
-                channel_ids_by_template = m.template_best_channels(templateInds, :);
+                channel_ids_by_template = this.template_best_channels(templateInds, :);
             end
-            channel_ind_by_template = m.lookup_sortedChannelIds(channel_ids_by_template);
+            channel_ind_by_template = this.lookup_sortedChannelIds(channel_ids_by_template);
             
-            yspacing = m.channelMap.yspacing;
-            xspacing = m.channelMap.xspacing;
+            yspacing = this.channelMap.yspacing;
+            xspacing = this.channelMap.xspacing;
             xmag = p.Results.xmag;
             ymag = p.Results.ymag;
             
             % plot relative time vector
-            tvec = linspace(0, xspacing * xmag, size(m.template_scaled, 2));
+            tvec = linspace(0, xspacing * xmag, size(this.template_scaled, 2));
             tvec_shift = tvec - mean(tvec);
             
             nTemp = numel(templateInds);
@@ -1849,18 +1850,18 @@ classdef KilosortMetrics < handle
             
             % gather data
             if batchwise
-                assert(m.has_computed_batchwise, 'Call m.computeBatchwiseMetrics() first');
-                batches = m.batchesComputed;
+                assert(this.has_computed_batchwise, 'Call m.computeBatchwiseMetrics() first');
+                batches = this.batchesComputed;
                 nBatchesPlotted = numel(batches);
-                data = nan(nTemp, size(m.template_scaled, 2), nChannelsSorted, nBatchesPlotted, 'single');
+                data = nan(nTemp, size(this.template_scaled, 2), nChannelsSorted, nBatchesPlotted, 'single');
                 for iT = 1:nTemp
-                    full_temp = m.construct_scaled_template_batchwise(templateInds(iT), 'batches', batches);
+                    full_temp = this.construct_scaled_template_batchwise(templateInds(iT), 'batches', batches);
                     data(iT, :, :, :) = full_temp(1, :, channel_ind_by_template(iT, :), :);
                 end
             else
-                data = nan(nTemp, size(m.template_scaled, 2), nChannelsSorted, 'single');
+                data = nan(nTemp, size(this.template_scaled, 2), nChannelsSorted, 'single');
                 for iT = 1:nTemp
-                    data(iT, :, :) = m.template_scaled(templateInds(iT), :, channel_ind_by_template(iT, :));
+                    data(iT, :, :) = this.template_scaled(templateInds(iT), :, channel_ind_by_template(iT, :));
                 end
             end
             data = data - mean(data(:, :), 2); % center over time
@@ -1869,14 +1870,14 @@ classdef KilosortMetrics < handle
             if p.Results.batchwise
                 batch_cmap = p.Results.batch_colormap;
                 if isempty(batch_cmap)
-                    batch_cmap = m.getDefaultBatchColormap();
+                    batch_cmap = this.getDefaultBatchColormap();
                 elseif isa(batch_cmap, 'function_handle')
                     batch_cmap = batch_cmap(nBatchesPlotted);
                 end
             else
                 template_cmap = p.Results.template_colormap;
                 if isempty(template_cmap)
-                    template_cmap = m.getDefaultCategoricalColormap(nTemp);
+                    template_cmap = this.getDefaultCategoricalColormap(nTemp);
                 elseif isa(template_cmap, 'function_handle')
                     template_cmap = template_cmap(nTemp);
                 end
@@ -1898,8 +1899,8 @@ classdef KilosortMetrics < handle
             for iT = 1:nTemp
                 this_channel_ind = channel_ind_by_template(iT, :);
                 %                 this_channel_ids = channel_ids_by_template(iT, :);
-                xc = m.ks.channel_positions_sorted(this_channel_ind, 1);
-                yc = m.ks.channel_positions_sorted(this_channel_ind, 2);
+                xc = this.ks.channel_positions_sorted(this_channel_ind, 1);
+                yc = this.ks.channel_positions_sorted(this_channel_ind, 2);
                 
                 for iC = 1:nChannelsSorted
                     if batchwise
@@ -1928,12 +1929,12 @@ classdef KilosortMetrics < handle
                 
                 if plotCentroids
                     if batchwise
-                        centroid = npxutils.util.TensorUtils.squeezeDims(m.template_centroid_batchwise(templateInds(iT), :, [1 2]), 1);
+                        centroid = npxutils.util.TensorUtils.squeezeDims(this.template_centroid_batchwise(templateInds(iT), :, [1 2]), 1);
                         plot(axh, centroid(:, 1), centroid(:, 2), '-', 'Color', [0.8 0.8 0.8]);
                         scatter(axh, centroid(:, 1), centroid(:, 2), p.Results.centroidSize^2, batch_cmap, '+');
                         
                     else
-                        centroid = m.template_centroid(templateInds(iT), [1 2]);
+                        centroid = this.template_centroid(templateInds(iT), [1 2]);
                         plot(axh, centroid(1), centroid(2), '+', 'MarkerSize', p.Results.centroidSize, 'Color', template_cmap(iT, :));
                     end
                 end
@@ -1943,11 +1944,11 @@ classdef KilosortMetrics < handle
             axis(axh, 'off', 'tight');
             if batchwise
                 colormap(axh, batch_cmap);
-                caxis(axh, [1 m.nBatches]);
+                caxis(axh, [1 this.nBatches]);
                 if p.Results.colorbar
                     h = colorbar(axh);
                     h.YDir = 'reverse';
-                    h.Ticks = [1 m.nBatches];
+                    h.Ticks = [1 this.nBatches];
                     h.TickLabels = ["Early", "Late"];
                     ylabel(h, 'Batches');
                 end
@@ -1957,7 +1958,7 @@ classdef KilosortMetrics < handle
             if ~isholding, hold(axh, 'off'), end
         end
         
-        function plotTemplateCentroids(m, template_inds, varargin)
+        function plotTemplateCentroids(this, template_inds, varargin)
             p = inputParser();
             p.addParameter('batchwise', false, @islogical);
             p.addParameter('batch_colormap', [], @(x) true);
@@ -1974,20 +1975,20 @@ classdef KilosortMetrics < handle
             isholding = ishold(axh);
             
             if nargin < 2 || isempty(template_inds)
-                template_inds = find(m.template_is_localized);
+                template_inds = find(this.template_is_localized);
             end
             
             if p.Results.batchwise
                 batch_cmap = p.Results.batch_colormap;
                 if isempty(batch_cmap)
-                    batch_cmap = m.getDefaultBatchColormap();
+                    batch_cmap = this.getDefaultBatchColormap();
                 elseif isa(batch_cmap, 'function_handle')
                     batch_cmap = batch_cmap(nBatchesPlotted);
                 end
             else
                 template_cmap = p.Results.template_colormap;
                 if isempty(template_cmap)
-                    template_cmap = m.getDefaultCategoricalColormap(numel(template_inds));
+                    template_cmap = this.getDefaultCategoricalColormap(numel(template_inds));
                 elseif isa(template_cmap, 'function_handle')
                     template_cmap = template_cmap(nTemp);
                 end
@@ -1995,8 +1996,8 @@ classdef KilosortMetrics < handle
             
             if p.Results.batchwise
                 for iT = 1:numel(template_inds)
-                    mask_valid = m.template_useCount_batchwise(template_inds(iT), :) >= p.Results.batchMinSpikes;
-                    centroid = npxutils.util.TensorUtils.squeezeDims(m.template_centroid_batchwise(template_inds(iT), :, [1 2]), 1);
+                    mask_valid = this.template_useCount_batchwise(template_inds(iT), :) >= p.Results.batchMinSpikes;
+                    centroid = npxutils.util.TensorUtils.squeezeDims(this.template_centroid_batchwise(template_inds(iT), :, [1 2]), 1);
                     
                     xv = centroid(mask_valid, 1);
                     if p.Results.ignoreDriftX && ~isempty(xv)
@@ -2008,7 +2009,7 @@ classdef KilosortMetrics < handle
                 end
             else
                 for iT = 1:numel(template_inds)
-                    centroid = m.template_centroid(template_inds(iT), [1 2]);
+                    centroid = this.template_centroid(template_inds(iT), [1 2]);
                     plot(axh, centroid(1), centroid(2), '+', 'MarkerSize', p.Results.centroidSize, 'Color', template_cmap(iT, :));
                     hold(axh, 'on');
                 end
@@ -2018,7 +2019,7 @@ classdef KilosortMetrics < handle
             
         end
         
-        function plotClusterCentroids(m, cluster_ids, varargin)
+        function plotClusterCentroids(this, cluster_ids, varargin)
             p = inputParser();
             p.addParameter('batchwise', false, @islogical);
             p.addParameter('batch_colormap', [], @(x) true);
@@ -2034,29 +2035,29 @@ classdef KilosortMetrics < handle
             if isempty(axh), axh = gca; end
             isholding = ishold(axh);
             
-            cluster_inds = m.lookup_clusterIds(cluster_ids);
+            cluster_inds = this.lookup_clusterIds(cluster_ids);
             
             if p.Results.batchwise
                 batch_cmap = p.Results.batch_colormap;
                 if isempty(batch_cmap)
-                    batch_cmap = m.getDefaultBatchColormap();
+                    batch_cmap = this.getDefaultBatchColormap();
                 elseif isa(batch_cmap, 'function_handle')
                     batch_cmap = batch_cmap(nBatchesPlotted);
                 end
             else
                 cluster_cmap = p.Results.cluster_colormap;
                 if isempty(cluster_cmap)
-                    cluster_cmap = m.getDefaultCategoricalColormap(numel(cluster_inds));
+                    cluster_cmap = this.getDefaultCategoricalColormap(numel(cluster_inds));
                 elseif isa(cluster_cmap, 'function_handle')
                     cluster_cmap = cluster_cmap(nTemp);
                 end
             end
             
-            cluster_count_batchwise = sum(m.cluster_template_useCount_batchwise, 2);
+            cluster_count_batchwise = sum(this.cluster_template_useCount_batchwise, 2);
             if p.Results.batchwise
                 for iT = 1:numel(cluster_inds)
                     mask_valid = cluster_count_batchwise(cluster_inds(iT), 1, :) >= p.Results.batchMinSpikes;
-                    centroid = npxutils.util.TensorUtils.squeezeDims(m.cluster_centroid_batchwise(cluster_inds(iT), :, [1 2]), 1);
+                    centroid = npxutils.util.TensorUtils.squeezeDims(this.cluster_centroid_batchwise(cluster_inds(iT), :, [1 2]), 1);
                     
                     xv = centroid(mask_valid, 1);
                     if p.Results.ignoreDriftX && ~isempty(xv)
@@ -2068,7 +2069,7 @@ classdef KilosortMetrics < handle
                 end
             else
                 for iT = 1:numel(cluster_inds)
-                    centroid = m.cluster_centroid(cluster_inds(iT), [1 2]);
+                    centroid = this.cluster_centroid(cluster_inds(iT), [1 2]);
                     plot(axh, centroid(1), centroid(2), '+', 'MarkerSize', p.Results.centroidSize, 'Color', cluster_cmap(iT, :));
                     hold(axh, 'on');
                 end
@@ -2077,21 +2078,21 @@ classdef KilosortMetrics < handle
             if ~isholding, hold(axh, 'off'); end
         end
         
-        function plotClusterCentroidsBatchwiseReasonablyLocalized(m, varargin)
+        function plotClusterCentroidsBatchwiseReasonablyLocalized(this, varargin)
             p = inputParser();
             p.addParameter('maxDrift', 80, @isscalar);
             p.parse(varargin{:});
             
-            cluster_mask = m.cluster_is_localized;
+            cluster_mask = this.cluster_is_localized;
             
             % clusters x batches x spatial dims
-            maxDriftByCluster = m.computeClusterDriftDistance();
+            maxDriftByCluster = this.computeClusterDriftDistance();
             cluster_mask = cluster_mask & maxDriftByCluster <= p.Results.maxDrift;
             
-            m.plotClusterCentroids(m.cluster_ids(cluster_mask), 'batchwise', true, varargin{:});
+            this.plotClusterCentroids(this.cluster_ids(cluster_mask), 'batchwise', true, varargin{:});
         end
         
-        function plotClusterDriftSummary(m, varargin)
+        function plotClusterDriftSummary(this, varargin)
             p = inputParser();
             p.addParameter('spatialDim', 2, @isscalar); % 1 is x, 2 is y, 3 is z
             p.addParameter('referenceBatchInd', 1, @isscalar);
@@ -2102,19 +2103,19 @@ classdef KilosortMetrics < handle
             p.addParameter('compressInitialOffsetsBy', 10, @isscalar);
             p.parse(varargin{:});
             
-            m.computeBatchwiseMetrics(); % ensure batchwise metrics are computed
+            this.computeBatchwiseMetrics(); % ensure batchwise metrics are computed
             
             sdim = p.Results.spatialDim;
             referenceBatchInd = p.Results.referenceBatchInd;
             
-            cluster_mask = m.cluster_is_localized;
+            cluster_mask = this.cluster_is_localized;
             
             % clusters x batches x spatial dims
-            maxDriftByCluster = m.computeClusterDriftDistance();
+            maxDriftByCluster = this.computeClusterDriftDistance();
             cluster_mask = cluster_mask & maxDriftByCluster <= p.Results.maxDrift;
             
             % fill in missing batches with NaNs but don't extrapolate edges
-            centroids = fillmissing(m.cluster_centroid_batchwise, 'previous', 2, 'EndValues', 'none');
+            centroids = fillmissing(this.cluster_centroid_batchwise, 'previous', 2, 'EndValues', 'none');
             
             % grab initial position at reference batch to define the binning
             cluster_mask = cluster_mask & ~isnan(centroids(:, referenceBatchInd, sdim));
@@ -2139,10 +2140,10 @@ classdef KilosortMetrics < handle
             
             cmap = p.Results.colormap;
             if isempty(cmap)
-                cmap = m.getDefaultLinearColormap(nBins);
+                cmap = this.getDefaultLinearColormap(nBins);
             end
             
-            tvals = m.ks.batch_starts(m.batchesComputed) / m.fs;
+            tvals = this.ks.batch_starts(this.batchesComputed) / this.fs;
             for iB = 1:nBins
                 %                  TrialDataUtilities.Plotting.errorshadeInterval(m.batchesComputed, binnedQuantiles(iB, :, 1), binnedQuantiles(iB, :, 3), cmap(iB, :));
                 %                hold on
@@ -2161,19 +2162,19 @@ classdef KilosortMetrics < handle
             aa.update();
         end
         
-        function plotRecordingSites(m, varargin)
+        function plotRecordingSites(this, varargin)
             p = inputParser();
-            p.addParameter('channel_ids', m.channel_ids_sorted, @isvector)
+            p.addParameter('channel_ids', this.channel_ids_sorted, @isvector)
             p.addParameter('showChannelLabels', false, @islogical);
             p.addParameter('labelArgs', {}, @iscell);
             p.addParameter('color', [0.8 0.8 0.8], @(x) true);
             p.addParameter('markerSize', 25, @isscalar);
             p.parse(varargin{:});
             
-            [channelInds, channel_ids] = m.lookup_channelIds(p.Results.channel_ids);
+            [channelInds, channel_ids] = this.lookup_channelIds(p.Results.channel_ids);
             
-            xc = m.channelMap.xcoords(channelInds);
-            yc = m.channelMap.ycoords(channelInds);
+            xc = this.channelMap.xcoords(channelInds);
+            yc = this.channelMap.ycoords(channelInds);
             plot(xc, yc, '.', 'Marker', 's', 'MarkerEdgeColor', 'none', ...
                 'MarkerFaceColor', p.Results.color, 'MarkerSize', p.Results.markerSize);
             if p.Results.showChannelLabels
@@ -2186,12 +2187,12 @@ classdef KilosortMetrics < handle
             end
         end
         
-        function plotClusterWaveformAtCentroid(m, varargin)
+        function plotClusterWaveformAtCentroid(this, varargin)
             p = inputParser();
             p.addParameter('waveformScale', 10, @isscalar);
-            p.addParameter('waveformWidth', m.channelMap.xspacing/20, @isscalar);
-            p.addParameter('waveformHeight', m.channelMap.yspacing*3, @isscalar);
-            p.addParameter('cluster_ids', m.cluster_ids, @isvector);
+            p.addParameter('waveformWidth', this.channelMap.xspacing/20, @isscalar);
+            p.addParameter('waveformHeight', this.channelMap.yspacing*3, @isscalar);
+            p.addParameter('cluster_ids', this.cluster_ids, @isvector);
             p.addParameter('colormap', [], @(x) isempty(x) || ismatrix(x));
             p.addParameter('plotRecordingSites', false, @islogical);
             p.addParameter('useAutoAxis', false, @islogical);
@@ -2201,11 +2202,11 @@ classdef KilosortMetrics < handle
             p.parse(varargin{:});
             
             cluster_ids = p.Results.cluster_ids;
-            clusterInds = m.lookup_clusterIds(cluster_ids);
-            waves = m.cluster_waveform(clusterInds, :, 1); % nClusters x nTimepoints
+            clusterInds = this.lookup_clusterIds(cluster_ids);
+            waves = this.cluster_waveform(clusterInds, :, 1); % nClusters x nTimepoints
             
             xvec = linspace(-p.Results.waveformWidth/2, p.Results.waveformWidth/2, size(waves, 2)) * p.Results.waveformScale;
-            timeScaleFactor_umtoms = (size(waves, 2) / m.fs * 1000) / range(xvec);
+            timeScaleFactor_umtoms = (size(waves, 2) / this.fs * 1000) / range(xvec);
             
             waveScalingFactor_umtouV = double((max(waves(:)) - min(waves(:))) / p.Results.waveformHeight / p.Results.waveformScale);
             waves = waves ./ waveScalingFactor_umtouV;
@@ -2228,14 +2229,14 @@ classdef KilosortMetrics < handle
             end
             
             % nClusters x 2 or 3
-            com = m.cluster_centroid(clusterInds, :);
+            com = this.cluster_centroid(clusterInds, :);
             
             newplot
             holding = ishold;
             
             % plot recording sites
             if p.Results.plotRecordingSites
-                m.plotRecordingSites('color', p.Results.recordingSitesColor, 'markerSize', p.Results.recordingSitesMarkerSize);
+                this.plotRecordingSites('color', p.Results.recordingSitesColor, 'markerSize', p.Results.recordingSitesMarkerSize);
             end
             ax = gca;
             %ax.Color = [0.92 0.92 0.95];
@@ -2244,14 +2245,14 @@ classdef KilosortMetrics < handle
             
             hold on
             
-            xlim(double([min(com(:,1)) - m.channelMap.xspacing/2, max(com(:,1)) + m.channelMap.xspacing/2]));
-            ylim(double([min(com(:,2)) - m.channelMap.yspacing*5, max(com(:,2)) + m.channelMap.yspacing*5]));
+            xlim(double([min(com(:,1)) - this.channelMap.xspacing/2, max(com(:,1)) + this.channelMap.xspacing/2]));
+            ylim(double([min(com(:,2)) - this.channelMap.yspacing*5, max(com(:,2)) + this.channelMap.yspacing*5]));
             
             for iC = 1:size(waves, 1)
                 color = colormap(iC, :);
                 
-                ud = struct('cluster_id', cluster_ids(iC), 'cluster_amplitude', sprintf('%.1f uV', m.cluster_amplitude(clusterInds(iC))), ...
-                    'cluster_is_localized', m.cluster_is_localized(clusterInds(iC)), ...
+                ud = struct('cluster_id', cluster_ids(iC), 'cluster_amplitude', sprintf('%.1f uV', this.cluster_amplitude(clusterInds(iC))), ...
+                    'cluster_is_localized', this.cluster_is_localized(clusterInds(iC)), ...
                     'xname', 'Time', 'yname', 'Voltage', 'xoffset', xvec(1) + com(iC, 1), 'yoffset', com(iC, 2), 'xscale', timeScaleFactor_umtoms, 'yscale', waveScalingFactor_umtouV, 'xunits', 'ms', 'yunits', 'uV');
                 plot(xvec + com(iC, 1), waves(iC, :) + com(iC, 2), '-', 'Color', color, 'UserData', ud, 'LineWidth', p.Results.LineWidth);
                 hold on;
@@ -2286,14 +2287,14 @@ classdef KilosortMetrics < handle
             hold off;
         end
         
-        function ch_ids_sorted = plotClusterHeatmap(m, cluster_id, varargin)
-            cluster_ind = m.lookup_clusterIds(cluster_id);
+        function ch_ids_sorted = plotClusterHeatmap(this, cluster_id, varargin)
+            cluster_ind = this.lookup_clusterIds(cluster_id);
             
-            template_inds = cat(1, m.cluster_template_list{cluster_ind});
-            ch_ids_sorted = m.plotTemplateHeatmap(template_inds, varargin{:});
+            template_inds = cat(1, this.cluster_template_list{cluster_ind});
+            ch_ids_sorted = this.plotTemplateHeatmap(template_inds, varargin{:});
         end
         
-        function ch_ids_sorted = plotTemplateHeatmap(m, template_inds, varargin)
+        function ch_ids_sorted = plotTemplateHeatmap(this, template_inds, varargin)
             % plots one snippet as a heatmap with each of the clusters that occur during that period
             
             p = inputParser();
@@ -2304,16 +2305,16 @@ classdef KilosortMetrics < handle
             p.parse(varargin{:});
             
             if p.Results.timeInMilliseconds
-                time = m.templateTimeRelativeMs;
+                time = this.templateTimeRelativeMs;
             else
-                time = m.templateTimeRelative;
+                time = this.templateTimeRelative;
             end
             
             nChannels = p.Results.reconstruct_best_channels;
-            ch_ids_by_proximity = m.template_best_channels(template_inds(1), 1:nChannels);
-            ch_ids_sorted = m.channelMap.sortChannelsVertically(ch_ids_by_proximity);
-            ch_inds_sorted = m.lookup_sortedChannelIds(ch_ids_sorted);
-            data = m.template_scaled(template_inds, :, ch_inds_sorted);
+            ch_ids_by_proximity = this.template_best_channels(template_inds(1), 1:nChannels);
+            ch_ids_sorted = this.channelMap.sortChannelsVertically(ch_ids_by_proximity);
+            ch_inds_sorted = this.lookup_sortedChannelIds(ch_ids_sorted);
+            data = this.template_scaled(template_inds, :, ch_inds_sorted);
             
             % nTemplates x nTemplates x nBestChannels --> (nBestChannels*nTemplates) x nTime
             data_stacked = npxutils.util.TensorUtils.reshapeByConcatenatingDims(data, {[1 3], 2});
@@ -2334,44 +2335,44 @@ classdef KilosortMetrics < handle
     end
     
     methods % Pairwise cluster comparison
-        function ss = inspect_spike_heatmap(m, spike_ind, varargin)
-            ss = m.ks.getWaveformsFromRawData('spike_idx', spike_ind, 'best_n_channels', 24, varargin{:});
+        function ss = inspect_spike_heatmap(this, spike_ind, varargin)
+            ss = this.ks.getWaveformsFromRawData('spike_idx', spike_ind, 'best_n_channels', 24, varargin{:});
             ss.plotHeatmapWithTemplates(1);
         end
         
-        function ss = inspect_spike_overlay(m, spike_ind, varargin)
+        function ss = inspect_spike_overlay(this, spike_ind, varargin)
             p = inputParser();
             p.addParameter('overlay_all_clusters', false, @islogical);
             p.KeepUnmatched = true;
             p.parse(varargin{:})
-            ss = m.ks.getWaveformsFromRawData('spike_idx', spike_ind, 'best_n_channels', 24, p.Unmatched);
+            ss = this.ks.getWaveformsFromRawData('spike_idx', spike_ind, 'best_n_channels', 24, p.Unmatched);
             
             if p.Results.overlay_all_clusters
-                ss.overlay_cluster_ids = m.ks.cluster_ids;
+                ss.overlay_cluster_ids = this.ks.cluster_ids;
             end
             
             ss.plotStackedTracesWithOverlays('maskSnippet', 1, 'overlay_templates', true);
         end
         
-        function ss = extractSnippets_clusterInWindow(m, cluster_id, filter_window, varargin)
-            ss = m.ks.getWaveformsFromRawData('cluster_ids', cluster_id, 'filter_window', filter_window, 'best_n_channels', 24, varargin{:});
+        function ss = extractSnippets_clusterInWindow(this, cluster_id, filter_window, varargin)
+            ss = this.ks.getWaveformsFromRawData('cluster_ids', cluster_id, 'filter_window', filter_window, 'best_n_channels', 24, varargin{:});
         end
         
-        function [times1, times2, lags] = pairwiseClusterFindSpikesWithLag(m, cluster_ids, varargin)
+        function [times1, times2, lags] = pairwiseClusterFindSpikesWithLag(this, cluster_ids, varargin)
             % find spikes with a
             p = inputParser();
             p.addParameter('lagWindowMs', [-5 5], @isvector); % in ms
             p.addParameter('N', Inf, @isscalar);
             p.addParameter('sortClosestToCentralLag', false, @isscalar);
             p.parse(varargin{:});
-            lagWindow = p.Results.lagWindowMs / 1000 * m.fs; % convert to samples
+            lagWindow = p.Results.lagWindowMs / 1000 * this.fs; % convert to samples
             
             assert(numel(cluster_ids) == 2);
-            [~, which_cluster] = ismember(m.spike_clusters, cluster_ids);
+            [~, which_cluster] = ismember(this.spike_clusters, cluster_ids);
             
             % now we want to find the set of pairs of spikes where spikes
-            times1 = double(m.spike_times(which_cluster == 1));
-            times2 = double(m.spike_times(which_cluster == 2));
+            times1 = double(this.spike_times(which_cluster == 1));
+            times2 = double(this.spike_times(which_cluster == 2));
             
             lagCentral = (lagWindow(2) + lagWindow(1)) / 2;
             lagRadius = (lagWindow(2) - lagWindow(1)) / 2;
@@ -2383,7 +2384,7 @@ classdef KilosortMetrics < handle
             
             times1 = times1(inds1);
             times2 = times2(inds2);
-            lags = (times2 - times1) / m.fs * 1000;
+            lags = (times2 - times1) / this.fs * 1000;
             
             if p.Results.sortClosestToCentralLag
                 [~, sort_idx] = sort(abs(lags - lagCentral), 'ascend');
@@ -2400,30 +2401,30 @@ classdef KilosortMetrics < handle
             end
         end
         
-        function [times1, times2, lags] = findSpikePairsWithAutoLag(m, cluster_id, varargin)
+        function [times1, times2, lags] = findSpikePairsWithAutoLag(this, cluster_id, varargin)
             % find spike pairs that live in a certain bin on an autocorrelogram
             p = inputParser();
             p.addParameter('lagWindowMs', [0 5], @isvector); % in ms
             p.addParameter('N', Inf, @isscalar);
             p.addParameter('sortSmallestLag', false, @isscalar);
             p.parse(varargin{:});
-            lagWindow = p.Results.lagWindowMs / 1000 * m.fs; % convert to samples
+            lagWindow = p.Results.lagWindowMs / 1000 * this.fs; % convert to samples
             if isscalar(lagWindow)
                 lagWindow = [0 lagWindow];
             end
             
             assert(numel(cluster_id) == 1);
-            [~, which_cluster] = ismember(m.spike_clusters, cluster_id);
+            [~, which_cluster] = ismember(this.spike_clusters, cluster_id);
             
             % now we want to find the set of pairs of spikes where spikes
-            times = double(m.spike_times(which_cluster == 1));
+            times = double(this.spike_times(which_cluster == 1));
             dt = diff(times);
             inds1 = find(dt >= lagWindow(1) & dt <= lagWindow(2));
             inds2 = inds1 + 1;
             
             times1 = times(inds1);
             times2 = times(inds2);
-            lags = (times2 - times1) / m.fs * 1000;
+            lags = (times2 - times1) / this.fs * 1000;
             
             if p.Results.sortSmallestLag
                 [~, sort_idx] = sort(abs(lags), 'ascend');
@@ -2440,7 +2441,7 @@ classdef KilosortMetrics < handle
             end
         end
         
-        function [snippetSet, lags] = extractSnippets_pairwiseClusterFindSpikesWithLag(m, cluster_ids, varargin)
+        function [snippetSet, lags] = extractSnippets_pairwiseClusterFindSpikesWithLag(this, cluster_ids, varargin)
             p = inputParser();
             p.addParameter('lagWindowMs', [-5 5], @isvector);
             p.addParameter('N', Inf, @isscalar);
@@ -2450,18 +2451,18 @@ classdef KilosortMetrics < handle
             p.parse(varargin{:});
             
             args = rmfield(p.Results, 'best_n_channels');
-            [times1, times2, lags] = m.pairwiseClusterFindSpikesWithLag(cluster_ids, args);
+            [times1, times2, lags] = this.pairwiseClusterFindSpikesWithLag(cluster_ids, args);
             
-            window_width = max(int64(times2) - int64(times1)) + int64(m.nTemplateTimepoints);
+            window_width = max(int64(times2) - int64(times1)) + int64(this.nTemplateTimepoints);
             window = [-window_width / 2, window_width / 2];
             
             times = (int64(times1) + int64(times2)) / int64(2);
             
-            snippetSet = m.ks.readAPSnippsetSet_clusterIdSubset(times, window, cluster_ids, ...
+            snippetSet = this.ks.readAPSnippsetSet_clusterIdSubset(times, window, cluster_ids, ...
                 'best_n_channels', p.Results.best_n_channels, p.Unmatched);
         end
         
-        function [snippetSet, lags] = extractSnippets_clusterFindSpikesWithAutoLag(m, cluster_id, varargin)
+        function [snippetSet, lags] = extractSnippets_clusterFindSpikesWithAutoLag(this, cluster_id, varargin)
             p = inputParser();
             p.addParameter('lagWindowMs', [0 5], @isvector);
             p.addParameter('N', Inf, @isscalar);
@@ -2471,33 +2472,34 @@ classdef KilosortMetrics < handle
             p.parse(varargin{:});
             
             args = rmfield(p.Results, 'best_n_channels');
-            [times1, times2, lags] = m.findSpikePairsWithAutoLag(cluster_id, args);
+            [times1, times2, lags] = this.findSpikePairsWithAutoLag(cluster_id, args);
             
-            window_width = max(int64(times2) - int64(times1)) + int64(m.nTemplateTimepoints);
+            window_width = max(int64(times2) - int64(times1)) + int64(this.nTemplateTimepoints);
             window = [-window_width / 2, window_width / 2];
             
             times = (int64(times1) + int64(times2)) / int64(2);
             
-            snippetSet = m.ks.readAPSnippsetSet_clusterIdSubset(times, window, cluster_id, ...
+            snippetSet = this.ks.readAPSnippsetSet_clusterIdSubset(times, window, cluster_id, ...
                 'best_n_channels', p.Results.best_n_channels, p.Unmatched);
         end
         
-        function [timesByCluster, indsByCluster, windowWidth] = multiClusterFindSpikesWithinWindow(m, cluster_ids, varargin)
+        function [timesByCluster, indsByCluster, windowWidth] = ...
+                multiClusterFindSpikesWithinWindow(this, cluster_ids, varargin)
             p = inputParser();
             p.addParameter('window', 20, @isvector);
             p.addParameter('N', Inf, @isscalar);
             p.addParameter('sortSmallestWindow', true, @isscalar);
             p.parse(varargin{:});
-            window = p.Results.window * m.fs; % convert to samples
+            window = p.Results.window * this.fs; % convert to samples
             nClusters = numel(cluster_ids);
             
             % take times for the first cluster and find times for all other clusters within +/- window
             % which we will narrow down later
-            [~, which_cluster] = ismember(m.spike_clusters, cluster_ids);
-            times1 = double(m.spike_times(which_cluster == 1));
+            [~, which_cluster] = ismember(this.spike_clusters, cluster_ids);
+            times1 = double(this.spike_times(which_cluster == 1));
             mask_other = which_cluster > 1;
             indsOther = find(mask_other);
-            timesOther = double(m.spike_times(mask_other));
+            timesOther = double(this.spike_times(mask_other));
             indsIntoTimesOtherNearest = rangesearch(timesOther, times1, window, 'SortIndices', false);
             
             valid = false(numel(times1), 1);
@@ -2524,8 +2526,8 @@ classdef KilosortMetrics < handle
                 [windowWidth, sortIdx] = sort(windowWidth, 'ascend');
                 indsByCluster = indsByCluster(sortIdx, :);
             end
-            timesByCluster = m.spike_times(indsByCluster);
-            windowWidth = windowWidth / m.fs;
+            timesByCluster = this.spike_times(indsByCluster);
+            windowWidth = windowWidth / this.fs;
             
             function [valid, indsByCluster, windowWidth] = bestWindowCover(relativeTimes, whichCluster)
                 % given a set of nSpikes relative times between +/- window and cluster identities whichCluster
@@ -2562,9 +2564,9 @@ classdef KilosortMetrics < handle
             end
         end
         
-        function out = inspectSampleIdx_highlightClusterWaveforms(m, sampleIdx, cluster_ids, varargin)
+        function out = inspectSampleIdx_highlightClusterWaveforms(this, sampleIdx, cluster_ids, varargin)
             p = inputParser();
-            p.addParameter('channel_ids', m.channelMap.channelIdsMapped, @isvector);
+            p.addParameter('channel_ids', this.channelMap.channelIdsMapped, @isvector);
             p.addParameter('channel_ids_by_cluster', [], @ismatrix); % specify this manually
             p.addParameter('best_n_channels', 24, @isscalar); % or take the best n channels based on this clusters template when cluster_id is scalar
             
@@ -2580,16 +2582,16 @@ classdef KilosortMetrics < handle
             p.parse(varargin{:});
             waveform_window = p.Results.waveform_window;
             
-            df = m.ks.raw_dataset;
+            df = this.ks.raw_dataset;
             sampleIdx = npxutils.util.makecol(sampleIdx);
             mat = df.readAP_idx(sampleIdx); % C x T
             
             [channelInds, channelIds] = df.lookup_channelIds(p.Results.channel_ids);
             channelsHighlightByCluster = p.Results.channel_ids_by_cluster;
-            clusterInds = m.lookup_clusterIds(cluster_ids);
+            clusterInds = this.lookup_clusterIds(cluster_ids);
             if isempty(channelsHighlightByCluster)
-                n_best = min(p.Results.best_n_channels, size(m.cluster_best_channels, 2));
-                channelsHighlightByCluster = m.cluster_best_channels(clusterInds, 1:n_best);
+                n_best = min(p.Results.best_n_channels, size(this.cluster_best_channels, 2));
+                channelsHighlightByCluster = this.cluster_best_channels(clusterInds, 1:n_best);
             end
             
             mat = mat(channelInds, :);
@@ -2622,7 +2624,7 @@ classdef KilosortMetrics < handle
                 cinds = channelIndsHighlight(tf);
                 
                 % nTimes x 1
-                times = single(m.spike_times(m.spike_clusters == cluster_ids(iC)));
+                times = single(this.spike_times(this.spike_clusters == cluster_ids(iC)));
                 
                 % nSamples x nTimes --> nSamples
                 within_window = any(sampleIdx >= times' + waveform_window(1) & sampleIdx <= times' + waveform_window(2), 2);

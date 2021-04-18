@@ -1,14 +1,14 @@
 classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
     
-    properties(Constant)
+    properties (Constant, Hidden)
         defaultRatingValueSet = ["unrated", "noise", "lowfr", "unstable", "good"]';
     end
     
-    properties(Transient, SetAccess=protected) % don't save KS to disk
+    properties (Transient, SetAccess=protected) % don't save KS to disk
         ks
     end
     
-    properties(SetAccess=protected)
+    properties (SetAccess=protected)
         cluster_ids(:, 1) uint32
         subgroupSet(:, 1) string
         
@@ -28,7 +28,7 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
         includeCutoffSpikes(:, 1) logical % nClusters
     end
     
-    properties(Dependent)
+    properties (Dependent)
         nClusters
         nSubgroups
         defaultRating
@@ -69,123 +69,123 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
             r.initializeBlank(cluster_ids, subgroupSet);
         end
         
-        function initializeBlank(r, cluster_ids, subgroupSet)
-            r.cluster_ids = cluster_ids;
-            r.subgroupSet = string(subgroupSet);
+        function initializeBlank(this, cluster_ids, subgroupSet)
+            this.cluster_ids = cluster_ids;
+            this.subgroupSet = string(subgroupSet);
             
-            r.ratings = repmat(r.defaultRating, r.nClusters, 1);
-            r.usableWithin = true(r.nClusters, r.nSubgroups);
-            r.stableAcross = true(r.nClusters, r.nSubgroups-1);
-            r.includeCutoffSpikes = true(r.nClusters, 1);
+            this.ratings = repmat(this.defaultRating, this.nClusters, 1);
+            this.usableWithin = true(this.nClusters, this.nSubgroups);
+            this.stableAcross = true(this.nClusters, this.nSubgroups-1);
+            this.includeCutoffSpikes = true(this.nClusters, 1);
         end
         
-        function rating = convertToRatingCategorical(r, value)
-            rating = categorical(string(value), r.ratingValueSet, 'Ordinal', true);
+        function rating = convertToRatingCategorical(this, value)
+            rating = categorical(string(value), this.ratingValueSet, 'Ordinal', true);
         end
         
-        function setKilosortDataset(r, ks)
+        function setKilosortDataset(this, ks)
             assert(isa(ks, 'npxutils.KilosortDataset'));
             if ~ks.isLoaded
                 ks.load('loadBatchwise', false, 'loadFeatures', false);
             end
-            r.ks = ks;
+            this.ks = ks;
             assert(~isempty(ks.cluster_ids));
-            if ~isequal(r.cluster_ids, ks.cluster_ids)
+            if ~isequal(this.cluster_ids, ks.cluster_ids)
                 
                 % update my properties to avoid mismatch
-                [maskKeep, indSet] = ismember(r.cluster_ids, ks.cluster_ids);
+                [maskKeep, indSet] = ismember(this.cluster_ids, ks.cluster_ids);
                 indSet = indSet(maskKeep);
                 
                 nDropped = nnz(~maskKeep);
-                uniq_ratings_dropped = unique(string(r.ratings(~maskKeep)));
+                uniq_ratings_dropped = unique(string(this.ratings(~maskKeep)));
                 
-                missing = ~ismember(ks.cluster_ids, r.cluster_ids);
+                missing = ~ismember(ks.cluster_ids, this.cluster_ids);
                 nMissing = nnz(missing);
                 warning('KilsortDataset cluster_ids do not match ClusterRatingInfo''s. Missing ratings for %d. Dropping %d with ratings %s', ...
                     nMissing, nDropped, strjoin(uniq_ratings_dropped, '+'));
                 
-                ratings = r.ratings; %#ok<*PROPLC>
-                usableWithin = r.usableWithin;
-                stableAcross = r.stableAcross;
-                includeCutoffSpikes = r.includeCutoffSpikes;
-                r.initializeBlank(ks.cluster_ids, r.subgroupSet);
+                ratings = this.ratings; %#ok<*PROPLC>
+                usableWithin = this.usableWithin;
+                stableAcross = this.stableAcross;
+                includeCutoffSpikes = this.includeCutoffSpikes;
+                this.initializeBlank(ks.cluster_ids, this.subgroupSet);
                 
-                r.ratings(indSet) = ratings(maskKeep);
-                r.usableWithin(indSet, :) = usableWithin(maskKeep, :);
-                r.stableAcross(indSet, :) = stableAcross(maskKeep, :);
-                r.includeCutoffSpikes(indSet, :) = includeCutoffSpikes(maskKeep, :);
+                this.ratings(indSet) = ratings(maskKeep);
+                this.usableWithin(indSet, :) = usableWithin(maskKeep, :);
+                this.stableAcross(indSet, :) = stableAcross(maskKeep, :);
+                this.includeCutoffSpikes(indSet, :) = includeCutoffSpikes(maskKeep, :);
             end
         end
         
-        function n = get.nClusters(r)
-            n = numel(r.cluster_ids);
+        function n = get.nClusters(this)
+            n = numel(this.cluster_ids);
         end
         
-        function n = get.nSubgroups(r)
-            n = max(1, numel(r.subgroupSet));
+        function n = get.nSubgroups(this)
+            n = max(1, numel(this.subgroupSet));
         end
         
-        function rating = get.defaultRating(r)
-            rating = r.convertToRatingCategorical(r.defaultRatingValueSet(1));
+        function rating = get.defaultRating(this)
+            rating = this.convertToRatingCategorical(this.defaultRatingValueSet(1));
         end
         
-        function [clusterInds, cluster_ids] = lookup_clusterIds(r, cluster_ids)
+        function [clusterInds, cluster_ids] = lookup_clusterIds(this, cluster_ids)
             if islogical(cluster_ids)
-                cluster_ids = r.cluster_ids(cluster_ids);
+                cluster_ids = this.cluster_ids(cluster_ids);
             end
-            [tf, clusterInds] = ismember(cluster_ids, r.cluster_ids);
+            [tf, clusterInds] = ismember(cluster_ids, this.cluster_ids);
             assert(all(tf), 'Some cluster ids were not found in r.cluster_ids');
         end
         
-        function [subgroupInds, subgroups] = lookup_subgroups(r, subgroups)
+        function [subgroupInds, subgroups] = lookup_subgroups(this, subgroups)
             if isnumeric(subgroups)
                 subgroupInds = subgroups;
-                subgroups = r.subgroupSet(subgroupInds);
+                subgroups = this.subgroupSet(subgroupInds);
             else
-                [tf, subgroupInds] = ismember(string(subgroups), r.subgroupSet);
+                [tf, subgroupInds] = ismember(string(subgroups), this.subgroupSet);
                 assert(all(tf), 'Some subgroups were not found in r.subgroupSet');
-                subgroups = r.subgroupSet(subgroupInds);
+                subgroups = this.subgroupSet(subgroupInds);
             end
         end
         
-        function [ratings, usableWithin, stableAcross, includeCutoffSpikes] = lookupClusterRatings(r, cluster_ids)
-            cluster_inds = r.lookup_clusterIds(cluster_ids);
-            ratings = r.ratings(cluster_inds);
+        function [ratings, usableWithin, stableAcross, includeCutoffSpikes] = lookupClusterRatings(this, cluster_ids)
+            cluster_inds = this.lookup_clusterIds(cluster_ids);
+            ratings = this.ratings(cluster_inds);
             
             if nargout > 1
-                usableWithin = r.usableWithin(cluster_inds, :);
+                usableWithin = this.usableWithin(cluster_inds, :);
             end
             if nargout > 2
-                stableAcross = r.stableAcross(cluster_inds, :);
+                stableAcross = this.stableAcross(cluster_inds, :);
             end
             if nargout > 3
-                includeCutoffSpikes = r.includeCutoffSpikes(cluster_inds);
+                includeCutoffSpikes = this.includeCutoffSpikes(cluster_inds);
             end
         end
         
-        function tf = lookupClusterSubgroupUsableWithin(r, cluster_ids, subgroups)
-            cluster_inds = r.lookup_clusterIds(cluster_ids);
-            subgroup_inds = r.lookup_subgroups(subgroups);
-            assert(max(subgroup_inds) <= r.nSubgroups);
+        function tf = lookupClusterSubgroupUsableWithin(this, cluster_ids, subgroups)
+            cluster_inds = this.lookup_clusterIds(cluster_ids);
+            subgroup_inds = this.lookup_subgroups(subgroups);
+            assert(max(subgroup_inds) <= this.nSubgroups);
             
-            tf = r.usableWithin(cluster_inds, subgroup_inds);
+            tf = this.usableWithin(cluster_inds, subgroup_inds);
         end
         
-        function tf = lookupClusterSubgroupStableAcross(r, cluster_ids, subgroups)
-            cluster_inds = r.lookup_clusterIds(cluster_ids);
-            subgroup_inds = r.lookup_subgroups(subgroups);
-            assert(max(subgroup_inds) < r.nSubgroups);
+        function tf = lookupClusterSubgroupStableAcross(this, cluster_ids, subgroups)
+            cluster_inds = this.lookup_clusterIds(cluster_ids);
+            subgroup_inds = this.lookup_subgroups(subgroups);
+            assert(max(subgroup_inds) < this.nSubgroups);
             
-            tf = r.stableAcross(cluster_inds, subgroup_inds);
+            tf = this.stableAcross(cluster_inds, subgroup_inds);
         end
         
-        function setClusterRatings(r, cluster_ids, ratings, usableWithin, stableAcross, includeCutoffSpikes)
-            cluster_inds = r.lookup_clusterIds(cluster_ids);
+        function setClusterRatings(this, cluster_ids, ratings, usableWithin, stableAcross, includeCutoffSpikes)
+            cluster_inds = this.lookup_clusterIds(cluster_ids);
             nClu = numel(cluster_inds);
-            nSub = r.nSubgroups;
+            nSub = this.nSubgroups;
             
             if ~isempty(ratings)
-                r.ratings(cluster_inds) = r.convertToRatingCategorical(ratings);
+                this.ratings(cluster_inds) = this.convertToRatingCategorical(ratings);
             end
             
             if nargin > 3 && ~isempty(usableWithin)
@@ -195,7 +195,7 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
                 if size(usableWithin, 2) == 1
                     usableWithin = repmat(usableWithin, 1, nSub);
                 end
-                r.usableWithin(cluster_inds, :) = usableWithin;
+                this.usableWithin(cluster_inds, :) = usableWithin;
             end
             
             if nargin > 4 && ~isempty(stableAcross)
@@ -205,70 +205,71 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
                 if size(stableAcross, 2) == 1
                     stableAcross = repmat(stableAcross, 1, nSub-1);
                 end
-                r.stableAcross(cluster_inds, :) = stableAcross;
+                this.stableAcross(cluster_inds, :) = stableAcross;
             end
             
             if nargin > 5 && ~isempty(includeCutoffSpikes)
-                r.includeCutoffSpikes(cluster_inds) = includeCutoffSpikes;
+                this.includeCutoffSpikes(cluster_inds) = includeCutoffSpikes;
             end
         end
         
-        function tf = lookupClusterIncludeCutoffSpikes(r, cluster_ids)
-            cluster_inds = r.lookup_clusterIds(cluster_ids);
-            tf = r.includeCutoffSpikes(cluster_inds);
+        function tf = lookupClusterIncludeCutoffSpikes(this, cluster_ids)
+            cluster_inds = this.lookup_clusterIds(cluster_ids);
+            tf = this.includeCutoffSpikes(cluster_inds);
         end
         
-        function setClusterIncludeCutoffSpikes(r, cluster_ids, includeCutoffSpikes)
-            r.setClusterRatings(cluster_ids, [], [], [], includeCutoffSpikes);
+        function setClusterIncludeCutoffSpikes(this, cluster_ids, includeCutoffSpikes)
+            this.setClusterRatings(cluster_ids, [], [], [], includeCutoffSpikes);
         end
         
-        function setClusterSubgroupUsableWithin(r, cluster_ids, subgroups, usableWithin)
-            cluster_inds = r.lookup_clusterIds(cluster_ids);
-            subgroup_inds = r.lookup_subgroups(subgroups);
+        function setClusterSubgroupUsableWithin(this, cluster_ids, subgroups, usableWithin)
+            cluster_inds = this.lookup_clusterIds(cluster_ids);
+            subgroup_inds = this.lookup_subgroups(subgroups);
             
             assert(size(usableWithin, 2) == 1 || size(usableWithin, 2) == numel(subgroups));
-            r.usableWithin(cluster_inds, subgroup_inds) = usableWithin;
+            this.usableWithin(cluster_inds, subgroup_inds) = usableWithin;
         end
         
-        function setClusterSubgroupStableAcross(r, cluster_ids, subgroups, stableAcross)
-            cluster_inds = r.lookup_clusterIds(cluster_ids);
-            subgroup_inds = r.lookup_subgroups(subgroups);
-            assert(all(subgroup_inds < r.nSubgroups));
+        function setClusterSubgroupStableAcross(this, cluster_ids, subgroups, stableAcross)
+            cluster_inds = this.lookup_clusterIds(cluster_ids);
+            subgroup_inds = this.lookup_subgroups(subgroups);
+            assert(all(subgroup_inds < this.nSubgroups));
             
             assert(size(stableAcross, 2) == 1 || size(stableAcross, 2) == numel(subgroups));
-            r.stableAcross(cluster_inds, subgroup_inds) = stableAcross;
+            this.stableAcross(cluster_inds, subgroup_inds) = stableAcross;
         end
         
-        function countsByRatingSubgroup = computeClusterCounts(r, ratingValueSet, countUsableOnlyMask)
+        function countsByRatingSubgroup = computeClusterCounts(this, ratingValueSet, countUsableOnlyMask)
             % countsByRatingSubgroup is numel(ratingValueSet) x nSubgroups count of clusters
             % that have that rating and are listed as usableWithin that subgroup
             
             if nargin < 2 || isempty(ratingValueSet)
-                ratingValueSet = r.ratingValueSet;
+                ratingValueSet = this.ratingValueSet;
             end
-            ratingValueSet = r.convertToRatingCategorical(ratingValueSet);
+            ratingValueSet = this.convertToRatingCategorical(ratingValueSet);
             if nargin < 3 || isempty(countUsableOnlyMask)
-                ratingsMaskCountAlways = false(r.nClusters, 1);
+                ratingsMaskCountAlways = false(this.nClusters, 1);
             else
-                ratingsMaskCountAlways = ~ismember(r.ratings, ratingValueSet(countUsableOnlyMask));
+                ratingsMaskCountAlways = ~ismember(this.ratings, ratingValueSet(countUsableOnlyMask));
             end
             
             nRatingValues = numel(ratingValueSet);
-            countsByRatingSubgroup = zeros(nRatingValues, r.nSubgroups);
+            countsByRatingSubgroup = zeros(nRatingValues, this.nSubgroups);
             
-            for iS = 1:r.nSubgroups
+            for iS = 1:this.nSubgroups
                 % count a rating if cluster marked usable, or rated something where we count it usable or not
-                ratingsCountable = r.usableWithin(:, iS) | ratingsMaskCountAlways;
-                countsByRatingSubgroup(:, iS) = histcounts(r.ratings(ratingsCountable), ratingValueSet);
+                ratingsCountable = this.usableWithin(:, iS) | ratingsMaskCountAlways;
+                countsByRatingSubgroup(:, iS) = histcounts(this.ratings(ratingsCountable), ratingValueSet);
             end
         end
         
-        function n = get.nClustersUnrated(r)
-            unrated = r.convertToRatingCategorical("unrated");
-            n = nnz(r.ratings == unrated);
+        function n = get.nClustersUnrated(this)
+            unrated = this.convertToRatingCategorical("unrated");
+            n = nnz(this.ratings == unrated);
         end
         
-        function [countsByRatingSubgroup, nClustersPostMerge] = computeClusterCountsAfterApplyingMerges(r, mergeInfo, ratingValueSet, countUsableOnlyMask)
+        function [countsByRatingSubgroup, nClustersPostMerge] = ...
+                computeClusterCountsAfterApplyingMerges(this, mergeInfo, ratingValueSet, countUsableOnlyMask)
             % countsByRatingSubgroup is numel(ratingValueSet) x nSubgroups count of clusters
             % that have that rating and are listed as usableWithin that subgroup
             
@@ -280,26 +281,27 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
             end
             
             % apply merge on copy
-            r = copy(r);
-            r.apply_cluster_merge(mergeInfo);
-            nClustersPostMerge = r.nClusters;
+            this = copy(this);
+            this.apply_cluster_merge(mergeInfo);
+            nClustersPostMerge = this.nClusters;
             
             % then count clusters
-            countsByRatingSubgroup = r.computeClusterCounts(ratingValueSet, countUsableOnlyMask);
+            countsByRatingSubgroup = this.computeClusterCounts(ratingValueSet, countUsableOnlyMask);
         end
         
-        function [nUnrated, nClustersPostMerge, cluster_ids_unrated] = computeClusterUnratedCountAfterApplyingMerges(r, mergeInfo)
-            unrated = r.convertToRatingCategorical("unrated");
+        function [nUnrated, nClustersPostMerge, cluster_ids_unrated] = ...
+                computeClusterUnratedCountAfterApplyingMerges(this, mergeInfo)
+            unrated = this.convertToRatingCategorical("unrated");
             
-            r = copy(r);
-            r.apply_cluster_merge(mergeInfo);
-            nClustersPostMerge = r.nClusters;
-            mask_unrated = any(r.ratings == unrated, 2);
+            this = copy(this);
+            this.apply_cluster_merge(mergeInfo);
+            nClustersPostMerge = this.nClusters;
+            mask_unrated = any(this.ratings == unrated, 2);
             nUnrated = nnz(mask_unrated);
-            cluster_ids_unrated = r.cluster_ids(mask_unrated);
+            cluster_ids_unrated = this.cluster_ids(mask_unrated);
         end
         
-        function cluster_ids = listClusterIdsUsableWithinSubgroup(r, subgroup, ratingsAccepted)
+        function cluster_ids = listClusterIdsUsableWithinSubgroup(this, subgroup, ratingsAccepted)
             % cluster_ids = listClusterIdsUsableWithinSubgroup(r, subgroup, ratingsAccepted)
             %
             % list all cluster_ids that are:
@@ -308,47 +310,48 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
             %
             % see listClusterIdsUsableAcrossSubgroupsWithRating if aggregating across multiple subgroups
             
-            subgroup_ind = sort(r.lookup_subgroups(subgroup), 'ascend');
-            mask_rating_accepted = ismember(r.ratings, r.convertToRatingCategorical(ratingsAccepted));
-            mask_usable_all = all(r.usableWithin(:, subgroup_ind), 2);
+            subgroup_ind = sort(this.lookup_subgroups(subgroup), 'ascend');
+            mask_rating_accepted = ismember(this.ratings, this.convertToRatingCategorical(ratingsAccepted));
+            mask_usable_all = all(this.usableWithin(:, subgroup_ind), 2);
             
             mask = mask_rating_accepted & mask_usable_all;
-            cluster_ids = r.cluster_ids(mask);
+            cluster_ids = this.cluster_ids(mask);
         end
         
-        function [cluster_ids, cluster_ratings] = listClusterIdsUsableAcrossSubgroupsWithRating(r, subgroups, ratingsAccepted)
+        function [cluster_ids, cluster_ratings] = ...
+                listClusterIdsUsableAcrossSubgroupsWithRating(this, subgroups, ratingsAccepted)
             % cluster_ids = listClusterIdsUsableAcrossSubgroupsWithRating(r, subgroups, ratingsAccepted)
             %
             % list all cluster_ids that are:
             % - rated as one of the ratings in ratingsAccepted
             % - usable within each subgroup listed,
             % - stable across all interspersed subgroups
-            subgroup_inds = sort(r.lookup_subgroups(subgroups), 'ascend');
-            mask_rating_accepted = ismember(r.ratings, r.convertToRatingCategorical(ratingsAccepted));
-            mask_usable_all = all(r.usableWithin(:, subgroup_inds), 2);
+            subgroup_inds = sort(this.lookup_subgroups(subgroups), 'ascend');
+            mask_rating_accepted = ismember(this.ratings, this.convertToRatingCategorical(ratingsAccepted));
+            mask_usable_all = all(this.usableWithin(:, subgroup_inds), 2);
             
             if numel(subgroup_inds) > 1
-                mask_stable_across = all(r.stableAcross(:, min(subgroup_inds):max(subgroup_inds)), 2);
+                mask_stable_across = all(this.stableAcross(:, min(subgroup_inds):max(subgroup_inds)), 2);
             else
-                mask_stable_across = true(r.nClusters, 1);
+                mask_stable_across = true(this.nClusters, 1);
             end
             
             mask = mask_rating_accepted & mask_usable_all & mask_stable_across;
-            cluster_ids = r.cluster_ids(mask);
-            cluster_ratings = r.ratings(mask);
+            cluster_ids = this.cluster_ids(mask);
+            cluster_ratings = this.ratings(mask);
         end
         
-        function apply_cluster_merge(r, mergeInfo)
-            ratings = r.ratings; %#ok<*NASGU>
-            usableWithin = r.usableWithin;
-            stableAcross = r.stableAcross;
-            includeCutoffSpikes = r.includeCutoffSpikes;
+        function apply_cluster_merge(this, mergeInfo)
+            ratings = this.ratings; %#ok<*NASGU>
+            usableWithin = this.usableWithin;
+            stableAcross = this.stableAcross;
+            includeCutoffSpikes = this.includeCutoffSpikes;
             
             new_cluster_ids = mergeInfo.new_cluster_ids;
-            new_cluster_inds = r.lookup_clusterIds(new_cluster_ids);
+            new_cluster_inds = this.lookup_clusterIds(new_cluster_ids);
             for iM = 1:mergeInfo.nMerges
                 cluster_ids = mergeInfo.merges{iM};
-                [this_ratings, this_usableWithin, this_stableAcross, this_includeCutoffSpikes] = r.lookupClusterRatings(cluster_ids);
+                [this_ratings, this_usableWithin, this_stableAcross, this_includeCutoffSpikes] = this.lookupClusterRatings(cluster_ids);
                 
                 this_new_ind = new_cluster_inds(iM);
                 ratings(this_new_ind) = max(this_ratings); % rating is the "max" of merged ratings, which means the best due to the order of defaultRatingValueSet which is used to define the ordering of the categorical
@@ -360,18 +363,18 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
             end
             
             cluster_ids_removed_by_merge = setdiff(cat(2, mergeInfo.merges{:}), new_cluster_ids);
-            mask = ~ismember(r.cluster_ids, cluster_ids_removed_by_merge);
+            mask = ~ismember(this.cluster_ids, cluster_ids_removed_by_merge);
             
             % subselect by destination clusters only
-            r.ratings = ratings(mask);
-            r.usableWithin = usableWithin(mask, :);
-            r.stableAcross = stableAcross(mask, :);
-            r.includeCutoffSpikes = includeCutoffSpikes(mask);
-            r.cluster_ids = r.cluster_ids(mask);
+            this.ratings = ratings(mask);
+            this.usableWithin = usableWithin(mask, :);
+            this.stableAcross = stableAcross(mask, :);
+            this.includeCutoffSpikes = includeCutoffSpikes(mask);
+            this.cluster_ids = this.cluster_ids(mask);
         end
     end
     
-    methods(Static)
+    methods (Static)
         function rating = convertToDefaultRatingCategorical(value)
             rating = categorical(string(value), npxutils.ClusterRatingInfo.defaultRatingValueSet, 'Ordinal', true);
         end

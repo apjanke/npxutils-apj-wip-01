@@ -1,21 +1,24 @@
 classdef ChannelMap
-    % Author: Daniel J. O'Shea (2019)
+    
+    properties (Constant, Hidden)
+        knownProbeNames = ["phase3a", "phase3a4", "phase3b1", "phase3b2"];        
+    end
     
     properties
-        file  (1, 1) string
-        name (1, 1) string
+        file (1,1) string
+        name (1,1) string
         
-        channelIdsMapped (:, 1) uint32
-        connected (:, 1) logical
-        shankInd (:, 1)
+        channelIdsMapped (:,1) uint32
+        connected (:,1) logical
+        shankInd (:,1)
         
         nSpatialDims = 2;
-        xcoords (:, 1)
-        ycoords (:, 1)
-        zcoords (:, 1)
+        xcoords (:,1)
+        ycoords (:,1)
+        zcoords (:,1)
         
-        syncChannelIndex (:, 1) uint32 % actual index in the AP & LF bin file
-        syncChannelId (:, 1) uint32 % arbitrary channel id, typically the same as index
+        syncChannelIndex (:,1) uint32 % actual index in the AP & LF bin file
+        syncChannelId (:,1) uint32 % arbitrary channel id, typically the same as index
     end
     
     properties(Dependent)
@@ -41,29 +44,54 @@ classdef ChannelMap
     end
     
     methods
-        function map = ChannelMap(spec)
-            if nargin < 1 || isempty(spec)
+        function this = ChannelMap(spec)
+            % Construct a new ChannelMap object
+            %
+            % map = npxutils.ChannelMap
+            % map = npxutils.ChannelMap(spec)
+            %
+            % Spec may be:
+            %   - A charvec or string
+            %   - A struct
+            %   - An npxutils.ChannelMap object
+            %   - An empty of any type
+            if nargin == 0 || isempty(spec)
                 return;
             elseif isa(spec, 'npxutils.ChannelMap')
                 % return the existing instance
-                map = fname;
+                this = spec;
                 return;
             elseif isstruct(spec)
-                map = npxutils.ChannelMap.fromMeta(spec);
+                this = npxutils.ChannelMap.fromMeta(spec);
             elseif ischar(spec) || isstring(spec)
                 if exist(spec, 'file') == 2
-                    map = npxutils.ChannelMap.fromMatFile(spec);
+                    this = npxutils.ChannelMap.fromMatFile(spec);
                 else
-                    map = npxutils.ChannelMap.fromProbeName(spec);
+                    this = npxutils.ChannelMap.fromProbeName(spec);
                 end
             else
-                error('Unknown ChannelMap spec format');
+                error('Unknown ChannelMap spec input format: %s', class(spec));
             end
         end
     end
     
     methods(Static)
         function map = fromMatFile(fname)
+            % Read a ChannelMap from a MAT file.
+            %
+            % map = fromMatFile(fname)
+            %
+            % Reads a MAT file and constructs a ChannelMap from it.
+            %
+            % It looks like this assumes that you have added a directory with
+            % probe map files to your Matlab path.
+            %
+            % Fname (string) is the path to a MAT file.
+            %
+            % The MAT file has to be in a particular format, which is not
+            % documented here.
+            %
+            % Returns a scalar npxutils.ChannelMap object.
             map = npxutils.ChannelMap();
             
             d = load(fname);
@@ -95,9 +123,21 @@ classdef ChannelMap
         end
         
         function map = fromProbeName(key)
-            key = lower(string(key));
+            % Get the ChannelMap for a given probe name.
+            %
+            % map = npxutils.Channel.amp.fromProbeName(key)
+            %
+            % Key (string) is the name of a probe. Case insensitive.
+            %
+            % Looks like this needs you to have added a directory that contains
+            % probe channel map files to your Matlab path before you call this.
+            %
+            % Returns a scalar ChannelMap.
+            arguments
+                key (1,1) string
+            end
             
-            switch key
+            switch lower(key)
                 case "phase3a"
                     fname = "neuropixPhase3A_kilosortChanMap.mat";
                 case "phase3a4"
@@ -107,7 +147,8 @@ classdef ChannelMap
                 case "phase3b2"
                     fname = "neuropixPhase3B2_kilosortChanMap.mat";
                 otherwise
-                    error('Unknown channel map key or file %s. Valid options are phase3a, phase3a4, phase3b1, phase3b2.', key);
+                    error('Unknown probe name for channel map: %s. Valid options are: %s', ...
+                        key, strjoin(npxutils.ChannelMap.knownProbeNames, ', '));
             end
             
             map = npxutils.ChannelMap.fromMatFile(fname);
@@ -153,120 +194,133 @@ classdef ChannelMap
     end
     
     methods
-        function tf = get.syncInAPFile(map)
-            tf = ~isempty(map.syncChannelIndex);
+        function tf = get.syncInAPFile(this)
+            tf = ~isempty(this.syncChannelIndex);
         end
         
-        function tf = get.syncInLFFile(map)
-            tf = ~isempty(map.syncChannelIndex);
+        function tf = get.syncInLFFile(this)
+            tf = ~isempty(this.syncChannelIndex);
         end
         
-        function zcoords = get.zcoords(map)
-            if isempty(map.zcoords)
-                zcoords = zeros(size(map.ycoords), 'like', map.ycoords);
+        function zcoords = get.zcoords(this)
+            if isempty(this.zcoords)
+                zcoords = zeros(size(this.ycoords), 'like', this.ycoords);
             else
-                zcoords = map.zcoords;
+                zcoords = this.zcoords;
             end
         end
         
-        function v = get.channelIds(map)
-            v = map.channelIdsMapped;
-            if ~isempty(map.syncChannelIndex)
-                v(map.syncChannelIndex) = map.syncChannelId;
+        function v = get.channelIds(this)
+            v = this.channelIdsMapped;
+            if ~isempty(this.syncChannelIndex)
+                v(this.syncChannelIndex) = this.syncChannelId;
             end
         end
         
-        function nChannels = get.nChannelsMapped(map)
-            nChannels = numel(map.channelIdsMapped);
+        function nChannels = get.nChannelsMapped(this)
+            nChannels = numel(this.channelIdsMapped);
         end
         
-        function nChannels = get.nChannels(map)
-            nChannels = numel(map.channelIds);
+        function nChannels = get.nChannels(this)
+            nChannels = numel(this.channelIds);
         end
         
-        function sites = get.connectedChannels(map)
-            sites = map.channelIds(map.connected);
+        function sites = get.connectedChannels(this)
+            sites = this.channelIds(this.connected);
         end
         
-        function sites = get.referenceChannels(map)
-            sites = setdiff(map.channelIdsMapped, map.connectedChannels);
+        function sites = get.referenceChannels(this)
+            sites = setdiff(this.channelIdsMapped, this.connectedChannels);
         end
         
-        function zspacing = get.zspacing(map)
-            zs = sort(map.zcoords(map.connected));
+        function zspacing = get.zspacing(this)
+            zs = sort(this.zcoords(this.connected));
             dzs = diff(zs);
             dzs = dzs(dzs > 0);
             zspacing = min(dzs);
         end
         
-        function yspacing = get.yspacing(map)
-            ys = sort(map.ycoords(map.connected));
+        function yspacing = get.yspacing(this)
+            ys = sort(this.ycoords(this.connected));
             dys = diff(ys);
             dys = dys(dys > 0);
             yspacing = min(dys);
         end
         
-        function xspacing = get.xspacing(map)
-            xs = sort(map.xcoords(map.connected));
+        function xspacing = get.xspacing(this)
+            xs = sort(this.xcoords(this.connected));
             dxs = diff(xs);
             dxs = dxs(dxs > 0);
             xspacing = min(dxs);
         end
         
-        function ylim = get.ylim(map)
-            ys = map.yspacing;
-            ylim = [min(map.ycoords) - ys, max(map.ycoords) + ys];
+        function ylim = get.ylim(this)
+            ys = this.yspacing;
+            ylim = [min(this.ycoords) - ys, max(this.ycoords) + ys];
         end
         
-        function xlim = get.xlim(map)
-            xs = map.yspacing;
-            xlim = [min(map.xcoords) - xs, max(map.xcoords) + xs];
+        function xlim = get.xlim(this)
+            xs = this.yspacing;
+            xlim = [min(this.xcoords) - xs, max(this.xcoords) + xs];
         end
         
-        function zlim = get.zlim(map)
-            zs = map.yspacing;
-            zlim = [min(map.zcoords) - zs, maz(map.zcoords) + zs];
+        function zlim = get.zlim(this)
+            zs = this.yspacing;
+            zlim = [min(this.zcoords) - zs, maz(this.zcoords) + zs];
         end
         
-        function coords = get.coords(map)
-            if map.nSpatialDims == 3
-                coords = cat(2, map.xcoords, map.ycoords, map.zcoords);
+        function coords = get.coords(this)
+            if this.nSpatialDims == 3
+                coords = cat(2, this.xcoords, this.ycoords, this.zcoords);
             else
-                coords = cat(2, map.xcoords, map.ycoords);
+                coords = cat(2, this.xcoords, this.ycoords);
             end
         end
         
-        function tf = get.invertChannelsY(map)
-            % bigger y coords are higher up on the probe. This is used when we want to plot stacked traces. If false,
-            % channel 1 belongs at the top (has largest y coord). If true, channel 1 belongs at the bottom (has smallest y coord)
+        function tf = get.invertChannelsY(this)
+            % Get invertChannels
             
-            tf = map.ycoords(1) < map.ycoords(end);
+            % bigger y coords are higher up on the probe. This is used when we
+            % want to plot stacked traces. If false, channel 1 belongs at the
+            % top (has largest y coord). If true, channel 1 belongs at the
+            % bottom (has smallest y coord)
+            
+            tf = this.ycoords(1) < this.ycoords(end);
         end
         
-        function [channelInds, channelIds] = lookup_channelIds(map, channelIds)
+        function [channelInds, channelIds] = lookup_channelIds(this, channelIds)
             if islogical(channelIds)
-                channelIds = map.channelIds(channelIds);
+                channelIds = this.channelIds(channelIds);
             end
-            [tf, channelInds] = ismember(channelIds, map.channelIds);
+            [tf, channelInds] = ismember(channelIds, this.channelIds);
             assert(all(tf), 'Some channel ids not found');
         end
         
-        function closest_ids = getClosestChannels(map, nClosest, channel_ids, eligibleChannelIds)
+        function closest_ids = getClosestChannels(this, nClosest, channelIds, eligibleChannelIds)
+            % Get channels that are closest to specified channels.
+            %
+            % closest_ids = getClosestChannels(obj, nClosest, channelIds, eligibleChannelIds)
+            %
+            % ChannelIds is a list of channels. Defaults to
+            % this.connectedChannels.
+            %
+            % EligibleChannelIds defaults to this.connectedChannels.
+            
             % channel_idx is is in 1:nChannels raw data indices
             % closest is numel(channel_idx) x nClosest
             
             if nargin < 3
-                channel_ids = map.connectedChannels;
+                channelIds = this.connectedChannels;
             end
             if nargin < 4
-                eligibleChannelIds = map.connectedChannels;
+                eligibleChannelIds = this.connectedChannels;
             end
             
-            eligibleChannelInds = map.lookup_channelIds(eligibleChannelIds);
+            eligibleChannelInds = this.lookup_channelIds(eligibleChannelIds);
             
-            x = map.xcoords(eligibleChannelInds);
-            y = map.ycoords(eligibleChannelInds);
-            z = map.zcoords(eligibleChannelInds);
+            x = this.xcoords(eligibleChannelInds);
+            y = this.ycoords(eligibleChannelInds);
+            z = this.zcoords(eligibleChannelInds);
             N = numel(x);
             
             X = repmat(x, 1, N);
@@ -277,7 +331,7 @@ classdef ChannelMap
             distSq = (X - X').^2 + (Y - Y').^2 + (Z - Z').^2;
             distSq(logical(eye(N))) = Inf; % don't localize each channel to itself
             
-            [tf, channel_inds] = ismember(channel_ids, eligibleChannelInds);
+            [tf, channel_inds] = ismember(channelIds, eligibleChannelInds);
             assert(all(tf), 'Cannot localize non-connected channels or channels not in eligibleChannelIds');
             
             closest_ids = nan(numel(channel_inds), nClosest);
@@ -293,19 +347,21 @@ classdef ChannelMap
             %             end
         end
         
-        function channel_ids_sorted = sortChannelsVertically(map, channel_ids)
-            channel_inds = map.lookup_channelIds(channel_ids);
-            if size(map.coords, 2) == 3
-                [~, sortIdx] = sortrows(map.coords(channel_inds, :), [-2 1 3]); % sort by y (high to low), x (low to high), then z (low to high)
+        function channel_ids_sorted = sortChannelsVertically(this, channel_ids)
+            channel_inds = this.lookup_channelIds(channel_ids);
+            if size(this.coords, 2) == 3
+                % sort by y (high to low), x (low to high), then z (low to high)
+                [~, sortIdx] = sortrows(this.coords(channel_inds, :), [-2 1 3]);
             else
-                [~, sortIdx] = sortrows(map.coords(channel_inds, :), [-2 1]); % sort by y (high to low), x (low to high)
+                % sort by y (high to low), x (low to high)
+                [~, sortIdx] = sortrows(this.coords(channel_inds, :), [-2 1]);
             end
             channel_ids_sorted = channel_ids(sortIdx);
         end
         
-        function plotRecordingSites(map, varargin)
+        function plotRecordingSites(this, varargin)
             p = inputParser();
-            p.addParameter('channel_ids', map.channelIdsMapped, @isvector);
+            p.addParameter('channel_ids', this.channelIdsMapped, @isvector);
             p.addParameter('goodChannels', [], @isvector);
             p.addParameter('badChannels', [], @isvector);
             
@@ -319,14 +375,14 @@ classdef ChannelMap
             p.addParameter('color_reference', [0.5 0.5 1], @(x) true);
             p.parse(varargin{:});
             
-            [channelInds, channelIds] = map.lookup_channelIds(p.Results.channel_ids);
-            xc = map.xcoords(channelInds);
-            yc = map.ycoords(channelInds);
+            [channelInds, channelIds] = this.lookup_channelIds(p.Results.channel_ids);
+            xc = this.xcoords(channelInds);
+            yc = this.ycoords(channelInds);
             
-            is_connected = ismember(channelIds, map.connectedChannels);
+            is_connected = ismember(channelIds, this.connectedChannels);
             is_good = ismember(channelIds, p.Results.goodChannels);
             is_bad = ismember(channelIds, p.Results.badChannels);
-            is_ref = ismember(channelIds, map.referenceChannels);
+            is_ref = ismember(channelIds, this.referenceChannels);
             cmap = zeros(numel(channelInds), 3);
             cmap(is_connected, :) = repmat(p.Results.color_connected, nnz(is_connected), 1);
             cmap(is_good, :) = repmat(p.Results.color_good, nnz(is_good), 1);

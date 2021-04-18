@@ -1,13 +1,14 @@
 classdef ConcatenationInfo < handle
+    
     properties
         fs
-        samplesPreShift (:, 1) uint64
-        timeShifts (:, 1) % npxutils.TimeShiftSpec
-        names (:, 1) string
-        gains (:, 1)
-        multipliers (:, 1)
-        adcBits (:, 1)
-        ranges (:, 2)
+        samplesPreShift (:,1) uint64
+        timeShifts (:,1) % npxutils.TimeShiftSpec
+        names (:,1) string
+        gains (:,1)
+        multipliers (:,1)
+        adcBits (:,1)
+        ranges (:,2)
         nSamples
     end
     
@@ -93,7 +94,7 @@ classdef ConcatenationInfo < handle
         end
     end
     
-    methods(Static)
+    methods (Static)
         function ci = inferFromOtherBand(imec, bandInfer, bandRef)
             ci = npxutils.ConcatenationInfo();
             
@@ -170,38 +171,38 @@ classdef ConcatenationInfo < handle
     end
     
     methods
-        function n = get.nDatasets(ds)
-            n = numel(ds.samplesPreShift);
+        function n = get.nDatasets(this)
+            n = numel(this.samplesPreShift);
         end
         
-        function v = get.samples(ci)
-            if isempty(ci.timeShifts)
-                v = ci.samplesPreShift;
+        function v = get.samples(this)
+            if isempty(this.timeShifts)
+                v = this.samplesPreShift;
             else
-                v = arrayfun(@(spec) spec.nShiftedTimes, ci.timeShifts);
+                v = arrayfun(@(spec) spec.nShiftedTimes, this.timeShifts);
             end
         end
         
-        function v = get.startIdx(ci)
-            cs = cumsum([uint64(1); ci.samples]);
+        function v = get.startIdx(this)
+            cs = cumsum([uint64(1); this.samples]);
             v = cs(1:end-1);
         end
         
-        function v = get.stopIdx(ci)
-            v = [ci.startIdx(2:end); ci.nSamples];
+        function v = get.stopIdx(this)
+            v = [this.startIdx(2:end); this.nSamples];
         end
         
-        function v = get.scaleToUvs(ci)
-            v = (ci.ranges(:, 2) - ci.ranges(:, 1)) ./ (2.^ci.adcBits) ./ ci.gains * 1e6;
+        function v = get.scaleToUvs(this)
+            v = (this.ranges(:, 2) - this.ranges(:, 1)) ./ (2.^this.adcBits) ./ this.gains * 1e6;
         end
         
-        function [fileInds, origSampleInds] = lookup_sampleIndexInSourceFiles(ci, inds)
+        function [fileInds, origSampleInds] = lookup_sampleIndexInSourceFiles(this, inds)
             % convert from a time index in this file to which of the concatenated files that index came from
             % factoring in the time shifts that were used to excise regions from those individual files before concatenating
             
             [fileInds, origSampleInds] = deal(zeros(size(inds), 'uint64'));
-            starts = ci.startIdx;
-            stops = ci.stopIdx;
+            starts = this.startIdx;
+            stops = this.stopIdx;
             
             for i = 1:numel(starts)
                 mask = inds >= starts(i) & inds <= stops(i);
@@ -210,15 +211,15 @@ classdef ConcatenationInfo < handle
             end
             
             % now unshift the original sampleInds
-            if ~isempty(ci.timeShifts)
-                for i = 1:ci.nDatasets
+            if ~isempty(this.timeShifts)
+                for i = 1:this.nDatasets
                     mask = fileInds == i;
-                    origSampleInds(mask) = ci.timeShifts(i).unshiftTimes(origSampleInds(mask));
+                    origSampleInds(mask) = this.timeShifts(i).unshiftTimes(origSampleInds(mask));
                 end
             end
         end
         
-        function markConcatenatedFileBoundaries(ci, varargin)
+        function markConcatenatedFileBoundaries(this, varargin)
             % mark the time points where multiple files were concatenated together
             % this assumes we are plotting into a space where ci.timeShifts is already applied (i.e. the concatenated file time axis),
             % but time_shifts may be passed in if needed to simulate a second set of time shifts
@@ -235,7 +236,7 @@ classdef ConcatenationInfo < handle
             xOffset = p.Results.xOffset;
             timeShifts = p.Results.time_shifts; %#ok<*PROPLC>
             
-            starts = ci.startIdx;
+            starts = this.startIdx;
             if ~isempty(timeShifts)
                 starts = timeShifts.shiftTimes(starts);
             end
@@ -246,19 +247,19 @@ classdef ConcatenationInfo < handle
                 mask = true(size(starts));
             end
             if p.Results.timeInSeconds
-                starts = double(starts) / ci.fs;
+                starts = double(starts) / this.fs;
             end
             washolding = ishold();
             for iF = 1:numel(starts)
                 if ~mask(iF), continue, end
-                h = xline(starts(iF) + xOffset, '-', ci.names{iF}, 'Color', p.Results.Color, 'LineWidth', p.Results.LineWidth, 'Interpreter', 'none');
+                h = xline(starts(iF) + xOffset, '-', this.names{iF}, 'Color', p.Results.Color, 'LineWidth', p.Results.LineWidth, 'Interpreter', 'none');
                 h.NodeChildren(1).NodeChildren(1).BackgroundColor = uint8(255*[1 1 1 0.5]');
                 hold on;
             end
             if ~washolding, hold off; end
         end
         
-        function markExcisionBoundaries(ci, varargin)
+        function markExcisionBoundaries(this, varargin)
             % marks times where each concatenated source file was split based on ci.timeShifts(iF)
             % this assumes we are plotting into a space where ci.timeShifts is NOT already applied (i.e. the concatenated file time axis)
             % but if time_shifts is passed in as ci.time_shifts, it will plot into the already time-shifted time axis
@@ -272,17 +273,17 @@ classdef ConcatenationInfo < handle
             sample_window = p.Results.sample_window;
             
             timeInSeconds = p.Results.timeInSeconds;
-            if isempty(ci.timeShifts)
+            if isempty(this.timeShifts)
                 return;
             end
             
             % map the sample_window into individual files
             if isempty(sample_window)
-                sample_window = [1 ci.nSamples];
+                sample_window = [1 this.nSamples];
             end
-            [window_fileInd, window_origInd] = ci.lookup_sampleIndexInSourceFiles(sample_window);
+            [window_fileInd, window_origInd] = this.lookup_sampleIndexInSourceFiles(sample_window);
             
-            for iF = 1:ci.nDatasets
+            for iF = 1:this.nDatasets
                 if window_fileInd(1) > iF || window_fileInd(2) < iF, continue, end % this file isn't in window at all
                 
                 sample_window_this = [-Inf Inf];
@@ -292,12 +293,12 @@ classdef ConcatenationInfo < handle
                 if window_fileInd(2) == iF
                     sample_window_this(2) = window_origInd(2);
                 end
-                ci.timeShifts(iF).markExcisionBoundaries('sample_window', sample_window_this, 'xOffset', xOffset, ...
-                    'timeInSeconds', timeInSeconds, 'fs', ci.fs, 'time_shifts', p.Results.time_shifts);
+                this.timeShifts(iF).markExcisionBoundaries('sample_window', sample_window_this, 'xOffset', xOffset, ...
+                    'timeInSeconds', timeInSeconds, 'fs', this.fs, 'time_shifts', p.Results.time_shifts);
                 if timeInSeconds
-                    xOffset = xOffset + ci.timeShifts(iF).nShiftedTimes / ci.fs;
+                    xOffset = xOffset + this.timeShifts(iF).nShiftedTimes / this.fs;
                 else
-                    xOffset = xOffset + ci.timeShifts(iF).nShiftedTimes;
+                    xOffset = xOffset + this.timeShifts(iF).nShiftedTimes;
                 end
             end
         end

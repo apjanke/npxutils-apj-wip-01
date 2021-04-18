@@ -8,10 +8,10 @@ classdef KilosortTrialSegmentedDataset < handle & matlab.mixin.Copyable
         is_segmented_by_trials logical = true;
         is_segmented_by_clusters logical = true;
         
-        trial_ids(:, 1) uint32
+        trial_ids (:,1) uint32
         
         % nTrials x 1
-        trial_has_data(:, 1) logical
+        trial_has_data (:, 1) logical
         
         % nTrials x 1
         trial_start(:, 1) uint64
