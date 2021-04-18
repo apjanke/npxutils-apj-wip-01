@@ -209,7 +209,7 @@ value = mmap.Data.x(ch_index, sample_index); % access a specific sample
 Equivalent functionality is available for LF files using `imec.memmapLF_full()`. If you wish to modify the underlying data file directly, you can also request a Writeable version of the memory map:
 
 ```matlab
-mmap = imec.memmapAP_full('Writiable', true);
+mmap = imec.memmapAP_full('Writable', true);
 mmap.Data.x(ch_index, sample_index) = new_value; % overwrite a specific sample
 ```
 
@@ -382,7 +382,7 @@ imecOut = imec.saveTransformedDataset(outPath, 'timeShiftsAP', timeShifts, ... )
 
 A cell array of `Neuropixel.TimeShiftSpec` instances can be provided when concatenating multiple files:
 
-```matlab 
+```matlab
 imecOut = Neuropixel.ImecDataset.writeConcatenatedFileMatchGains(outPath, imecList, ...
         'timeShiftsAP', {timeShift1, timeShift2, ... }, ...);
 ```
