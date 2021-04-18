@@ -1,35 +1,35 @@
 classdef ProgressBar < handle
-% Stripped down version for Neuropixel which does not support parallel mode
-% Generates a progress bar which uses ANSI color codes to colorize output
-% in a color terminal. The background color steadily advances along from 
-% left to right beneath a custom message and progress percentage string.
-%
-% Usage:
-%   pbar = ProgressBar('Message goes here', nThingsToProcess);
-%   for i = 1:nThingsToProcess
-%       pbar.update(i, [optional message update]);
-%       ...
-%   end
-%   pbar.finish([optional final message]);
-%
-% Daniel J. O'Shea, 2019
-
-properties(SetAccess=protected)
+    % Stripped down version for Neuropixel which does not support parallel mode
+    % Generates a progress bar which uses ANSI color codes to colorize output
+    % in a color terminal. The background color steadily advances along from
+    % left to right beneath a custom message and progress percentage string.
+    %
+    % Usage:
+    %   pbar = ProgressBar('Message goes here', nThingsToProcess);
+    %   for i = 1:nThingsToProcess
+    %       pbar.update(i, [optional message update]);
+    %       ...
+    %   end
+    %   pbar.finish([optional final message]);
+    %
+    % Daniel J. O'Shea, 2019
+    
+    properties(SetAccess=protected)
         message
         n = 0; % last value
         N
         cols
         trueColor = false;
-        firstUpdate  
+        firstUpdate
         timeStart
         
         lastCalled
         
         usingTerminal
-
+        
         fnamePrefix
         
-%         objWorker
+        %         objWorker
         
         nCompleteByWorker
         
@@ -44,7 +44,7 @@ properties(SetAccess=protected)
     properties(Constant)
         minInterval = 0.1; % seconds
     end
-
+    
     methods
         function pbar = ProgressBar(N, message, varargin)
             if nargin >= 2
@@ -81,7 +81,7 @@ properties(SetAccess=protected)
             pbar.lastNSpaces = 0;
             pbar.update(0);
         end
- 
+        
         function increment(pbar, varargin)
             if nargin > 1 && isnumeric(varargin{1})
                 by = varargin{1};
@@ -146,32 +146,32 @@ properties(SetAccess=protected)
                 message = [pbar.message(1:(pbar.cols - progLen - 6)), '...'];
             else
                 message = pbar.message;
-            end 
+            end
             
             gap = pbar.cols - 1 - (length(message)+1) - progLen;
             spaces = repmat(' ', 1, gap);
             if pbar.usingTerminal
-                str = [message spaces progStr]; 
+                str = [message spaces progStr];
             else
                 str = [message spaces blanks(numel(progStr))];
             end
-
+            
             % separate into colored portion of bar and non-colored portion of bar
             ind = min(length(str), ceil(ratio*pbar.cols));
             preStr = str(1:ind);
             postStr = str(ind+1:end);
-
+            
             % try using 24 color
             if pbar.trueColor
                 newPreStr = '';
                 for i = 1:numel(preStr)
                     color = pbar.trueCmap(i, :);
-%                     color = pbar.trueCmap(mod(i-1, size(pbar.trueCmap, 1))+1, :);
+                    %                     color = pbar.trueCmap(mod(i-1, size(pbar.trueCmap, 1))+1, :);
                     newPreStr = [newPreStr, sprintf('\x1b[48;2;%d;%d;%dm%s' , color, preStr(i))];
                 end
                 preStr = newPreStr;
             end
-
+            
             if pbar.usingTerminal
                 if pbar.firstUpdate
                     fprintf(' '); % don't delete whole line on first update
@@ -190,7 +190,7 @@ properties(SetAccess=protected)
             %disp(str);
             
         end
-
+        
         function finish(pbar, message, varargin)
             % if message is provided (also in printf format), the message
             % will be displayed. Otherwise, the progress bar will disappear
@@ -218,7 +218,7 @@ properties(SetAccess=protected)
             % Inspired by: http://blogs.mathworks.com/loren/2007/08/01/monitoring-progress-of-a-calculation/
             %
             % Modified by Dan O'Shea
-
+            
             %% Initialization
             
             strPercentageLength = 9;   %   Length of percentage string (must be >5)
@@ -230,13 +230,13 @@ properties(SetAccess=protected)
             end
             
             c = round(c*100, 1);
-
+            
             percentageOut = [num2str(c) '%%'];
             percentageOut = [repmat(' ',1,strPercentageLength-length(percentageOut)-1) percentageOut ' '];
             nDots = floor(c/100*strDotsMaximum);
             dotOut = ['[' repmat('_',1,nDots) repmat(' ',1,strDotsMaximum-nDots) ']   '];
             strOut = [percentageOut dotOut];
-
+            
             % Print it on the screen
             if pbar.textprogressStrCR == -1
                 % Don't do carriage return during first run
@@ -245,21 +245,21 @@ properties(SetAccess=protected)
                 % Do it during all the other runs
                 fprintf([pbar.textprogressStrCR strOut]);
             end
-
+            
             % Update carriage return
             pbar.textprogressStrCR = repmat('\b',1,length(strOut)-1);
-
+            
         end
     end
-
+    
     methods(Static)
         function [rows, cols] = getTerminalSize()
             usingTerminal = ~usejava('desktop');
-
+            
             % use sensible defaults
             rows = 24;
             cols = 80;
-
+            
             if (ismac || isunix) && usingTerminal
                 % actual terminal: get terminal width using tput
                 cmd = 'tput lines';
@@ -268,20 +268,20 @@ properties(SetAccess=protected)
                 if ~isempty(num)
                     rows = num(end);
                 end
-
+                
                 cmd = 'tput cols';
                 [~, r] = unix(cmd);
                 num = sscanf(r, '%d');
                 if ~isempty(num)
                     cols = num(end);
                 end
-
+                
             elseif ~usingTerminal %#ok<*PROP
                 % matlab command window size
                 try
                     jDesktop = com.mathworks.mde.desk.MLDesktop.getInstance;
                     cmdWin = jDesktop.getClient('Command Window');
-
+                    
                     jTextArea = cmdWin.getComponent(0).getViewport.getComponent(0);
                     height = jTextArea.getHeight();
                     width = jTextArea.getParent.getWidth();
@@ -289,13 +289,13 @@ properties(SetAccess=protected)
                     metrics = cmdWin.getFontMetrics(font);
                     charWidth = metrics.charWidth('A');
                     charHeight = metrics.getHeight();
-
+                    
                     rows = floor(height/charHeight);
                     cols = floor(width/charWidth);
                 catch
                 end
             end
-        end 
+        end
         
     end
 end

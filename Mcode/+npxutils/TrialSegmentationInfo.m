@@ -1,6 +1,6 @@
 classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
     % simple utility for describing how to segment trials in Kilosort
-
+    
     properties
         fs % sampling rate (Hz)
         trialId(:, 1) uint32
@@ -13,7 +13,7 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
         nTrials
         trialsAreAdjacent % true if each trial's stop == next trial's start
     end
-
+    
     methods
         function tsi = TrialSegmentationInfo(nTrials, fs)
             if nargin < 1
@@ -89,7 +89,7 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             longTrials = durations > maxDurSamples;
             tsi.idxStop(longTrials) = tsi.idxStart(longTrials) + maxDurSamples;
         end
-     
+        
         function [idxStart, idxStop, trialStartStop] = computeActiveRegions(tsi, varargin)
             p = inputParser();
             p.addParameter('maxPauseSec', 20, @isscalar); % in samples
@@ -115,12 +115,12 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
                 trialStartStop(iR, :) = [tsi.trialId(last), tsi.trialId(longPauses(iR))];
                 last = longPauses(iR) + 1;
             end
-
+            
             idxStart(end) = tsi.idxStart(last)-uint64(1);
             idxStop(end) = tsi.idxStop(end);
-            trialStartStop(end, :) = [tsi.trialId(last), tsi.trialId(end)]; 
+            trialStartStop(end, :) = [tsi.trialId(last), tsi.trialId(end)];
         end
-             
+        
         function markTrialStartStops(tsi, varargin) % assumes x is in seconds
             p = inputParser();
             p.addParameter('Color', [0 0 1], @isvector);
@@ -159,7 +159,7 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             p.addParameter('time_shifts', [], @(x) isempty(x) || isa(x, 'npxutils.TimeShiftSpec'));
             p.addParameter('side', 'bottom', @ischar);
             p.addParameter('Color', [0 0 1], @isvector);
-            p.addParameter('timeInSeconds', true, @islogical); % if true, x axis is seconds, if false, is samples 
+            p.addParameter('timeInSeconds', true, @islogical); % if true, x axis is seconds, if false, is samples
             p.addParameter('expand_limits', false, @islogical);
             p.addParameter('xOffset', 0, @isscalar);
             p.parse(varargin{:});
@@ -197,10 +197,10 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
         function markActiveRegions(tsi, varargin)
             % marks regions that are densely covered with trials (ignoring gaps between trials
             p = inputParser();
-            p.addParameter('maxPauseSec', 20, @isscalar); 
+            p.addParameter('maxPauseSec', 20, @isscalar);
             p.addParameter('time_shifts', [], @(x) isempty(x) || isa(x, 'npxutils.TimeShiftSpec'));
             p.addParameter('Color', [0 0 1], @isvector);
-            p.addParameter('timeInSeconds', true, @islogical); % if true, x axis is seconds, if false, is samples 
+            p.addParameter('timeInSeconds', true, @islogical); % if true, x axis is seconds, if false, is samples
             
             p.addParameter('LineSpecStart', '-', @ischar);
             p.addParameter('LineSpecStop', '--', @ischar);
@@ -235,7 +235,7 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             p.addParameter('sample_window', [], @(x) isempty(x) || isvector(x)); % masks which trials to include, note that it applies before the time shifts
             p.addParameter('time_shifts', [], @(x) isempty(x) || isa(x, 'npxutils.TimeShiftSpec'));
             p.addParameter('Color', [0 0 1], @ismatrix);
-            p.addParameter('timeInSeconds', true, @islogical); % if true, x axis is seconds, if false, is samples 
+            p.addParameter('timeInSeconds', true, @islogical); % if true, x axis is seconds, if false, is samples
             
             p.addParameter('LineSpecStart', '-', @ischar);
             p.addParameter('LineSpecStop', '--', @ischar);
@@ -292,5 +292,5 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             spec = npxutils.TimeShiftSpec.buildToExciseGaps(idxStart, idxStop);
         end
     end
-
+    
 end

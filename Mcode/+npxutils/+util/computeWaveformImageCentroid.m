@@ -40,7 +40,7 @@ switch method
         % --> nImages x 1 x spatialDim --> nIamges x spatialDim
         image_pos = npxutils.util.TensorUtils.squeezeDims(sum(amp_data_thresh .* image_ch_pos, 2) ./ ...
             sum(amp_data_thresh, 2), 2);
-
+        
     case 'com_via_provided_amplitudes'
         % compute the center of mass taking the amplitude as given by the single timepoint in image_data
         assert(nTime == 1);
@@ -49,7 +49,7 @@ switch method
         
         amp_data_thresh = amp_data_raw;
         amp_data_thresh(image_data < peak_amp * relThresh) = 0;
-
+        
         image_pos = npxutils.util.TensorUtils.squeezeDims(sum(amp_data_thresh .* image_ch_pos, 2) ./ ...
             sum(amp_data_thresh, 2), 2);
         
@@ -78,7 +78,7 @@ switch method
         % --> nImages x 1 x spatialDim --> nIamges x spatialDim
         image_pos = npxutils.util.TensorUtils.squeezeDims(sum(amp_data_thresh .* image_ch_pos, 2) ./ ...
             sum(amp_data_thresh, 2), 2);
-
+        
     otherwise
         error('Unknown centroid method %s', method);
         

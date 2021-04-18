@@ -19,7 +19,7 @@ for i = 1:Nrank
         % [Nfilt, Nfilt, ntimelag == 2*nt0-1] correlation over all time lags
         XC = reshape(npxutils.util.xcorrAB(single(W(:, :, i)), single(W(:, :, j))), 2*nt0-1, Nfilt, Nfilt);
         wtw0 = utu0 .* permute(XC, [2 3 1]); % --> ntimelag x nfilt x nfilt
-
+        
         WtW = WtW + wtw0; % add it to the full correlation array
     end
 end
@@ -27,7 +27,7 @@ end
 if nargin>2 && nargout>1
     % the maximum across timelags accounts for sample alignment mismatch
     cc = max(WtW(:,:,:), [], 3);
-
+    
     [~, isort] = sort(cc, 1, 'descend');
     iNear = rem([1:Nnearest]-1, Nfilt) + 1;% if we don't have enough templates yet, just wrap the indices around the range 1:Nfilt
     iList = int32(isort(iNear, :)); % return the list of pairs for each template

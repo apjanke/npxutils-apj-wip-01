@@ -13,7 +13,7 @@ else
     if ~isempty(parent)
         npxutils.util.mkdirRecursive(parent);
     end
-
+    
     mkdir(dirPath);
 end
 

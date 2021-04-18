@@ -27,12 +27,12 @@ valsCell = cell(sz);
 nFields = length(fields);
 
 if nFields > 0
-    argsForStruct = cell(2*nFields, 1); 
+    argsForStruct = cell(2*nFields, 1);
     for i = 1:nFields
         argsForStruct{2*i-1} = fields{i};
         argsForStruct{2*i} = valsCell;
     end
-
+    
     S = struct(argsForStruct{:});
 elseif prod(sz) == 0
     S = struct(zeros(0, 1));

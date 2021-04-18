@@ -1,6 +1,6 @@
 classdef ChannelMap
-% Author: Daniel J. O'Shea (2019)
-
+    % Author: Daniel J. O'Shea (2019)
+    
     properties
         file  (1, 1) string
         name (1, 1) string
@@ -106,50 +106,50 @@ classdef ChannelMap
                     fname = "neuropixPhase3B1_kilosortChanMap.mat";
                 case "phase3b2"
                     fname = "neuropixPhase3B2_kilosortChanMap.mat";
-                otherwise 
+                otherwise
                     error('Unknown channel map key or file %s. Valid options are phase3a, phase3a4, phase3b1, phase3b2.', key);
             end
             
             map = npxutils.ChannelMap.fromMatFile(fname);
         end
         
-%         function map = fromMeta(meta)
-%             % this function is from Nick Steinmetz: takes a .meta file from spikeglx and produces a kilosort-compatible channel map.
-%             % In order to get the x and y coordinates correct in units of µm it needs a little additional info about the probe geometry
-%             % which is hard-coded there for neuropixels 2.0, but that aspect of the function could be straightforwardly improved. 
-%             
-%             chanMap = [1:nCh(1)]'; 
-%             chanMap0ind = chanMap-1;
-%             connected = true(size(chanMap)); W
-% 
-%             shankSep = 250; 
-%             rowSep = 15; 
-%             colSep = 32;
-% 
-%             openParen = find(shankMap=='('); 
-%             closeParen = find(shankMap==')'); 
-%             for c = 1:nCh(1)
-%                 thisMap = shankMap(openParen(c+1)+1: closeParen(c+1)-1); 
-%                 thisMap(thisMap==':') = ',';
-%                 n = str2num(thisMap); 
-%                 xcoords(c) = (n(1)-1)*shankSep + (n(2)-1)*colSep; 
-%                 ycoords(c) = (n(3)-1)*rowSep; 
-%             end
-% 
-%             cm = struct();
-%             cm.chanMap = chanMap; 
-%             cm.chanMap0ind = chanMap0ind;
-%             cm.xcoords = xcoords'; 
-%             cm.ycoords = ycoords'; 
-%             cm.connected = connected;
-%             [~,name] = fileparts(m.imRoFile); 
-%             cm.name = name;
-%             
-%             snsChanMap = char(snsChanMap);
-%             map = npxutils.ChannelMap();
-%             
-%             
-%         end
+        %         function map = fromMeta(meta)
+        %             % this function is from Nick Steinmetz: takes a .meta file from spikeglx and produces a kilosort-compatible channel map.
+        %             % In order to get the x and y coordinates correct in units of µm it needs a little additional info about the probe geometry
+        %             % which is hard-coded there for neuropixels 2.0, but that aspect of the function could be straightforwardly improved.
+        %
+        %             chanMap = [1:nCh(1)]';
+        %             chanMap0ind = chanMap-1;
+        %             connected = true(size(chanMap)); W
+        %
+        %             shankSep = 250;
+        %             rowSep = 15;
+        %             colSep = 32;
+        %
+        %             openParen = find(shankMap=='(');
+        %             closeParen = find(shankMap==')');
+        %             for c = 1:nCh(1)
+        %                 thisMap = shankMap(openParen(c+1)+1: closeParen(c+1)-1);
+        %                 thisMap(thisMap==':') = ',';
+        %                 n = str2num(thisMap);
+        %                 xcoords(c) = (n(1)-1)*shankSep + (n(2)-1)*colSep;
+        %                 ycoords(c) = (n(3)-1)*rowSep;
+        %             end
+        %
+        %             cm = struct();
+        %             cm.chanMap = chanMap;
+        %             cm.chanMap0ind = chanMap0ind;
+        %             cm.xcoords = xcoords';
+        %             cm.ycoords = ycoords';
+        %             cm.connected = connected;
+        %             [~,name] = fileparts(m.imRoFile);
+        %             cm.name = name;
+        %
+        %             snsChanMap = char(snsChanMap);
+        %             map = npxutils.ChannelMap();
+        %
+        %
+        %         end
     end
     
     methods
@@ -183,7 +183,7 @@ classdef ChannelMap
         function nChannels = get.nChannels(map)
             nChannels = numel(map.channelIds);
         end
-            
+        
         function sites = get.connectedChannels(map)
             sites = map.channelIds(map.connected);
         end
@@ -237,16 +237,16 @@ classdef ChannelMap
         end
         
         function tf = get.invertChannelsY(map)
-            % bigger y coords are higher up on the probe. This is used when we want to plot stacked traces. If false, 
+            % bigger y coords are higher up on the probe. This is used when we want to plot stacked traces. If false,
             % channel 1 belongs at the top (has largest y coord). If true, channel 1 belongs at the bottom (has smallest y coord)
             
             tf = map.ycoords(1) < map.ycoords(end);
         end
         
         function [channelInds, channelIds] = lookup_channelIds(map, channelIds)
-             if islogical(channelIds)
+            if islogical(channelIds)
                 channelIds = map.channelIds(channelIds);
-             end
+            end
             [tf, channelInds] = ismember(channelIds, map.channelIds);
             assert(all(tf), 'Some channel ids not found');
         end
@@ -263,16 +263,16 @@ classdef ChannelMap
             end
             
             eligibleChannelInds = map.lookup_channelIds(eligibleChannelIds);
-                
+            
             x = map.xcoords(eligibleChannelInds);
             y = map.ycoords(eligibleChannelInds);
             z = map.zcoords(eligibleChannelInds);
             N = numel(x);
-
+            
             X = repmat(x, 1, N);
             Y = repmat(y, 1, N);
             Z = repmat(z, 1, N);
-
+            
             % distance between all connected and non-connected channels
             distSq = (X - X').^2 + (Y - Y').^2 + (Z - Z').^2;
             distSq(logical(eye(N))) = Inf; % don't localize each channel to itself
@@ -287,10 +287,10 @@ classdef ChannelMap
                 closest_ids(iC, :) = eligibleChannelIds(idxSort(1:nClosest));
             end
             
-%             function idxFull = indicesIntoMaskToOriginalIndices(idxIntoMasked, mask)
-%                 maskInds = find(mask);
-%                 idxFull = maskInds(idxIntoMasked);
-%             end
+            %             function idxFull = indicesIntoMaskToOriginalIndices(idxIntoMasked, mask)
+            %                 maskInds = find(mask);
+            %                 idxFull = maskInds(idxIntoMasked);
+            %             end
         end
         
         function channel_ids_sorted = sortChannelsVertically(map, channel_ids)
@@ -344,16 +344,16 @@ classdef ChannelMap
             h.DataTipTemplate.DataTipRows(2).Format = '%g um';
             h.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('channel id', double(channelIds));
             h.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('type', channelTypes);
-
+            
             if p.Results.showChannelLabels
                 for iC = 1:numel(channelInds)
                     text(xc(iC), yc(iC), sprintf('ch %d', m.channel_ids(channelInds(iC))), ...
-                            'HorizontalAlignment', 'right', 'VerticalAlignment', 'middle', ...
-                            'Background', 'none', ...
-                            p.Results.labelArgs{:});
+                        'HorizontalAlignment', 'right', 'VerticalAlignment', 'middle', ...
+                        'Background', 'none', ...
+                        p.Results.labelArgs{:});
                 end
             end
         end
-            
+        
     end
 end

@@ -44,7 +44,7 @@ if size(whitening, 1) == nCh
     whitening(end+1, :) = 0;
     whitening(:, end+1) = 0;
     whitening(end, end) = 1;
-
+    
     whitening_inv = whitening^(-1);
     
     writeNPY(whitening, fullfile(savePath, 'whitening_mat.npy'));

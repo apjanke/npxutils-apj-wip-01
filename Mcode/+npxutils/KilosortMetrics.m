@@ -464,7 +464,7 @@ classdef KilosortMetrics < handle
                     template_batch_time_channel = permute(m.construct_scaled_template_batchwise(iT, 'batches', m.batchesComputed, ...
                         'average_skipped_batches', average_skipped_batches), [4 2 3 1]);
                     
-                    % some of these can be nan if the template is entirely zero 
+                    % some of these can be nan if the template is entirely zero
                     template_centroid_batchwise(iT, :, :) = npxutils.util.computeWaveformImageCentroid(...
                         template_batch_time_channel, 1:m.nChannelsSorted, m.ks.channel_positions_sorted);
                     
@@ -496,7 +496,7 @@ classdef KilosortMetrics < handle
                             % we have to mask over templates because unusued templates will have NaN centroids and the product will be NaN even where weight is 0
                             mask_template = weights_temp_batch ~= 0;
                             cluster_centroid_batchwise(iC, iB, :) =  weights_temp_batch(mask_template) * permute(m.template_centroid_batchwise(mask_template, iB, :), [1 3 2]);
-
+                            
                             cluster_waveform_batchwise(iC, :, iB) = weights_temp_batch(mask_template) * m.template_waveform_batchwise(mask_template, :, iB);
                             cluster_amplitude_batchwise(iC, iB) = weights_temp_batch(mask_template) * m.template_amplitude_batchwise(mask_template, iB);
                         end
@@ -586,7 +586,7 @@ classdef KilosortMetrics < handle
             % and return either the min or the max, depending on which absolute value is larger
             hi = max(m.cluster_waveform(:, :, 1), [], 2, 'omitnan');
             lo = min(m.cluster_waveform(:, :, 1), [], 2, 'omitnan');
-           
+            
             ratio = hi ./ -lo; % will be positive (typically axonal spikes)
             m = -lo > hi;
             ratio(m) = lo(m) ./ hi(m); % will be negative
@@ -1011,7 +1011,7 @@ classdef KilosortMetrics < handle
             p.addParameter('minAmpQuantile', 0, @isscalar);
             p.addParameter('showIndividual', false, @islogical);
             p.addParameter('highlightGaps', true, @islogical);
-            p.addParameter('onlyGaps', false, @islogical), 
+            p.addParameter('onlyGaps', false, @islogical),
             p.addParameter('minGapSeconds', 300, @isscalar);
             
             p.addParameter('showSmooth', true, @islogical); % smooth amplitudes over spikes by this width
@@ -1048,7 +1048,7 @@ classdef KilosortMetrics < handle
             showSmooth = p.Results.showSmooth;
             showIndividual = p.Results.showIndividual;
             highlightGaps = p.Results.highlightGaps;
-            onlyGaps = p.Results.onlyGaps; 
+            onlyGaps = p.Results.onlyGaps;
             alpha = p.Results.alpha;
             if alpha == 1 && showSmooth
                 alpha = 0.3;
@@ -1191,7 +1191,7 @@ classdef KilosortMetrics < handle
                 mask_keep = ~mask_invalidate | first_gap;
                 xb = xb(mask_keep);
                 yb = yb(mask_keep);
-
+                
                 gaps = find(first_gap(mask_keep));
                 gaps = gaps(gaps > 1) - 1; % ensure the index points to before the gap starts
                 
@@ -1357,7 +1357,7 @@ classdef KilosortMetrics < handle
                 end
             end
             
-            if ~isempty(tsi)    
+            if ~isempty(tsi)
                 % make ticks at the bottom of the plot
                 hold on;
                 if isempty(p.Results.trialTickColorIndex)
@@ -1379,7 +1379,7 @@ classdef KilosortMetrics < handle
                             'time_shifts', timeShiftsAppliedHere, 'xOffset', xOffset, 'side', 'bottom', 'Color', cmap(iC, :));
                     end
                 end
-                    
+                
                 % optionally mark specific trial starts
                 if ~isempty(p.Results.markSpecificTrialIds)
                     markTrialIds = npxutils.util.makecol(p.Results.markSpecificTrialIds);
@@ -1777,8 +1777,8 @@ classdef KilosortMetrics < handle
             if nargin < 2
                 nBatch = m.nBatchesComputed;
             end
-                        cmap = npxutils.util.colorcet('d6', 'N', nBatch);
-%             cmap = npxutils.util.cmocean('haline', nBatch);
+            cmap = npxutils.util.colorcet('d6', 'N', nBatch);
+            %             cmap = npxutils.util.cmocean('haline', nBatch);
         end
         
         function cmap = getDefaultCategoricalColormap(~, nItems)
@@ -2212,19 +2212,19 @@ classdef KilosortMetrics < handle
             
             colormap = p.Results.colormap;
             if isempty(colormap)
-%                 if numel(cluster_ids) < 20
+                %                 if numel(cluster_ids) < 20
                 if exist('turbo', 'file')
                     colormap = turbo(numel(clusterInds));
                 else
                     colormap = npxutils.util.turbomap(numel(clusterInds));
                 end
-%                     colormap = cbrewer('div', 'Spectral', numel(clusterInds));                 
-%                 % color by cluster amplitude
-%                 colormap = cmocean('haline', numel(clusterInds));
-% %                 colormap = npxutils.util.evalColorMapAt(colormap, linspace(0, 1, numel(clusterInds)));
-%                 [~, sortIdx] = sort(m.cluster_amplitude(clusterInds), 'ascend');
-%                 [~, cmapSort] = ismember(1:numel(clusterInds), sortIdx);
-%                 colormap = colormap(cmapSort, :);
+                %                     colormap = cbrewer('div', 'Spectral', numel(clusterInds));
+                %                 % color by cluster amplitude
+                %                 colormap = cmocean('haline', numel(clusterInds));
+                % %                 colormap = npxutils.util.evalColorMapAt(colormap, linspace(0, 1, numel(clusterInds)));
+                %                 [~, sortIdx] = sort(m.cluster_amplitude(clusterInds), 'ascend');
+                %                 [~, cmapSort] = ismember(1:numel(clusterInds), sortIdx);
+                %                 colormap = colormap(cmapSort, :);
             end
             
             % nClusters x 2 or 3

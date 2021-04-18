@@ -42,10 +42,10 @@ save(fname, 'rez', '-v7.3');
 end
 
 function s = clearFields(s, flds)
-    for iF = 1:numel(flds)
-        fld = flds{iF};
-        if isfield(s, fld)
-            s = rmfield(s, fld);
-        end
+for iF = 1:numel(flds)
+    fld = flds{iF};
+    if isfield(s, fld)
+        s = rmfield(s, fld);
     end
-end  
+end
+end

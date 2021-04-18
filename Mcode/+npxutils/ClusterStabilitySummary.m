@@ -46,7 +46,7 @@ classdef ClusterStabilitySummary < handle & matlab.mixin.Copyable
             mask = ~ismissing(s.condition_ids);
             uc = unique(s.condition_ids(mask));
         end
-
+        
         function t = getStartTimeSec(s)
             t = double(s.idxStart) / double(s.fs);
         end
@@ -54,7 +54,7 @@ classdef ClusterStabilitySummary < handle & matlab.mixin.Copyable
         function clusterInd = lookup_clusterIds(s, cluster_ids)
             [tf, clusterInd] = ismember(uint32(cluster_ids), s.cluster_ids);
             assert(all(tf), 'Clusters not found');
-        end  
+        end
         
         function [conditionInd, condition_list] = lookup_conditionIdsInList(s, condition_ids)
             condition_list = s.condition_list;

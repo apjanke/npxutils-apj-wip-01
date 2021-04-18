@@ -2,7 +2,7 @@ function [out, transformInfo] = plotStackedTraces(tvec, data_txcxl, varargin)
 % data is time x channels x layers
 
 p = inputParser();
-p.addParameter('style', 'traces', @(x) ischar(x) || isstring(x)); 
+p.addParameter('style', 'traces', @(x) ischar(x) || isstring(x));
 p.addParameter('transformInfo', [], @(x) isempty(x) || isstruct(x));
 
 p.addParameter('colors', [], @(x) true); % over channels
@@ -22,7 +22,7 @@ p.addParameter('invertChannels', false, @islogical);
 % common data tip for all traces
 % value is of size(data) (t x c x l) and singleton dimensions will be automatically expanded
 p.addParameter('dataTipLabel', 'overlay', @(x) isempty(x) || ischar(x) || isstring(x));
-p.addParameter('dataTipValues', [], @(x) true); 
+p.addParameter('dataTipValues', [], @(x) true);
 p.addParameter('dataTipFormat', '', @ischar);
 
 p.addParameter('showChannelDataTips', true, @islogical);
@@ -52,7 +52,7 @@ traceColors = p.Results.colors;
 if ~isempty(traceColors) && size(traceColors, 1) == 1
     traceColors = repmat(traceColors, nTraces, 1);
 end
-layerColors = p.Results.layerColors; 
+layerColors = p.Results.layerColors;
 if ~isempty(layerColors) && size(layerColors, 1) == 1
     layerColors = repmat(layerColors, nLayers, 1);
 end
@@ -102,7 +102,7 @@ elseif numel(tform.normBy) > 1
 end
 
 if ~isfield(tform, 'gain')
-    tform.gain = p.Results.gain; 
+    tform.gain = p.Results.gain;
 end
 data(:, cmask, :) = data(:, cmask, :) * tform.gain;
 data(:, ~cmask, :) = data(:, ~cmask, :) * 0.95; % this keeps logical bits from touching
@@ -185,30 +185,30 @@ switch style
                 end
             end
             
-
-            if ~verLessThan('matlab', '9.6.0') 
-                if ~isempty(channel_ids) && showChannelDataTips % R2019a 
+            
+            if ~verLessThan('matlab', '9.6.0')
+                if ~isempty(channel_ids) && showChannelDataTips % R2019a
                     for iL = 1:nLayers
                         nPoints = numel(hvec(iR, iL).XData);
                         hvec(iR, iL).DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('channel', repmat(double(channel_ids(iR, iL)), nPoints, 1), '%d');
                     end
                 end
-
+                
                 if ~isempty(dataTipValue)
                     for iL = 1:nLayers
                         hvec(iR, iL).DataTipTemplate.DataTipRows(end+1) = dataTipTextRow(p.Results.dataTipLabel, double(dataTipValue(:, iR, iL)), dtipfmatArg{:});
                     end
                 end
             end
-
+            
             hold on;
-
-        %     if ~isempty(labels)
-        %         text(tvec(1) - (tvec(2) - tvec(1)), offsets(iR), labels{iR}, 'Background', 'none', ...
-        %             'HorizontalAlign', 'right', 'VerticalAlign', 'bottom', 'Color', colors(iR, :));
-        %     end
+            
+            %     if ~isempty(labels)
+            %         text(tvec(1) - (tvec(2) - tvec(1)), offsets(iR), labels{iR}, 'Background', 'none', ...
+            %             'HorizontalAlign', 'right', 'VerticalAlign', 'bottom', 'Color', colors(iR, :));
+            %     end
         end
-
+        
     case 'heatmap'
         assert(nLayers == 1);
         npxutils.util.pmatbal(data');
@@ -245,7 +245,7 @@ if ~isempty(p.Results.colorOverlayLabels)
             
             hLabel{iU, iL} = plot(tvec(t_mask), dataMasked(t_mask, ch_mask, iL), '-', 'Color', labelCmap(iU, :), 'LineWidth', p.Results.LineWidth, p.Results.lineArgs{:});
             
-            if ~verLessThan('matlab', '9.6.0') && showOverlayDataTips && ~isempty(dataTipValuesByLabel) % R2019a 
+            if ~verLessThan('matlab', '9.6.0') && showOverlayDataTips && ~isempty(dataTipValuesByLabel) % R2019a
                 for iH = 1:numel(hLabel{iU, iL})
                     nPoints = numel(hLabel{iU, iL}(iH).XData);
                     label_this = repmat(dataTipValuesByLabel(iU), nPoints, 1);

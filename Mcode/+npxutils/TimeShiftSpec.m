@@ -30,7 +30,7 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
                 spec.idxStart = uint64(idxStart);
                 spec.idxStop = uint64(idxStop);
                 spec.idxShiftStart = uint64(idxShiftStart);
-            end     
+            end
         end
         
         function specNew = convertToDifferentSampleRate(spec, fsThis, fsNew, maxSamples)
@@ -95,8 +95,8 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
                 % no offset by 1 here, time == idxShiftStart should map to idxStart exactly
                 time_src(mask) = uint64(int64(times(mask)) - int64(spec.idxShiftStart(iR)) +  int64(spec.idxStart(iR)));
             end
-%             srcIdx = spec.computeSourceIndices();
-%             [~, time_src] = ismember(times, srcIdx);
+            %             srcIdx = spec.computeSourceIndices();
+            %             [~, time_src] = ismember(times, srcIdx);
         end
         
         function constrainToNumSamples(spec, nSamplesSource)
@@ -117,18 +117,18 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
             % compute a nShiftedTimes x 1 vector of indices into the source file imec
             % that would occupy times 1:nShiftedTimes in the shifted output file
             % if a given slot isn't filled, it will be set to 0
-           
+            
             if nargin > 1
                 spec.constrainToNumSamples(nSamplesSource);
             end
-
+            
             shiftIndices = zeros(spec.nShiftedTimes, 1, 'uint64');
             dur = spec.intervalDurations;
             for i = 1:spec.nIntervals
-               offsets = int64(0):(int64(dur(i)) - int64(1));
-               to = int64(spec.idxShiftStart(i)) + offsets;
-               from = int64(spec.idxStart(i)) + offsets;
-               shiftIndices(to) = from;
+                offsets = int64(0):(int64(dur(i)) - int64(1));
+                to = int64(spec.idxShiftStart(i)) + offsets;
+                from = int64(spec.idxStart(i)) + offsets;
+                shiftIndices(to) = from;
             end
         end
         
@@ -137,7 +137,7 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
             p.addParameter('sample_window', [], @(x) isempty(x) || isvector(x)); % set this to the x window being shown to avoid plotting hidden boundaries
             p.addParameter('Color', [0.9 0.3 0.9], @isvector);
             p.addParameter('LineWidth', 1, @isscalar);
-            p.addParameter('timeInSeconds', true, @islogical); % if true, x axis is seconds, if false, is samples 
+            p.addParameter('timeInSeconds', true, @islogical); % if true, x axis is seconds, if false, is samples
             p.addParameter('fs', 0, @(x) isempty(x) || isscalar(x));
             p.addParameter('xOffset', 0, @isscalar);
             p.addParameter('time_shifts', [], @(x) isempty(x) || isa(x, 'npxutils.TimeShiftSpec')); % applied on what is plotted, on top of this spec
@@ -191,7 +191,7 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
         end
         
         function spec = from_string(str, nSamplesFull)
-            % string is as generated from to_string, possibly multiple strings concatenated 
+            % string is as generated from to_string, possibly multiple strings concatenated
             str = strtrim(string(str));
             if str == ""
                 spec = npxutils.TimeShiftSpec.non_shift(nSamplesFull);
@@ -201,7 +201,7 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
                 mat = str2num(str); %#ok<ST2NM>
                 spec = npxutils.TimeShiftSpec.from_matrix(mat, nSamplesFull);
             end
-        end  
+        end
         
         function spec = buildToExciseGaps(idxStart, idxStop)
             regionDurations = int64(idxStop) - int64(idxStart);
@@ -212,7 +212,7 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
                     regionUpdatedStarts(iR) = regionUpdatedStarts(iR-1) + regionDurations(iR-1);
                 end
             end
-
+            
             spec = npxutils.TimeShiftSpec(idxStart, idxStop, regionUpdatedStarts);
         end
         

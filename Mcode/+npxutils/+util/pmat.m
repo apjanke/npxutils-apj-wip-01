@@ -44,7 +44,7 @@ else
 end
 
 [X, Y] = meshgrid(x, y);
-        
+
 % need an extra row and column because of the way that pcolor works
 m = addRowCol(m);
 X = addRowCol(X);

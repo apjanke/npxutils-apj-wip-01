@@ -1,5 +1,5 @@
 classdef KilosortPartialResort < handle & matlab.mixin.Copyable
-
+    
     properties(Transient)
         ks  % npxutils.KilosortDataset
     end
@@ -14,18 +14,18 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
         
         % amplitudes.npy - [nSpikes, ] double vector with the amplitude scaling factor that was applied to the template when extracting that spike
         amplitudes(:,1) single;
-
+        
         % spike_templates.npy - [nSpikes, ] uint32 vector specifying the identity of the template that was used to extract each spike
         spike_templates(:, 1) uint32
         
         % spike_templates.npy - [nSpikes, ] uint32 vector specifying the identity of the template that was originally used to extract each spike, before splitAllClusters
         spike_templates_preSplit(:, 1) uint32
-
+        
         % spike_clusters.npy - [nSpikes, ] uint32 vector giving the cluster identity of each spike. This file is optional and
         % if not provided will be automatically created the first time you run the template gui, taking the same values as
         % spike_templates.npy until you do any merging or splitting.
         spike_clusters(:, 1) uint32
-
+        
         % [nSpikesCutoff, ] uint64 vector giving the spike time of each spike in samples. To convert to seconds, divide by sample_rate from params.py.
         cutoff_spike_times(:, 1) uint64
         cutoff_amplitudes(:, 1) single
@@ -43,7 +43,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
         % template_features.npy - [nSpikes, nTemplateRank] single matrix giving the magnitude of the projection of each spike onto nTemplateRank other features.
         % Which other features is specified in template_feature_ind.npy
         template_features(:, :) single
-
+        
         cutoff_template_features(:, :) single % [nSpikesCutoff, nTemplateRank]
         
         % [nSpikesCutoff, nFeaturesPerChannel, nPCFeatures] single matrix giving the PC values for each spike (from .cProjPC_cutoff_invalid)
@@ -95,7 +95,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
                 mask_keep = mask_keep & ~(ks.spike_times >= kspr.sort_windows(iW, 1) & ks.spike_times <= kspr.sort_windows(iW, 2));
                 mask_keep_cutoff = mask_keep_cutoff & ~(ks.cutoff_spike_times >= kspr.sort_windows(iW, 1) & ks.cutoff_spike_times <= kspr.sort_windows(iW, 2));
             end
-           
+            
             debug('Removing %d spikes / %d cutoff, inserting %d / %d in %d sort windows\n', nnz(~mask_keep), nnz(~mask_keep_cutoff), kspr.nSpikes, kspr.nSpikesCutoff, kspr.nSortWindows);
             ks.mask_spikes(mask_keep, mask_keep_cutoff);
             ks.append_spikes(kspr);
@@ -104,7 +104,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
         
         function [spike_idx_segmented, cutoff_spike_idx_segmented] = segment_into_windows_clusters(kspr, varargin)
             % used mostly for evaluating the response, quickly segments spike times into sort_windows and cluster_ids
-            % spike_idx_segmented is a nSortWindows x nClusters 
+            % spike_idx_segmented is a nSortWindows x nClusters
             p = inputParser();
             p.addParameter('cluster_ids', kspr.cluster_ids, @isvector);
             p.addParameter('elide_padding', [0 0], @isvector); % in samples
@@ -136,7 +136,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
         end
         
         function [spike_time_segmented_rel, cutoff_spike_time_segmented_rel] = segment_align_into_windows_clusters(kspr, varargin)
-            % spike_time_segmented_rel is nSortWindows x nClusters { nTimes } where each time is relative to (start of the sort window plus elide_padding(1)) 
+            % spike_time_segmented_rel is nSortWindows x nClusters { nTimes } where each time is relative to (start of the sort window plus elide_padding(1))
             % unless convert_to_ms is true, times are in samples, not ms
             p = inputParser();
             p.addParameter('sort_window_mask', true(kspr.nSortWindows, 1), @isvector);
@@ -147,7 +147,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
             p.parse(varargin{:});
             
             % used mostly for evaluating the response, quickly segments spike times into sort_windows and cluster_ids
-            % spike_idx_segmented is a nSortWindows x nClusters 
+            % spike_idx_segmented is a nSortWindows x nClusters
             sort_window_mask = npxutils.util.TensorUtils.vectorIndicesToMask(p.Results.sort_window_mask, kspr.nSortWindows);
             cluster_ids = p.Results.cluster_ids;
             elide_padding = p.Results.elide_padding;
@@ -162,7 +162,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
             
             nWindows = size(windows, 1);
             nClusters = numel(cluster_ids);
-                
+            
             if nWindows == 0 || nClusters == 0
                 [spike_time_segmented_rel, cutoff_spike_time_segmented_rel] = deal(cell(nWindows, nClusters));
                 return;
@@ -177,7 +177,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
                     time_seg_rel(:) = {zeros(0, 1, 'like', times)};
                     return;
                 end
-            
+                
                 [mask_in_cluster, cluster_ind] = ismember(clusters, cluster_ids);
                 window_ind = npxutils.util.discretize_windows(times, windows);
                 mask_in_window = ~isnan(window_ind);
@@ -229,7 +229,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
             else
                 cluster_ids = ratings_or_cluster_ids;
             end
-
+            
             accept_cutoff_mask = ismember(kspr.cutoff_spike_clusters, cluster_ids);
             nCurrent = kspr.nSpikes;
             nAccepted = nnz(accept_cutoff_mask);
@@ -238,7 +238,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
             kspr.cutoff_spike_times = kspr.cutoff_spike_times(~accept_cutoff_mask);
             [~, insertOrigAt] = ismember((1:nCurrent)', sortIdx);
             [~, insertCutoffAt] = ismember((nCurrent+1:nTotal)', sortIdx);
-
+            
             function [combined, cutoff] = combineAndSort(orig, cutoff)
                 sz = size(orig);
                 sz(1) = nTotal;
@@ -247,7 +247,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
                 combined(insertCutoffAt, :, :, :) = cutoff(accept_cutoff_mask, :, :, :);
                 cutoff = cutoff(~accept_cutoff_mask, :, :, :);
             end
-
+            
             [kspr.spike_templates, kspr.cutoff_spike_templates] = combineAndSort(kspr.spike_templates, kspr.cutoff_spike_templates);
             [kspr.spike_templates_preSplit, kspr.cutoff_spike_templates_preSplit] = combineAndSort(kspr.spike_templates_preSplit, kspr.cutoff_spike_templates_preSplit);
             [kspr.amplitudes, kspr.cutoff_amplitudes] = combineAndSort(kspr.amplitudes, kspr.cutoff_amplitudes);
@@ -273,7 +273,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
         function apply_cluster_merge(kspr, mergeInfo)
             % apply the merges in clusterMergeInfo
             assert(isa(mergeInfo, 'npxutils.ClusterMergeInfo'));
-
+            
             spike_clusters = kspr.spike_clusters;
             cutoff_spike_clusters = kspr.cutoff_spike_clusters;
             for iM = 1:mergeInfo.nMerges
@@ -282,7 +282,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
             end
             kspr.spike_clusters = spike_clusters;
             kspr.cutoff_spike_clusters = cutoff_spike_clusters;
-
+            
             function spike_clusters = apply_single_merge(spike_clusters, dst_cluster_id, src_cluster_ids)
                 mask_assign_to_dst = ismember(spike_clusters, src_cluster_ids);
                 spike_clusters(mask_assign_to_dst) = dst_cluster_id;
@@ -292,14 +292,14 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
         function [clusterInds, cluster_ids] = lookup_clusterIds(kspr, cluster_ids)
             if islogical(cluster_ids)
                 cluster_ids = kspr.cluster_ids(cluster_ids);
-             end
+            end
             [tf, clusterInds] = ismember(cluster_ids, kspr.cluster_ids);
             assert(all(tf, 'all'), 'Some cluster ids were not found in kspr.clusterids');
         end
         
         function mask_clusters(kspr, cluster_ids)
             [~, cluster_ids] = kspr.lookup_clusterIds(cluster_ids);
-
+            
             mask = ismember(kspr.spike_clusters, cluster_ids);
             cutoff_mask = ismember(kspr.cutoff_spike_clusters, cluster_ids);
             kspr.mask_spikes(mask, cutoff_mask);
@@ -308,7 +308,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
         function mask_spikes(kspr, mask, mask_cutoff)
             assert(islogical(mask) && numel(mask) == kspr.nSpikes);
             assert(islogical(mask_cutoff) && numel(mask_cutoff) == kspr.nSpikesCutoff);
-
+            
             kspr.spike_times = kspr.spike_times(mask);
             kspr.spike_templates = kspr.spike_templates(mask);
             if ~isempty(kspr.spike_templates_preSplit)
@@ -419,7 +419,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
     methods(Static)
         function kspr = construct_reextractSpikesWithFixedTemplates(ks, varargin)
             p = inputParser();
-            % these are used to replace specific time windows in the raw data with 
+            % these are used to replace specific time windows in the raw data with
             p.addParameter('data_replace_windows', zeros(0, 2), @(x) ismatrix(x) && size(x, 2) == 2);
             p.addParameter('data_replace', {}, @iscell);
             p.addParameter('debug_ignore_replace_data', false, @islogical);
@@ -448,23 +448,23 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
             else
                 spike_extract_windows = [spike_extract_windows(:, 1) - pad_spike_extract_windows(1), spike_extract_windows(:, 2) + pad_spike_extract_windows(2)];
             end
-
+            
             if p.Results.debug_ignore_replace_data
                 data_replace = {};
                 data_replace_windows = zeros(0, 2);
             end
-
+            
             if ~isempty(spike_extract_windows)
                 rez = reextractSpikesWithFixedTemplates(ks, ...
-                        'data_replace', data_replace, ...
-                        'data_replace_windows', data_replace_windows, ...
-                        'spike_extract_windows', spike_extract_windows);
+                    'data_replace', data_replace, ...
+                    'data_replace_windows', data_replace_windows, ...
+                    'spike_extract_windows', spike_extract_windows);
                 
                 % now build out the kspr fields
                 cluster_offset = -1;
                 
                 kspr.sort_windows = spike_extract_windows;
-
+                
                 kspr.spike_times = rez.st3(:, 1);
                 kspr.spike_templates_preSplit = rez.st3(:, 2);
                 kspr.amplitudes = rez.st3(:, 3);

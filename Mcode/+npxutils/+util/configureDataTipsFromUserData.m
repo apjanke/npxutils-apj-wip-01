@@ -1,10 +1,10 @@
 function configureDataTipsFromUserData(fig)
-    if nargin == 0
-        fig = gcf;
-    end
+if nargin == 0
+    fig = gcf;
+end
 
-    dcm_obj = datacursormode(fig);
-    set(dcm_obj,'UpdateFcn',@datatipfn);
+dcm_obj = datacursormode(fig);
+set(dcm_obj,'UpdateFcn',@datatipfn);
 
     function txt = datatipfn(empt, event_obj)
         if ~isvalid(event_obj.Target), txt = ''; return; end

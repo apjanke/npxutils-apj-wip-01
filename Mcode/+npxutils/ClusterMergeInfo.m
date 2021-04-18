@@ -4,7 +4,7 @@ classdef ClusterMergeInfo < handle
         ks
     end
     
-    properties(SetAccess=protected) 
+    properties(SetAccess=protected)
         merges (:, 1) cell = {}; % list of sets of cluster_ids, with only one cluster
     end
     
@@ -115,7 +115,7 @@ classdef ClusterMergeInfo < handle
             
             mi.postMergeUpdate();
         end
-            
+        
         function mergeClusters(mi, cluster_ids)
             mergeInds = mi.findMergesForClusters(cluster_ids);
             if isempty(mergeInds)
@@ -175,6 +175,6 @@ classdef ClusterMergeInfo < handle
             end
             cluster_ids_removed_by_merge = setdiff(cat(2, mi.merges{merge_inds}), mi.new_cluster_ids);
         end
-            
+        
     end
 end

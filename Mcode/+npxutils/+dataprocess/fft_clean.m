@@ -50,19 +50,19 @@ viFreq = (1:n1)';
 % vrFft1 = abs(mean(bsxfun(@times, data(1+viFreq,:), viFreq), 2));
 vrFft1 = (mean(bsxfun(@times, abs(data(1+viFreq,:)), viFreq), 2));
 if fDebug
-    vrFft0 = mean(abs(data(1+viFreq,:)), 2); vrFreq = (1:numel(vrFft1))/numel(vrFft1)*imec.fs/2;  
-    figure; subplot(221); plot(vrFreq, 2*pow2db(vrFft0),'k.','MarkerSize',8); xlabel('Freq (Hz)'); ylabel('Power (dB)'); grid on; xlim([0 500]);     
+    vrFft0 = mean(abs(data(1+viFreq,:)), 2); vrFreq = (1:numel(vrFft1))/numel(vrFft1)*imec.fs/2;
+    figure; subplot(221); plot(vrFreq, 2*pow2db(vrFft0),'k.','MarkerSize',8); xlabel('Freq (Hz)'); ylabel('Power (dB)'); grid on; xlim([0 500]);
 end
 
-n2 = round(n1/nbins); 
+n2 = round(n1/nbins);
 for ibin=1:nbins
     vi1 = (n2*(ibin-1) : n2*ibin) + 1;
     if ibin==nbins, vi1(vi1>n1)=[]; end
     vrFft2 = vrFft1(vi1);
-%     vrFft2 = detrend(vrFft2);
+    %     vrFft2 = detrend(vrFft2);
     vrFft2 = vrFft2 - median(vrFft2(1:nSkip_med:end)); %mad transform
     vrFft1(vi1) = vrFft2 / median(abs(vrFft2(1:nSkip_med:end)));
-%     vrFft1(vi1) = zscore((vrFft1(vi1)));    
+    %     vrFft1(vi1) = zscore((vrFft1(vi1)));
 end
 
 % broaden spectrum
@@ -76,7 +76,7 @@ for i_nw=1:nw
 end
 vi_noise = find(vl_noise);
 if fDebug
-    subplot(222); plot(vrFreq, vrFft1,'k.','MarkerSize',8); xlabel('Freq (Hz)'); ylabel('z-score (detrended)'); 
+    subplot(222); plot(vrFreq, vrFft1,'k.','MarkerSize',8); xlabel('Freq (Hz)'); ylabel('z-score (detrended)');
     grid on; xlim([0 500]); ylim([0 50]); set(gca,'YScale', 'linear');
     hold on; plot(get(gca,'XLim'),thresh*[1 1], 'r-','MarkerSize',8);
     hold on; plot(vrFreq(vi_noise), vrFft1(vi_noise), 'r.','MarkerSize',8);
@@ -91,17 +91,17 @@ if n < n_pow2, data = data(1:n,:); end
 data = bsxfun(@plus, data, vrMu); %add mean back
 
 if fDebug
-   % figure; set(gcf,'Color','w');
+    % figure; set(gcf,'Color','w');
     subplot(223); plot(vrFreq, vrFft1,'k.','MarkerSize',8); xlabel('Freq (Hz)');
     axis([0 10000 -10 40]);
     n = min(10000, size(data,1));
     subplot(224); plot(in(1:n,1)); hold on; plot(data(1:n,1));
-%     plot(data(1:n,1)-data(1:n,1));    
+    %     plot(data(1:n,1)-data(1:n,1));
     
-%     return;
-%     sRateHz = 25000;
-%     vrFreq = (1:size(data,1))/size(data,1)*sRateHz;
-%     figure; plot(viFreq, vrFft0, '.');
+    %     return;
+    %     sRateHz = 25000;
+    %     vrFreq = (1:size(data,1))/size(data,1)*sRateHz;
+    %     figure; plot(viFreq, vrFft0, '.');
     figure
     plot(viFreq, vrFft1, '.');
     hold on; plot(viFreq(vi_noise), vrFft1(vi_noise), 'o');

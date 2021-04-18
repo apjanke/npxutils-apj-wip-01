@@ -1,8 +1,8 @@
 function data = readNPY(filename)
-% Function to read NPY files into matlab. 
-% *** Only reads a subset of all possible NPY files, specifically N-D arrays of certain data types. 
+% Function to read NPY files into matlab.
+% *** Only reads a subset of all possible NPY files, specifically N-D arrays of certain data types.
 % See https://github.com/kwikteam/npy-matlab/blob/master/npy.ipynb for
-% more. 
+% more.
 %
 
 [shape, dataType, fortranOrder, littleEndian, totalHeaderLength, ~] = readNPYheader(filename);
@@ -16,7 +16,7 @@ end
 try
     
     [~] = fread(fid, totalHeaderLength, 'uint8');
-
+    
     % read the data
     data = fread(fid, prod(shape), [dataType '=>' dataType]);
     
@@ -82,19 +82,19 @@ try
     % assumptions about its format...
     
     r = regexp(arrayFormat, '''descr''\s*:\s*''(.*?)''', 'tokens');
-    dtNPY = r{1}{1};    
+    dtNPY = r{1}{1};
     
     littleEndian = ~strcmp(dtNPY(1), '>');
     
     dataType = dtypesMatlab{strcmp(dtNPY(2:3), dtypesNPY)};
-        
+    
     r = regexp(arrayFormat, '''fortran_order''\s*:\s*(\w+)', 'tokens');
     fortranOrder = strcmp(r{1}{1}, 'True');
     
     r = regexp(arrayFormat, '''shape''\s*:\s*\((.*?)\)', 'tokens');
-    shapeStr = r{1}{1}; 
+    shapeStr = r{1}{1};
     arrayShape = str2num(shapeStr(shapeStr~='L'));
-
+    
     
     fclose(fid);
     

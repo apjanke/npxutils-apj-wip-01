@@ -4,8 +4,8 @@ classdef ConcatenationInfo < handle
         samplesPreShift (:, 1) uint64
         timeShifts (:, 1) % npxutils.TimeShiftSpec
         names (:, 1) string
-        gains (:, 1) 
-        multipliers (:, 1) 
+        gains (:, 1)
+        multipliers (:, 1)
         adcBits (:, 1)
         ranges (:, 2)
         nSamples
@@ -79,7 +79,7 @@ classdef ConcatenationInfo < handle
                         rmax = npxutils.util.makecol(getor(meta, 'concatenatedAiRangeMax', imec.lfRange(2) * ones(nC, 1)));
                     otherwise
                         error ('unknown mode');
-                end 
+                end
                 ci.ranges = cat(2, rmin, rmax);
             end
             
@@ -149,7 +149,7 @@ classdef ConcatenationInfo < handle
             end
             ci.nSamples = nSamplesInfer;
             ci.names = ciRef.names;
-
+            
             switch bandInfer
                 case 'ap'
                     ci.gains = cat(1, imec.sourceDatasets.apGain);
@@ -196,26 +196,26 @@ classdef ConcatenationInfo < handle
         end
         
         function [fileInds, origSampleInds] = lookup_sampleIndexInSourceFiles(ci, inds)
-           % convert from a time index in this file to which of the concatenated files that index came from
-           % factoring in the time shifts that were used to excise regions from those individual files before concatenating
-
-           [fileInds, origSampleInds] = deal(zeros(size(inds), 'uint64'));
-           starts = ci.startIdx;
-           stops = ci.stopIdx;
-
-           for i = 1:numel(starts)
-              mask = inds >= starts(i) & inds <= stops(i);
-              fileInds(mask) = i;
-              origSampleInds(mask) = inds(mask) - double(starts(i)) + 1;
-           end
-           
-           % now unshift the original sampleInds
-           if ~isempty(ci.timeShifts)
-               for i = 1:ci.nDatasets
-                   mask = fileInds == i;
-                   origSampleInds(mask) = ci.timeShifts(i).unshiftTimes(origSampleInds(mask));
-               end
-           end
+            % convert from a time index in this file to which of the concatenated files that index came from
+            % factoring in the time shifts that were used to excise regions from those individual files before concatenating
+            
+            [fileInds, origSampleInds] = deal(zeros(size(inds), 'uint64'));
+            starts = ci.startIdx;
+            stops = ci.stopIdx;
+            
+            for i = 1:numel(starts)
+                mask = inds >= starts(i) & inds <= stops(i);
+                fileInds(mask) = i;
+                origSampleInds(mask) = inds(mask) - double(starts(i)) + 1;
+            end
+            
+            % now unshift the original sampleInds
+            if ~isempty(ci.timeShifts)
+                for i = 1:ci.nDatasets
+                    mask = fileInds == i;
+                    origSampleInds(mask) = ci.timeShifts(i).unshiftTimes(origSampleInds(mask));
+                end
+            end
         end
         
         function markConcatenatedFileBoundaries(ci, varargin)
@@ -228,7 +228,7 @@ classdef ConcatenationInfo < handle
             p.addParameter('Color', [0.3 0.3 0.9], @isvector);
             p.addParameter('LineWidth', 1, @isscalar);
             p.addParameter('time_shifts', [], @(x) isempty(x) || isa(x, 'npxutils.TimeShiftSpec'));
-            p.addParameter('timeInSeconds', true, @islogical); % if true, x axis is seconds, if false, is samples 
+            p.addParameter('timeInSeconds', true, @islogical); % if true, x axis is seconds, if false, is samples
             p.addParameter('expand_limits', false, @islogical);
             p.addParameter('xOffset', 0, @isscalar);
             p.parse(varargin{:});
@@ -263,7 +263,7 @@ classdef ConcatenationInfo < handle
             % this assumes we are plotting into a space where ci.timeShifts is NOT already applied (i.e. the concatenated file time axis)
             % but if time_shifts is passed in as ci.time_shifts, it will plot into the already time-shifted time axis
             p = inputParser();
-            p.addParameter('timeInSeconds', true, @islogical); % if true, x axis is seconds, if false, is samples 
+            p.addParameter('timeInSeconds', true, @islogical); % if true, x axis is seconds, if false, is samples
             p.addParameter('sample_window', [], @(x) isempty(x) || isvector(x));
             p.addParameter('xOffset', 0, @isscalar);
             p.addParameter('time_shifts', [], @(x) isempty(x) || isa(x, 'npxutils.TimeShiftSpec')); % assumed to be applied to times in plot
@@ -303,4 +303,3 @@ classdef ConcatenationInfo < handle
         end
     end
 end
-        
