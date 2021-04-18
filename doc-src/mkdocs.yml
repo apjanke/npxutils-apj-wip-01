@@ -41,3 +41,14 @@ nav:
   - Acknowledgements and Support: acknowledgements.md
 
 copyright: 'Copyright &copy; 2021 &mdash; <a href="http://djoshea.com">Daniel J. O&#39;Shea</a>'
+
+# Build configuration
+#
+# We customize this to work nicely with the MatlabProjectTemplate repo layout, and
+# with GitHub Pages sourced from the "master" branch instead of "gh-pages"
+
+docs_dir: docs
+site_dir: _site
+# We avoid directory URLs, so you can view the docs site directly from a
+# local filesystem, in addition to through a web server.
+use_directory_urls: false
