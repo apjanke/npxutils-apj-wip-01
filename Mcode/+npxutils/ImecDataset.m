@@ -1943,7 +1943,6 @@ classdef ImecDataset < handle
             p.addParameter('chunkEdgeExtraSamplesAP', [0 0], @isvector);
             p.addParameter('chunkEdgeExtraSamplesLF', [0 0], @isvector);
             
-            
             p.addParameter('timeShiftsAP', {}, @(x) isempty(x) || isa(x, 'npxutils.TimeShiftSpec')); % cell array of time shifts for each file, a time shift is a n x 3 matrix of idxStart, idxStop, newIdxStart. These are used to excise specific time windows from the file
             p.addParameter('timeShiftsLF', {}, @(x) isempty(x) || isa(x, 'npxutils.TimeShiftSpec')); % cell array of time shifts for each file, a time shift is a n x 3 matrix of idxStart, idxStop, newIdxStart. These are used to excise specific time windows from the file
             
