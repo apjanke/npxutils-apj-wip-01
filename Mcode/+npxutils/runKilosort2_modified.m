@@ -111,6 +111,8 @@ rezToPhy(rez, ops.saveDir);
 
 rezFile = fullfile(ops.saveDir, 'rez.mat');
 fprintf('Kilosort2: Saving rez to %s\n', rezFile);
+% TODO: Unclear if this is supposed to refer to npxutils.io.exportRezToMat, or to a
+% function supplied by an external library.
 exportRezToMat(rez, rezFile);
 
 % remove temporary file

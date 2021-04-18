@@ -1,7 +1,7 @@
 function exportRezToPhy(rez, savePath, varargin)
 % Save a rez dataset to disk in Phy format.
 % 
-% exportRezToPhy(rez, savePath, ...)
+% npxutils.io.exportRezToPhy(rez, savePath, ...)
 %
 % Saves the contents of a rez dataset as a set of .npy files which are
 % compatible both with Phy/Phy2 sorting and subsequent loading as a

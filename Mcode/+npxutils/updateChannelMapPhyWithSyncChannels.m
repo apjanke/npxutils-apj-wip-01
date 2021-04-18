@@ -31,6 +31,8 @@ end
 
 chanMap0ind = int32(chanMap - 1);
 
+% TODO: Unclear if this and writeNPY are supposed to refer to npxutils.io.readNPY
+% functions, or to functions supplied by an external library.
 whitening = readNPY(fullfile(savePath, 'whitening_mat.npy'));
 
 writeNPY(chanMap0ind, fullfile(savePath, 'channel_map.npy'));

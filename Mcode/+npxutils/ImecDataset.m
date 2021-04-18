@@ -1792,7 +1792,7 @@ classdef ImecDataset < handle
         end
         
         function meta = readAPMeta(this)
-            meta = npxutils.readINI(this.pathAPMeta);
+            meta = npxutils.io.readINI(this.pathAPMeta);
         end
         
         function meta = generateModifiedAPMeta(this)
@@ -1828,11 +1828,11 @@ classdef ImecDataset < handle
                 meta.(extraMetaFields{iFld}) = extraMeta.(extraMetaFields{iFld});
             end
             
-            npxutils.writeINI([this.pathAPMeta], meta);
+            npxutils.io.writeINI([this.pathAPMeta], meta);
         end
         
         function meta = readLFMeta(this)
-            meta = npxutils.readINI(this.pathLFMeta);
+            meta = npxutils.io.readINI(this.pathLFMeta);
         end
         
         function str = get.creationTimeStr(this)
@@ -1986,44 +1986,44 @@ classdef ImecDataset < handle
             
             this.symLinkAPIntoDirectory(savePath);
             
-            npxutils.writeNPY(spikeTimes, fullfile(savePath, 'spike_times.npy'));
-            npxutils.writeNPY(zeros(nSpikes, 1, 'uint32'), fullfile(savePath, 'spike_templates.npy'));
-            npxutils.writeNPY(spikeClusters, fullfile(savePath, 'spike_clusters.npy'));
+            npxutils.io.writeNPY(spikeTimes, fullfile(savePath, 'spike_times.npy'));
+            npxutils.io.writeNPY(zeros(nSpikes, 1, 'uint32'), fullfile(savePath, 'spike_templates.npy'));
+            npxutils.io.writeNPY(spikeClusters, fullfile(savePath, 'spike_clusters.npy'));
             
-            npxutils.writeNPY(zeros(nSpikes, 1, 'double'), fullfile(savePath, 'amplitudes.npy'));
+            npxutils.io.writeNPY(zeros(nSpikes, 1, 'double'), fullfile(savePath, 'amplitudes.npy'));
             
             templates = zeros(2, nTemplateTimepoints, nCh, 'single');
-            npxutils.writeNPY(templates, fullfile(savePath, 'templates.npy'));
+            npxutils.io.writeNPY(templates, fullfile(savePath, 'templates.npy'));
             
             templatesInds = this.goodChannels';
-            npxutils.writeNPY(templatesInds, fullfile(savePath, 'templates_ind.npy'));
+            npxutils.io.writeNPY(templatesInds, fullfile(savePath, 'templates_ind.npy'));
             
             sortedInds = this.goodChannelInds;
             chanMap0ind = int32(this.channelMap.channelIdsMapped(sortedInds) - uint32(1));
             xcoords = this.channelMap.xcoords(sortedInds);
             ycoords = this.channelMap.ycoords(sortedInds);
-            npxutils.writeNPY(chanMap0ind, fullfile(savePath, 'channel_map.npy'));
-            npxutils.writeNPY([xcoords ycoords], fullfile(savePath, 'channel_positions.npy'));
+            npxutils.io.writeNPY(chanMap0ind, fullfile(savePath, 'channel_map.npy'));
+            npxutils.io.writeNPY([xcoords ycoords], fullfile(savePath, 'channel_positions.npy'));
             
             templateFeatures = zeros([nTemplates nTemplateFeatures], 'single');
-            npxutils.writeNPY(templateFeatures, fullfile(savePath, 'template_features.npy'));
+            npxutils.io.writeNPY(templateFeatures, fullfile(savePath, 'template_features.npy'));
             
             templateFeatureInds = zeros(nTemplates, nTemplateFeatures, 'uint32');
-            npxutils.writeNPY(templateFeatureInds, fullfile(savePath, 'template_feature_ind.npy'));% -1 for zero indexing
+            npxutils.io.writeNPY(templateFeatureInds, fullfile(savePath, 'template_feature_ind.npy'));% -1 for zero indexing
             
             similarTemplates = zeros(nTemplates, nTemplates, 'single');
-            npxutils.writeNPY(similarTemplates, fullfile(savePath, 'similar_templates.npy'));
+            npxutils.io.writeNPY(similarTemplates, fullfile(savePath, 'similar_templates.npy'));
             
             pcFeatures = zeros([nSpikes, nFeaturesPerChannel, nPCFeatures], 'single');
-            npxutils.writeNPY(pcFeatures, fullfile(savePath, 'pc_features.npy'));
+            npxutils.io.writeNPY(pcFeatures, fullfile(savePath, 'pc_features.npy'));
             
             pcFeatureInds = zeros([nTemplates, nPCFeatures], 'uint32');
-            npxutils.writeNPY(pcFeatureInds, fullfile(savePath, 'pc_feature_ind.npy'));% -1 for zero indexing
+            npxutils.io.writeNPY(pcFeatureInds, fullfile(savePath, 'pc_feature_ind.npy'));% -1 for zero indexing
             
             whiteningMatrix = ones(nCh, nCh, 'double');
-            npxutils.writeNPY(whiteningMatrix, fullfile(savePath, 'whitening_mat.npy'));
+            npxutils.io.writeNPY(whiteningMatrix, fullfile(savePath, 'whitening_mat.npy'));
             whiteningMatrixInv = ones(nCh, nCh, 'double');
-            npxutils.writeNPY(whiteningMatrixInv, fullfile(savePath, 'whitening_mat_inv.npy'));
+            npxutils.io.writeNPY(whiteningMatrixInv, fullfile(savePath, 'whitening_mat_inv.npy'));
             
             % write params.py
             fid = fopen(fullfile(savePath,'params.py'), 'w');
@@ -2698,7 +2698,7 @@ classdef ImecDataset < handle
                 
                 fprintf('Writing AP meta file %s\n', lastFilePart(metaOutFile));
                 if ~dryRun
-                    npxutils.writeINI(metaOutFile, meta);
+                    npxutils.io.writeINI(metaOutFile, meta);
                 end
                 
                 fprintf('Writing AP bin file %s\n', (outFile));
@@ -2756,7 +2756,7 @@ classdef ImecDataset < handle
                 
                 fprintf('Writing LF meta file %s\n', lastFilePart(metaOutFile));
                 if ~dryRun
-                    npxutils.writeINI(metaOutFile, meta);
+                    npxutils.io.writeINI(metaOutFile, meta);
                 end
                 
                 fprintf('Writing LF bin file %s\n', lastFilePart(outFile));

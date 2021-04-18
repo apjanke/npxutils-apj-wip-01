@@ -1,7 +1,7 @@
 function writeNPY(var, filename)
 % Write data in NPY format.
 %
-% npxutils.writeNPY(var, filename)
+% npxutils.io.writeNPY(var, filename)
 %
 % Only writes little endian, Fortran (column-major) ordering; only writes
 % with NPY version number 1.0.
@@ -9,7 +9,7 @@ function writeNPY(var, filename)
 % Always outputs a shape according to matlab's convention, e.g. (10, 1)
 % rather than (10,).
 %
-% This function is from github.com/kwitkteam/npy-matlab.
+% This function is derived from github.com/kwitkteam/npy-matlab.
 arguments
     var
     filename (1,1) string
@@ -37,7 +37,8 @@ else
     littleEndian = true;
 end
 
-dtypesMatlab = {'uint8','uint16','uint32','uint64','int8','int16','int32','int64','single','double', 'logical'};
+dtypesMatlab = {'uint8','uint16','uint32','uint64','int8','int16','int32',...
+    'int64','single','double', 'logical'};
 dtypesNPY = {'u1', 'u2', 'u4', 'u8', 'i1', 'i2', 'i4', 'i8', 'f4', 'f8', 'b1'};
 
 magicString = uint8([147 78 85 77 80 89]); %x93NUMPY

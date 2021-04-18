@@ -109,7 +109,7 @@ fprintf('Kilosort2: Saving results for Phy\n')
 rezToPhy(rez, ops.saveDir);
 
 fprintf('Kilosort2: Saving rez to rez.mat\n')
-npxutils.exportRezToMat(rez, ops.saveDir);
+npxutils.io.exportRezToMat(rez, ops.saveDir);
 
 %     % mark templates that maybe should be split
 %     fprintf('Marking split candidates')

@@ -629,7 +629,7 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
                 mask = s.spike_clusters < this.CUTOFF_SPIKES_EXPORT_OFFSET; % eliminate cutoff spikes if included
                 s.spike_clusters = s.spike_clusters(mask);
                 s.cluster_ids = unique(s.spike_clusters);
-                params = npxutils.readINI(fullfile(this.path, 'params.py'));
+                params = npxutils.io.readINI(fullfile(this.path, 'params.py'));
                 s.sample_rate = params.sample_rate;
                 s.offset = params.offset;
                 s.spike_times = read('spike_times');
@@ -668,7 +668,7 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
             end
             
             function out = read(file)
-                out = npxutils.readNPY(fullfile(this.path, [file '.npy']));
+                out = npxutils.io.readNPY(fullfile(this.path, [file '.npy']));
             end
         end
         
@@ -701,7 +701,7 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
         end
         
         function readParamsPy(ks)
-            params = npxutils.readINI(fullfile(ks.path, 'params.py'));
+            params = npxutils.io.readINI(fullfile(ks.path, 'params.py'));
             ks.dat_path = params.dat_path;
             ks.n_channels_dat = params.n_channels_dat;
             ks.dtype = params.dtype;
@@ -1083,7 +1083,7 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
             
             function out = read(file)
                 progIncrFn(sprintf('Loading %s', file));
-                out = npxutils.readNPY(fullfile(path, [file '.npy']));
+                out = npxutils.io.readNPY(fullfile(path, [file '.npy']));
             end
             
             function tbl = readClusterMetaTSV(file, field, type)
@@ -2753,7 +2753,7 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
                 end
                 progIncrFn(sprintf('Writing %s', file));
                 ffile = fullfile(outpath, [file '.npy']);
-                npxutils.writeNPY(data, ffile);
+                npxutils.io.writeNPY(data, ffile);
             end
             
             function writeClusterMetaTSV(file_noext, field, values)

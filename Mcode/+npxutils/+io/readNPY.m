@@ -1,7 +1,7 @@
 function data = readNPY(filename)
 % Read an NPY format file as a Matlab array.
 %
-% data = readNPY(filename)
+% data = npxutils.io.readNPY(filename)
 %
 % Function to read NPY files into matlab.
 %
