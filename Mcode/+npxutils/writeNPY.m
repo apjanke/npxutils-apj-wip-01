@@ -1,5 +1,5 @@
 function writeNPY(var, filename)
-% Write data in NPY format
+% Write data in NPY format.
 %
 % npxutils.writeNPY(var, filename)
 %
@@ -8,7 +8,8 @@ function writeNPY(var, filename)
 %
 % Always outputs a shape according to matlab's convention, e.g. (10, 1)
 % rather than (10,).
-% This function is from github.com/kwitkteam/npy-matlab
+%
+% This function is from github.com/kwitkteam/npy-matlab.
 arguments
     var
     filename (1,1) string

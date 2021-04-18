@@ -1,6 +1,20 @@
 function exportRezToPhy(rez, savePath, varargin)
-% based on a rez dataset, save it's contents to disk as a set of .npy files
-% which are compatible both with Phy/Phy2 sorting and subsequent loading as a npxutils.KilosortDataset
+% Save a rez dataset to disk in Phy format.
+% 
+% exportRezToPhy(rez, savePath, ...)
+%
+% Saves the contents of a rez dataset as a set of .npy files which are
+% compatible both with Phy/Phy2 sorting and subsequent loading as a
+% npxutils.KilosortDataset.
+%
+% Rez is a rez dataset, as a ??? data structure.
+%
+% SavePath (string) is where to save it to. Defaults to rez.opts.saveDir.
+%
+% Options:
+%   export_cutoff_as_offset_clusters
+%   export_cutoff_hidden
+%   export_batchwise
 if nargin < 2 || isempty(savePath)
     savePath = rez.ops.saveDir;
 end

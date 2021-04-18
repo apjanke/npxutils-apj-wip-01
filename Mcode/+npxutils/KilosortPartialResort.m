@@ -7,47 +7,47 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
     properties
         cluster_ids % stored from ks
         fsAP % stored from ks
-        sort_windows (:, 2) uint64 % nWindows x 2 list of start, stop samples which were actually resorted
+        sort_windows (:,2) uint64 % nWindows x 2 list of start, stop samples which were actually resorted
         
         % spike_times.npy - [nSpikes, ] uint64 vector giving the spike time of each spike in samples. To convert to seconds, divide by sample_rate from params.py.
-        spike_times(:, 1) uint64
+        spike_times (:,1) uint64
         
         % amplitudes.npy - [nSpikes, ] double vector with the amplitude scaling factor that was applied to the template when extracting that spike
-        amplitudes(:,1) single;
+        amplitudes (:,1) single;
         
         % spike_templates.npy - [nSpikes, ] uint32 vector specifying the identity of the template that was used to extract each spike
-        spike_templates(:, 1) uint32
+        spike_templates (:,1) uint32
         
         % spike_templates.npy - [nSpikes, ] uint32 vector specifying the identity of the template that was originally used to extract each spike, before splitAllClusters
-        spike_templates_preSplit(:, 1) uint32
+        spike_templates_preSplit (:,1) uint32
         
         % spike_clusters.npy - [nSpikes, ] uint32 vector giving the cluster identity of each spike. This file is optional and
         % if not provided will be automatically created the first time you run the template gui, taking the same values as
         % spike_templates.npy until you do any merging or splitting.
-        spike_clusters(:, 1) uint32
+        spike_clusters (:,1) uint32
         
         % [nSpikesCutoff, ] uint64 vector giving the spike time of each spike in samples. To convert to seconds, divide by sample_rate from params.py.
-        cutoff_spike_times(:, 1) uint64
-        cutoff_amplitudes(:, 1) single
-        cutoff_spike_templates(:, 1) uint32
-        cutoff_spike_templates_preSplit(:, 1) uint32
-        cutoff_spike_clusters(:, 1) uint32
+        cutoff_spike_times (:,1) uint64
+        cutoff_amplitudes (:,1) single
+        cutoff_spike_templates (:,1) uint32
+        cutoff_spike_templates_preSplit (:,1) uint32
+        cutoff_spike_clusters (:,1) uint32
     end
     
     properties (Transient)
         % pc_features.npy - [nSpikes, nFeaturesPerChannel, nPCFeatures] single matrix giving the PC values for each spike.
         % The channels that those features came from are specified in pc_features_ind.npy. E.g. the value at pc_features[123, 1, 5]
         % is the projection of the 123rd spike onto the 1st PC on the channel given by pc_feature_ind[5].
-        pc_features(:, :, :) single
+        pc_features (:,:,:) single
         
         % template_features.npy - [nSpikes, nTemplateRank] single matrix giving the magnitude of the projection of each spike onto nTemplateRank other features.
         % Which other features is specified in template_feature_ind.npy
-        template_features(:, :) single
+        template_features (:,:) single
         
-        cutoff_template_features(:, :) single % [nSpikesCutoff, nTemplateRank]
+        cutoff_template_features (:,:) single % [nSpikesCutoff, nTemplateRank]
         
         % [nSpikesCutoff, nFeaturesPerChannel, nPCFeatures] single matrix giving the PC values for each spike (from .cProjPC_cutoff_invalid)
-        cutoff_pc_features(:, :, :) uint32
+        cutoff_pc_features(:,:,:) uint32
     end
     
     properties (Dependent)
@@ -76,7 +76,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
         end
         
         function n = get.nSortSamples(this)
-            durations = this.sort_windows(:, 2) - this.sort_windows(:, 1) + uint64(1);
+            durations = this.sort_windows(:, 2) - this.sort_windows(:,1) + uint64(1);
             n = sum(durations);
         end
         
@@ -85,7 +85,10 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
         end
         
         function splice_into_ks(this, ks)
-            assert(isa(ks, 'npxutils.KilosortDataset'));
+            arguments
+                this
+                ks (1,1) npxutils.KilosortDataset
+            end
             
             % compute mask of spikes to keep
             mask_keep = true(ks.nSpikes, 1);
@@ -115,7 +118,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
             elide_padding = p.Results.elide_padding;
             
             windows = this.sort_windows;
-            windows(:, 1) = windows(:, 1) + elide_padding(1);
+            windows(:,1) = windows(:,1) + elide_padding(1);
             windows(:, 2) = windows(:, 2) - elide_padding(2);
             
             spike_idx_segmented = do_segment(this.spike_times, this.spike_clusters);
@@ -145,7 +148,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
             p.addParameter('cluster_ids', this.cluster_ids, @isvector);
             p.addParameter('elide_padding', [0 0], @isvector); % in samples
             p.addParameter('convert_to_ms', false, @islogical);
-            p.addParameter('align_sample_offset', 0, @isscalar); % for alignment, treat window(:, 1) + align_sample_offset as time 0
+            p.addParameter('align_sample_offset', 0, @isscalar); % for alignment, treat window(:,1) + align_sample_offset as time 0
             p.parse(varargin{:});
             
             % used mostly for evaluating the response, quickly segments spike times into sort_windows and cluster_ids
@@ -157,10 +160,10 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
             align_sample_offset = p.Results.align_sample_offset;
             
             windows = this.sort_windows(sort_window_mask, :);
-            windows(:, 1) = windows(:, 1) + elide_padding(1);
+            windows(:,1) = windows(:,1) + elide_padding(1);
             windows(:, 2) = windows(:, 2) - elide_padding(2);
             
-            sample0 = int64(windows(:, 1) + align_sample_offset);
+            sample0 = int64(windows(:,1) + align_sample_offset);
             
             nWindows = size(windows, 1);
             nClusters = numel(cluster_ids);
@@ -447,9 +450,9 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
                 if ismember('data_replace_windows', p.UsingDefaults)
                     error('Neither data_replace_windows nor spike_extract_windows specified, not sure what to resort');
                 end
-                spike_extract_windows = [data_replace_windows(:, 1) - pad_spike_extract_windows(1), data_replace_windows(:, 2) + pad_spike_extract_windows(2)];
+                spike_extract_windows = [data_replace_windows(:,1) - pad_spike_extract_windows(1), data_replace_windows(:, 2) + pad_spike_extract_windows(2)];
             else
-                spike_extract_windows = [spike_extract_windows(:, 1) - pad_spike_extract_windows(1), spike_extract_windows(:, 2) + pad_spike_extract_windows(2)];
+                spike_extract_windows = [spike_extract_windows(:,1) - pad_spike_extract_windows(1), spike_extract_windows(:, 2) + pad_spike_extract_windows(2)];
             end
             
             if p.Results.debug_ignore_replace_data
@@ -468,7 +471,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
                 
                 kspr.sort_windows = spike_extract_windows;
                 
-                kspr.spike_times = rez.st3(:, 1);
+                kspr.spike_times = rez.st3(:,1);
                 kspr.spike_templates_preSplit = rez.st3(:, 2);
                 kspr.amplitudes = rez.st3(:, 3);
                 kspr.spike_templates = rez.st3(:, rez.st3_template_col);
@@ -476,7 +479,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
                 kspr.template_features = rez.cProj;
                 kspr.pc_features = rez.cProjPC;
                 
-                kspr.cutoff_spike_times = rez.st3_cutoff_invalid(:, 1);
+                kspr.cutoff_spike_times = rez.st3_cutoff_invalid(:,1);
                 kspr.cutoff_spike_templates_preSplit = rez.st3_cutoff_invalid(:, 2);
                 kspr.cutoff_amplitudes = rez.st3_cutoff_invalid(:, 3);
                 kspr.cutoff_spike_templates = rez.st3_cutoff_invalid(:, rez.st3_template_col);

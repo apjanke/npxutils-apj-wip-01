@@ -1,4 +1,14 @@
 function rez = runKilosort1(imec, varargin)
+% Run Kilosort1 on an IMEC data set.
+%
+% rez = runKilosort1(imec, ...)
+%
+% Requires npy-matlab to be installed on your system.
+%
+% Options:
+%   saveDir
+%   workingDir - path to working dir for intermediate files. Should be on a 
+%       fast SSD; defaults to tempdir().
 
 p = inputParser();
 p.addParameter('saveDir', imec.pathRoot, @ischar);

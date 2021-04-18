@@ -1,9 +1,17 @@
 function rezFull = runKilosort2(imec, varargin)
-% Run Kilosort2 on an IMEC dataset
+% Run Kilosort2 on an IMEC dataset.
 %
-% rezFull = runKilosort2(imec, varargin)
+% rezFull = runKilosort2(imec, ...)
 %
-% Imec (npxutils.ImecDataset) is the IMEC data set
+% Imec (npxutils.ImecDataset) is the IMEC data set.
+%
+% Options:
+%   saveDir
+%   workingDir - path to working dir for intermediate files. Should be on a 
+%       fast SSD; defaults to tempdir().
+%   
+% Requires npy-matlab to be installed on your system.
+
 
 p = inputParser();
 p.addParameter('saveDir', imec.pathRoot, @ischar);
