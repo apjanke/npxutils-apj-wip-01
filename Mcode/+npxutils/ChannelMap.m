@@ -338,7 +338,7 @@ classdef ChannelMap
             if ~all(tf)
                 badChannelIds = unique(channelIds(~tf));
                 error(['Cannot localize non-connected channels or channels not ' ...
-                    'in eligibleChannelIds. Bad channel IDs: %s', mat2str(badChannelIds));
+                    'in eligibleChannelIds. Bad channel IDs: %s'], mat2str(badChannelIds));
             end
             
             closest_ids = nan(numel(channel_inds), nClosest);
