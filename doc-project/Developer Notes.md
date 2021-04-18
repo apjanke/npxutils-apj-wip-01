@@ -68,3 +68,19 @@ npxutils_make dist
 ```
 
 This will produce the distribution Matlab Toolbox .mltbx file.
+
+## Style Guide
+
+### Prose Style
+
+* "Matlab", not "MATLAB"
+  * Yes, we know "MATLAB" is the official styling; we just don't like it.
+* Oxford commas
+
+### Code Style
+
+* 4-space indents
+* Auto-format everything using the Matlab Editor
+* Naming
+  * `camelCase` variable and function names
+  * `TitleCase` class names
