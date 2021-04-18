@@ -135,10 +135,13 @@ classdef ImecDataset < handle
     end
     
     methods
-        function imec = ImecDataset(fileOrFileStem, varargin)
-            % Construct a new ImecDataset from a set of files
+        function this = ImecDataset(fileOrFileStem, varargin)
+            % Construct a new ImecDataset from a set of files.
             %
             % obj = npxutils.ImecDataset(fileOrFileStem, [Options ...])
+            %
+            % Constructing an ImecDataset object opens and reads an IMEC data
+            % set from files on disk.
             %
             % FileOrFileStem is a scalar string specifying a file or file stem
             % that identifies the IMEC data set to load. It may be:
@@ -170,11 +173,11 @@ classdef ImecDataset < handle
                     error('No AP or LF Imec file found at or in %s', fileOrFileStem);
                 else
                     isLFOnly = true;
-                    [imec.pathRoot, imec.fileStem, imec.fileTypeLF, imec.fileImecNumber] = npxutils.ImecDataset.parseImecFileName(file);
+                    [this.pathRoot, this.fileStem, this.fileTypeLF, this.fileImecNumber] = npxutils.ImecDataset.parseImecFileName(file);
                 end
             elseif numel(file) == 1
-                [imec.pathRoot, imec.fileStem, imec.fileTypeAP, imec.fileImecNumber] = npxutils.ImecDataset.parseImecFileName(file);
-                isLFOnly= false;
+                [this.pathRoot, this.fileStem, this.fileTypeAP, this.fileImecNumber] = npxutils.ImecDataset.parseImecFileName(file);
+                isLFOnly = false;
             else
                 for iF = 1:numel(file)
                     fprintf('Possible match: %s\n', file{iF});
@@ -183,22 +186,22 @@ classdef ImecDataset < handle
             end
             
             if ~isLFOnly
-                if exist(imec.pathAP, 'file')
-                    if ~exist(imec.pathAPMeta, 'file')
-                        error('Could not find AP meta file %s', imec.pathAPMeta);
+                if exist(this.pathAP, 'file')
+                    if ~exist(this.pathAPMeta, 'file')
+                        error('Could not find AP meta file %s', this.pathAPMeta);
                     end
-                    imec.readInfo();
+                    this.readInfo();
                 else
-                    error('Could not find AP bin file %s', imec.pathAP);
+                    error('Could not find AP bin file %s', this.pathAP);
                 end
             else
-                if exist(imec.pathLF, 'file')
-                    if ~exist(imec.pathLFMeta, 'file')
-                        error('Could not find LF meta file %s', imec.pathLFMeta);
+                if exist(this.pathLF, 'file')
+                    if ~exist(this.pathLFMeta, 'file')
+                        error('Could not find LF meta file %s', this.pathLFMeta);
                     end
-                    imec.readInfo();
+                    this.readInfo();
                 else
-                    error('Could not find LF bin file %s', imec.pathLF);
+                    error('Could not find LF bin file %s', this.pathLF);
                 end
             end
             
@@ -211,171 +214,184 @@ classdef ImecDataset < handle
             
             if isa(channelMap, 'npxutils.ChannelMap')
                 % manually specified channel map
-                imec.channelMap = channelMap;
-                
+                this.channelMap = channelMap;
             elseif isstring(channelMap)
                 if channelMap == ""
                     % use default channel map file
                     channelMap = npxutils.util.getDefaultChannelMapFile(true);
                 end
-                imec.channelMap = npxutils.ChannelMap(channelMap);
+                this.channelMap = npxutils.ChannelMap(channelMap);
             end
-            assert(imec.channelMap.nChannels <= imec.nChannels, 'Channel count is less than number of channels in channel map');
+            assert(this.channelMap.nChannels <= this.nChannels, ...
+                'Channel count (%d) is less than number of channels in channel map (%d)', ...
+                this.nChannels, this.channelMap.nChannels);
             
             if ~isempty(p.Results.syncBitNames)
-                imec.setSyncBitNames(1:numel(p.Results.syncBitNames), p.Resuls.syncBitNames);
+                this.setSyncBitNames(1:numel(p.Results.syncBitNames), p.Resuls.syncBitNames);
             end
             
             if ~isempty(p.Results.sourceDatasets)
                 assert(isa(p.Results.sourceDatasets, 'npxutils.ImecDataset'));
-                imec.setSourceDatasets(p.Results.sourceDatasets);
+                this.setSourceDatasets(p.Results.sourceDatasets);
             end
         end
         
-        function readInfo(imec)
-            if imec.hasAP
-                metaAP = imec.readAPMeta();
-                if imec.hasLF
-                    metaLF = imec.readLFMeta();
+        function readInfo(this)
+            % Read info from the files into this object.
+            if this.hasAP
+                metaAP = this.readAPMeta();
+                if this.hasLF
+                    metaLF = this.readLFMeta();
                 else
-                    metaLF = struct();
+                    metaLF = struct;
                 end
                 meta = metaAP;
-                
-            elseif imec.hasLF
-                metaAP = struct();
-                metaLF = imec.readLFMeta();
+            elseif this.hasLF
+                metaAP = struct;
+                metaLF = this.readLFMeta();
                 meta = metaLF;
             else
                 error('Must have either AP or LF data files');
             end
             
-            imec.nChannels = meta.nSavedChans;
-            imec.creationTime = datenum(meta.fileCreateTime, 'yyyy-mm-ddTHH:MM:SS');
+            this.nChannels = meta.nSavedChans;
+            this.creationTime = datenum(meta.fileCreateTime, 'yyyy-mm-ddTHH:MM:SS');
             
-            if imec.hasAP
-                imec.fsAP = metaAP.imSampRate;
+            if this.hasAP
+                this.fsAP = metaAP.imSampRate;
                 if isfield(metaAP, 'imHpFlt')
-                    imec.highPassFilterHz = metaAP.imHpFlt;
+                    this.highPassFilterHz = metaAP.imHpFlt;
                 end
-            elseif imec.hasSourceDatasets
-                imec.fsAP = imec.sourceDatasets(1).fsAP;
+            elseif this.hasSourceDatasets
+                this.fsAP = this.sourceDatasets(1).fsAP;
             end
             
-            if imec.hasLF
-                imec.fsLF = metaLF.imSampRate;
-            elseif imec.hasSourceDatasets
-                imec.fsLF = imec.sourceDatasets(1).fsLF;
+            if this.hasLF
+                this.fsLF = metaLF.imSampRate;
+            elseif this.hasSourceDatasets
+                this.fsLF = this.sourceDatasets(1).fsLF;
             end
             
             % parse imroTable
             m = regexp(meta.imroTbl, '\(([\d, ]*)\)', 'tokens');
             gainVals = strsplit(m{2}{1}, ' ');
-            imec.apGain = str2double(gainVals{4});
-            imec.lfGain = str2double(gainVals{5});
+            this.apGain = str2double(gainVals{4});
+            this.lfGain = str2double(gainVals{5});
             
-            if imec.hasAP
-                imec.apRange = [metaAP.imAiRangeMin metaAP.imAiRangeMax];
+            if this.hasAP
+                this.apRange = [metaAP.imAiRangeMin metaAP.imAiRangeMax];
             end
             
-            if imec.hasLF
-                imec.lfRange = [metaLF.imAiRangeMin metaLF.imAiRangeMax];
+            if this.hasLF
+                this.lfRange = [metaLF.imAiRangeMin metaLF.imAiRangeMax];
             end
             
             % copy snsShankMap in case needed for building channel map
-            imec.snsShankMap = meta.snsShankMap;
+            this.snsShankMap = meta.snsShankMap;
             
             % look at AP meta fields that might have been set by us
             if isfield(meta, 'badChannels') && ~isempty(meta.badChannels)
-                imec.badChannels = union(imec.badChannels, meta.badChannels);
+                this.badChannels = union(this.badChannels, meta.badChannels);
             end
             if isfield(meta, 'syncBitNames')
-                imec.setSyncBitNames(1:numel(meta.syncBitNames), meta.syncBitNames);
+                this.setSyncBitNames(1:numel(meta.syncBitNames), meta.syncBitNames);
             end
             
-            if imec.hasAP
-                fid = imec.openAPFile();
+            if this.hasAP
+                fid = this.openAPFile();
                 fseek(fid, 0, 'eof');
                 bytes = ftell(fid);
                 fclose(fid);
                 
-                imec.nSamplesAP = bytes / imec.bytesPerSample / imec.nChannels;
-                if round(imec.nSamplesAP) ~= imec.nSamplesAP
-                    warning('AP bin file size is not an integral number of samples, file data may not be fully copied, truncating nSamplesAP');
-                    imec.nSamplesAP = floor(imec.nSamplesAP);
+                this.nSamplesAP = bytes / this.bytesPerSample / this.nChannels;
+                if round(this.nSamplesAP) ~= this.nSamplesAP
+                    warning(['AP bin file size is not an integral number of samples, ' ...
+                        'file data may not be fully copied, truncating nSamplesAP']);
+                    this.nSamplesAP = floor(this.nSamplesAP);
                 end
                 
-                imec.concatenationInfoAP = npxutils.ConcatenationInfo(imec, 'ap', metaAP);
+                this.concatenationInfoAP = npxutils.ConcatenationInfo(this, 'ap', metaAP);
             end
             
-            if imec.hasLF
-                fid = imec.openLFFile();
+            if this.hasLF
+                fid = this.openLFFile();
                 fseek(fid, 0, 'eof');
                 bytes = ftell(fid);
                 fclose(fid);
-                imec.nSamplesLF = bytes / imec.bytesPerSample / imec.nChannels;
-                if round(imec.nSamplesLF) ~= imec.nSamplesLF
+                this.nSamplesLF = bytes / this.bytesPerSample / this.nChannels;
+                if round(this.nSamplesLF) ~= this.nSamplesLF
                     warning('LF bin file size is not an integral number of samples, file data may not be fully copied, truncating nSamplesLF');
-                    imec.nSamplesLF = floor(imec.nSamplesLF);
+                    this.nSamplesLF = floor(this.nSamplesLF);
                 end
                 
-                imec.concatenationInfoLF = npxutils.ConcatenationInfo(imec, 'lf', metaLF);
+                this.concatenationInfoLF = npxutils.ConcatenationInfo(this, 'lf', metaLF);
             end
         end
         
-        function setSyncBitNames(imec, idx, names)
+        function setSyncBitNames(this, idx, names)
+            % Set the names of sync bits.
+            %
+            % setSyncBitNames(imec, idx, names)
+            %
+            % Idx is a vector if sync bit indices. Must be in range 1 ..
+            % this.nSyncBits.
+            %
+            % Names is a string array or charvec of names corresponding to the
+            % identified sync bits.
+            
             % idx is the indices of which bits to set to the corresponding items from names
-            assert(all(idx >= 1 & idx <= imec.nSyncBits), 'Sync bit indices must be in [1 %d]', imec.nSyncBits);
+            assert(all(idx >= 1 & idx <= this.nSyncBits), ...
+                'Sync bit indices must be in range [1..%d]', this.nSyncBits);
             if isscalar(idx) && ischar(names)
-                imec.syncBitNames{idx} = names;
+                this.syncBitNames{idx} = names;
             else
                 names = string(names);
-                imec.syncBitNames(idx) = names;
+                this.syncBitNames(idx) = names;
             end
         end
         
-        function setSourceDatasets(imec, imecList)
+        function setSourceDatasets(this, imecList)
             assert(isempty(imecList) || isa(imecList, 'npxutils.ImecDataset'));
-            imec.sourceDatasets = imecList;
+            this.sourceDatasets = imecList;
             
             % attempt to fill in missing metadata as well
-            if isnan(imec.fsAP)
-                imec.fsAP = imec.sourceDatasets(1).fsAP;
+            if isnan(this.fsAP)
+                this.fsAP = this.sourceDatasets(1).fsAP;
             end
             
-            if isnan(imec.fsLF)
-                imec.fsLF = imec.sourceDatasets(1).fsLF;
+            if isnan(this.fsLF)
+                this.fsLF = this.sourceDatasets(1).fsLF;
             end
             
             % attempt to cross infer concatenation info if missing
-            if imec.hasAP && ~imec.hasLF && imec.hasSourceLF
+            if this.hasAP && ~this.hasLF && this.hasSourceLF
                 % infer LF concatenation info from AP info to enable source LF data access through concatInfo lookup
                 if ~isempty(imecList)
-                    imec.concatenationInfoLF = npxutils.ConcatenationInfo.inferFromOtherBand(imec, 'lf', 'ap');
-                    imec.nSamplesLF = imec.concatenationInfoLF.nSamples;
-                    imec.lfRange = imec.concatenationInfoLF.ranges(1, :); % we assume that the ranges are shared across all datasets
+                    this.concatenationInfoLF = npxutils.ConcatenationInfo.inferFromOtherBand(this, 'lf', 'ap');
+                    this.nSamplesLF = this.concatenationInfoLF.nSamples;
+                    this.lfRange = this.concatenationInfoLF.ranges(1, :); % we assume that the ranges are shared across all datasets
                 else
                     % clear existing info
-                    imec.concatenationInfoLF = [];
-                    imec.nSamplesLF = 0;
-                    imec.lfRange = [];
+                    this.concatenationInfoLF = [];
+                    this.nSamplesLF = 0;
+                    this.lfRange = [];
                 end
-            elseif imec.hasLF && ~imec.hasAP && imec.hasSourceAP
+            elseif this.hasLF && ~this.hasAP && this.hasSourceAP
                 if ~isempty(imecList)
                     % infer AP concatenation info from LF info to enable source AP data access through concatInfo lookup
-                    imec.concatenationInfoAP = npxutils.ConcatenationInfo.inferFromOtherBand(imec, 'ap', 'lf');
-                    imec.nSamplesAP = imec.concatenationInfoAP.nSamples;
-                    imec.apRange = imec.concatenationInfoLF.ranges(1, :); % we assume that the ranges are shared across all datasets
+                    this.concatenationInfoAP = npxutils.ConcatenationInfo.inferFromOtherBand(this, 'ap', 'lf');
+                    this.nSamplesAP = this.concatenationInfoAP.nSamples;
+                    this.apRange = this.concatenationInfoLF.ranges(1, :); % we assume that the ranges are shared across all datasets
                 else
                     % clear existing info
-                    imec.concatenationInfoAP = [];
-                    imec.nSamplesAP = 0;
-                    imec.apRange = [];
+                    this.concatenationInfoAP = [];
+                    this.nSamplesAP = 0;
+                    this.apRange = [];
                 end
             end
         end
         
-        function idx = lookupSyncBitByName(imec, names, ignoreNotFound)
+        function idx = lookupSyncBitByName(this, names, ignoreNotFound)
             if nargin < 3
                 ignoreNotFound = false;
             end
@@ -383,7 +399,7 @@ classdef ImecDataset < handle
                 idx = names;
             else
                 names = string(names);
-                [tf, idx] = ismember(names, imec.syncBitNames);
+                [tf, idx] = ismember(names, this.syncBitNames);
                 if ignoreNotFound
                     idx(~tf) = NaN;
                 elseif any(~tf)
@@ -392,20 +408,20 @@ classdef ImecDataset < handle
             end
         end
         
-        function newImec = copyToNewLocation(imec, newRoot, newStem)
+        function newImec = copyToNewLocation(this, newRoot, newStem)
             if nargin < 3
-                newStem = imec.fileStem;
+                newStem = this.fileStem;
             end
             npxutils.util.mkdirRecursive(newRoot);
             
             f = @(suffix) fullfile(newRoot, [newStem suffix]);
-            docopy(imec.pathAP, f('.imec.ap.bin'));
-            docopy(imec.pathAPMeta, f('.imec.ap.meta'));
-            docopy(imec.pathLF, f('.imec.lf.bin'));
-            docopy(imec.pathLFMeta, f('.imec.lf.meta'));
-            docopy(imec.pathSync, f('.imec.sync.bin'));
+            docopy(this.pathAP, f('.imec.ap.bin'));
+            docopy(this.pathAPMeta, f('.imec.ap.meta'));
+            docopy(this.pathLF, f('.imec.lf.bin'));
+            docopy(this.pathLFMeta, f('.imec.lf.meta'));
+            docopy(this.pathSync, f('.imec.sync.bin'));
             
-            newImec = npxutils.ImecDataset(fullfile(newRoot, newStem), 'channelMap', imec.channelMapFile);
+            newImec = npxutils.ImecDataset(fullfile(newRoot, newStem), 'channelMap', this.channelMapFile);
             
             function docopy(from, to)
                 if ~exist(from, 'file')
@@ -1498,7 +1514,7 @@ classdef ImecDataset < handle
         end
     end
     
-    methods(Hidden)
+    methods (Hidden)
         function fid = openAPFile(imec)
             if ~exist(imec.pathAP, 'file')
                 error('RawDataFile: %s not found', imec.pathAP);
@@ -1531,9 +1547,11 @@ classdef ImecDataset < handle
                 error('RawDataFile: Could not open %s', imec.pathSync);
             end
         end
+    
     end
     
-    methods % Dependent properties
+        %% Dependent properties
+    methods    
         function tf = get.syncInAPFile(imec)
             tf = imec.channelMap.syncInAPFile && imec.hasAP;
         end
@@ -1824,9 +1842,9 @@ classdef ImecDataset < handle
             suffix = char(suffix);
             file = fullfile(imec.pathRoot, [imec.fileStem, '.', suffix]);
         end
-    end
     
-    methods % Marking Channels as bad
+        %% Marking Channels as bad
+        
         function [rmsBadChannels, rmsByChannel] = markBadChannelsByRMS(imec, varargin)
             p = inputParser();
             p.addParameter('rmsRange', [3 100], @isvector);
@@ -1855,10 +1873,9 @@ classdef ImecDataset < handle
             badConnectedChannels = list(ismember(list, imec.connectedChannels));
             imec.badChannels = union(imec.badChannels, badConnectedChannels);
         end
-        
-    end
     
-    methods % Modify bin data files in place
+        %% Modify bin data files in place
+        
         function modifyAPInPlace(imec, varargin)
             imec.modifyInPlaceInternal('ap', varargin{:});
         end
@@ -2031,7 +2048,7 @@ classdef ImecDataset < handle
         end
     end
     
-    methods(Hidden)
+    methods (Hidden)
         function [chInds, chIds] = build_channelSelectors_internal(imec, varargin)
             p = inputParser();
             p.addParameter('goodChannelsOnly', false, @islogical);
@@ -2189,7 +2206,7 @@ classdef ImecDataset < handle
         end
     end
     
-    methods(Static)
+    methods (Static)
         function [selectIdx, keepIdx] = determineChunkIdx(dataSize, iCh, nChunks, chunkSize, chunkExtra)
             if iCh == nChunks
                 % last chunk

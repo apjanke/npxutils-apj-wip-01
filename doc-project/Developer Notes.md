@@ -90,6 +90,7 @@ This will produce the distribution Matlab Toolbox .mltbx file.
   * `camelCase` variable, function, and method names
   * `TitleCase` class names
   * `lowercase` package names
+  * Method dispatch objects are named `this`
 * Markdown
   * MkDocs-flavored Markdown
     * (Andrew isn't exactly sure what this is, actually!)
