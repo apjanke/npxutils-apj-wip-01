@@ -1,4 +1,9 @@
 function rezFull = runKilosort2(imec, varargin)
+% Run Kilosort2 on an IMEC dataset
+%
+% rezFull = runKilosort2(imec, varargin)
+%
+% Imec (npxutils.ImecDataset) is the IMEC data set
 
 p = inputParser();
 p.addParameter('saveDir', imec.pathRoot, @ischar);
@@ -7,7 +12,7 @@ p.KeepUnmatched = true;
 p.parse(varargin{:});
 
 if exist('writeNPY', 'file') ~= 2
-    error('npy-matlab was not found on path');
+    error('npy-matlab was not found on the Matlab path');
 end
 
 ops = defaultConfig();

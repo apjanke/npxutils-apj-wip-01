@@ -464,7 +464,7 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
             if isempty(ks.cluster_ids)
                 n = zeros(0, 1, 'uint32');
             else
-                n = uint32(npxutils.util.discrete_histcounts(ks.spike_clusters, ks.cluster_ids));
+                n = uint32(npxutils.internal.discrete_histcounts(ks.spike_clusters, ks.cluster_ids));
             end
         end
         
@@ -472,7 +472,7 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
             if isempty(ks.cluster_ids)
                 n = zeros(0, 1, 'uint32');
             else
-                n = uint32(npxutils.util.discrete_histcounts(ks.cutoff_spike_clusters, ks.cluster_ids));
+                n = uint32(npxutils.internal.discrete_histcounts(ks.cutoff_spike_clusters, ks.cluster_ids));
             end
         end
         
@@ -654,17 +654,17 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
                 s.nClusters, s.nClustersAboveThresh, s.thresh);
             
             h = plot(sort(s.fr, 'descend'), '-', 'Color', p.Results.color);
-            npxutils.util.showFirstInLegend(h, ks.pathLeaf);
+            npxutils.internal.showFirstInLegend(h, ks.pathLeaf);
             if any(s.fr_cutoff_only)
                 hold on
                 h = plot(sort(s.fr_plus_cutoff, 'descend'), '--', 'Color', p.Results.color);
-                npxutils.util.hideInLegend(h);
+                npxutils.internal.hideInLegend(h);
             end
             xlabel('Cluster');
             ylabel('# spikes');
             hold on
             h = yline(s.thresh, 'Color', 'r');
-            npxutils.util.hideInLegend(h);
+            npxutils.internal.hideInLegend(h);
             hold off;
             box off;
             grid on;
@@ -737,7 +737,7 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
             
             initStr = sprintf('Loading Kilosort %d dataset', ks.kilosort_version);
             if isempty(p.Results.progressInitializeFn) && isempty(p.Results.progressIncrementFn)
-                prog = npxutils.util.ProgressBar(nProg, initStr);
+                prog = npxutils.internal.ProgressBar(nProg, initStr);
                 progIncrFn = @(text) prog.increment(text);
             else
                 if ~isempty(p.Results.progressInitializeFn)
@@ -1939,7 +1939,7 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
         %             if exist('ProgressBar', 'class') == 8
         %                 prog = ProgressBar(nTimes, 'Reconstructing templates around snippet times');
         %             else
-        %                 prog = npxutils.util.ProgressBar(nTimes, 'Reconstructing templates around snippet times');
+        %                 prog = npxutils.internal.ProgressBar(nTimes, 'Reconstructing templates around snippet times');
         %             end
         %
         %             for iT = 1:nTimes
@@ -2121,9 +2121,9 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
             %             search_half_width = ceil(maxT - t_center_offset);
             %             c_nearby_spike_inds = rangesearch(double(ks.spike_times), double(times) + double(t_center_offset), search_half_width, 'SortIndices', false);
             %
-            c_nearby_spike_inds = npxutils.util.simple_rangesearch(ks.spike_times, times, [minT maxT]);
+            c_nearby_spike_inds = npxutils.internal.simple_rangesearch(ks.spike_times, times, [minT maxT]);
             
-            prog = npxutils.util.ProgressBar(nTimes, 'Reconstructing templates around snippet times');
+            prog = npxutils.internal.ProgressBar(nTimes, 'Reconstructing templates around snippet times');
             for iT = 1:nTimes
                 t = int64(times(iT));
                 reconstruction_this = zeros(nChannelsSorted, numel(relTvec_snippet), 'single');
@@ -2383,7 +2383,7 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
             mask_dup = false(size(spikes));
             dup_from_template = zeros(size(spikes), 'like', templates);
             dup_from_cluster_ind = zeros(size(spikes), 'like', cluster_inds);
-            prog = npxutils.util.ProgressBar(numel(spikes), 'Checking for duplicate spikes');
+            prog = npxutils.internal.ProgressBar(numel(spikes), 'Checking for duplicate spikes');
             for iS = 1:numel(spikes)
                 if mask_dup(iS), continue, end
                 temp1 = templates(iS);
@@ -2519,7 +2519,7 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
             
             initStr = sprintf('Writing Kilosort %d dataset to %s', ks.kilosort_version, outpath);
             if isempty(p.Results.progressInitializeFn) && isempty(p.Results.progressIncrementFn)
-                prog = npxutils.util.ProgressBar(nProg, initStr);
+                prog = npxutils.internal.ProgressBar(nProg, initStr);
                 progIncrFn = @(text) prog.increment(text);
             else
                 if ~isempty(p.Results.progressInitializeFn)

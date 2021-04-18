@@ -61,7 +61,7 @@ classdef ProgressBar < handle
             
             pbar.usingTerminal = ~usejava('desktop');
             
-            [~, pbar.cols] = npxutils.util.ProgressBar.getTerminalSize();
+            [~, pbar.cols] = npxutils.internal.ProgressBar.getTerminalSize();
             pbar.trueColor = ~isempty(getenv('ITERM_PROFILE')) && false;
             
             if pbar.trueColor

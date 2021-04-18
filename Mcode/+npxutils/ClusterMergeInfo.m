@@ -96,7 +96,7 @@ classdef ClusterMergeInfo < handle
         end
         
         function addToMerge(this, mergeInd, cluster_ids)
-            this.merges{mergeInd} = npxutils.util.makecol(union(this.merges{mergeInd}, uint32(cluster_ids)));
+            this.merges{mergeInd} = npxutils.internal.makecol(union(this.merges{mergeInd}, uint32(cluster_ids)));
             this.postMergeUpdate();
         end
         
@@ -113,7 +113,7 @@ classdef ClusterMergeInfo < handle
             
             keep = setdiff(1:this.nMerges, mergeInds);
             this.merges = this.merges(keep);
-            this.merges{end+1} = npxutils.util.makecol(unique(newMerge));
+            this.merges{end+1} = npxutils.internal.makecol(unique(newMerge));
             
             this.postMergeUpdate();
         end
@@ -121,7 +121,7 @@ classdef ClusterMergeInfo < handle
         function mergeClusters(this, cluster_ids)
             mergeInds = this.findMergesForClusters(cluster_ids);
             if isempty(mergeInds)
-                this.merges{end+1} = npxutils.util.makecol(unique(uint32(cluster_ids)));
+                this.merges{end+1} = npxutils.internal.makecol(unique(uint32(cluster_ids)));
                 this.postMergeUpdate();
             else
                 this.mergeMerges(mergeInds, cluster_ids);

@@ -5,13 +5,13 @@ if nargin < 3
     relative = false;
 end
 
-src = resolveSymLink(npxutils.util.GetFullPath(src));
+src = resolveSymLink(npxutils.internal.GetFullPath(src));
 if ~exist(src, 'file')
     warning('Source is a dangling symlink, not creating');
 end
 
-link = npxutils.util.GetFullPath(link);
-npxutils.util.mkdirRecursive(fileparts(link));
+link = npxutils.internal.GetFullPath(link);
+npxutils.internal.mkdirRecursive(fileparts(link));
 % cant use exist on symlinks since it tests for existence of the file it points to
 sWarn = warning('off', 'MATLAB:DELETE:FileNotFound');
 try
@@ -21,7 +21,7 @@ end
 warning(sWarn);
 
 if relative
-    src = npxutils.util.relativepath(src, fileparts(link));
+    src = npxutils.internal.relativepath(src, fileparts(link));
 end
 
 cmd = sprintf('ln -s "%s" "%s"', src, link);
@@ -58,7 +58,7 @@ end
 return;
 
     function result = getResolved(file)
-        cmd = sprintf('readlink -m "%s"', npxutils.util.GetFullPath(file));
+        cmd = sprintf('readlink -m "%s"', npxutils.internal.GetFullPath(file));
         [status, result] = system(cmd);
         if status || isempty(result)
             fprintf(result);

@@ -207,15 +207,15 @@ classdef KilosortTrialSegmentedDataset < handle & matlab.mixin.Copyable
             if p.Results.loadSync
                 nToLoad = nToLoad + 1;
             end
-            prog = npxutils.util.ProgressBar(nToLoad, 'Segmenting trials: spike_times');
+            prog = npxutils.internal.ProgressBar(nToLoad, 'Segmenting trials: spike_times');
             prog.increment();
-            spike_times_grouped = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+            spike_times_grouped = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                 ks.spike_times(spike_mask), 1, [nTrialsSegment, nUnitsSegment], subs(spike_mask, :));
             
             this.spike_times = spike_times_grouped;
             
             if loadCutoff
-                cutoff_spike_times_grouped = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+                cutoff_spike_times_grouped = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                     ks.cutoff_spike_times(cutoff_spike_mask), 1, [nTrialsSegment, nUnitsSegment], cutoff_subs(cutoff_spike_mask, :));
                 this.cutoff_spike_times = cutoff_spike_times_grouped;
             end
@@ -251,30 +251,30 @@ classdef KilosortTrialSegmentedDataset < handle & matlab.mixin.Copyable
             
             prog.increment('Segmenting trials: spike_idx');
             spike_idx = (1:this.dataset.nSpikes)';
-            this.spike_idx = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+            this.spike_idx = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                 spike_idx(spike_mask), 1, [nTrialsSegment, nUnitsSegment], subs(spike_mask, :));
             if loadCutoff
                 cutoff_spike_idx = (1:this.dataset.nSpikesCutoff)';
-                this.cutoff_spike_idx = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+                this.cutoff_spike_idx = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                     cutoff_spike_idx(cutoff_spike_mask), 1, [nTrialsSegment, nUnitsSegment], cutoff_subs(cutoff_spike_mask, :));
             end
             
             if ~segment_by_trials
                 prog.increment('Segmenting trials: spike trial inds');
-                this.spike_trial_ind = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+                this.spike_trial_ind = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                     local_trial_ind_each_spike(spike_mask), 1, [nTrialsSegment, nUnitsSegment], subs(spike_mask, :));
                 if loadCutoff
-                    this.cutoff_spike_trial_ind = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+                    this.cutoff_spike_trial_ind = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                         cutoff_local_trial_ind_each_spike(cutoff_spike_mask), 1, [nTrialsSegment, nUnitsSegment], cutoff_subs(cutoff_spike_mask, :));
                 end
             end
             
             if ~segment_by_clusters
                 prog.increment('Segmenting trials: spike cluster ids');
-                this.spike_cluster_inds = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+                this.spike_cluster_inds = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                     unit_idx_each_spike(spike_mask), 1, [nTrialsSegment, nUnitsSegment], subs(spike_mask, :));
                 if loadCutoff
-                    this.cutoff_spike_cluster_inds = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+                    this.cutoff_spike_cluster_inds = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                         cutoff_unit_idx_each_spike(cutoff_spike_mask), 1, [nTrialsSegment, nUnitsSegment], cutoff_subs(cutoff_spike_mask, :));
                 end
             end
@@ -282,35 +282,35 @@ classdef KilosortTrialSegmentedDataset < handle & matlab.mixin.Copyable
             if loadFeatures
                 % slice the other fields into trials x unit:
                 prog.increment('Segmenting trials: amplitudes');
-                this.amplitudes = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+                this.amplitudes = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                     ks.amplitudes(spike_mask), 1, [nTrialsSegment, nUnitsSegment], subs(spike_mask, :));
                 if loadCutoff
-                    this.cutoff_amplitudes = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+                    this.cutoff_amplitudes = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                         ks.cutoff_amplitudes(cutoff_spike_mask), 1, [nTrialsSegment, nUnitsSegment], cutoff_subs(cutoff_spike_mask, :));
                 end
                 
                 prog.increment('Segmenting trials:  pc_features');
-                this.pc_features = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+                this.pc_features = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                     ks.pc_features(spike_mask, :, :), 1, [nTrialsSegment, nUnitsSegment], subs(spike_mask, :));
                 if loadCutoff
-                    this.cutoff_pc_features = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+                    this.cutoff_pc_features = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                         ks.cutoff_pc_features(cutoff_spike_mask, :, :), 1, [nTrialsSegment, nUnitsSegment], cutoff_subs(cutoff_spike_mask, :));
                 end
                 
                 prog.increment('Segmenting trials: template_features');
-                this.template_features = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+                this.template_features = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                     ks.template_features(spike_mask, :), 1, [nTrialsSegment, nUnitsSegment], subs(spike_mask, :));
                 if loadCutoff
-                    this.cutoff_template_features = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+                    this.cutoff_template_features = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                         ks.cutoff_template_features(cutoff_spike_mask, :), 1, [nTrialsSegment, nUnitsSegment], cutoff_subs(cutoff_spike_mask, :));
                 end
             end
             
             prog.increment('Segmenting trials: spike_clusters');
-            this.spike_templates = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+            this.spike_templates = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                 ks.spike_templates(spike_mask), 1, [nTrialsSegment, nUnitsSegment], subs(spike_mask, :));
             if loadCutoff
-                this.cutoff_spike_templates = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+                this.cutoff_spike_templates = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                     ks.cutoff_spike_templates(cutoff_spike_mask), 1, [nTrialsSegment, nUnitsSegment], cutoff_subs(cutoff_spike_mask, :));
             end
             
@@ -322,7 +322,7 @@ classdef KilosortTrialSegmentedDataset < handle & matlab.mixin.Copyable
                 sample_vec = uint32(1:numel(sync))';
                 local_trial_ind_each_sample = get_local_trial_ind_each_time(tsi, trial_ids, sample_vec);
                 
-                this.sync = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(...
+                this.sync = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(...
                     sync, 1, nTrialsSegment, local_trial_ind_each_sample);
             else
                 this.sync = {};
@@ -482,7 +482,7 @@ classdef KilosortTrialSegmentedDataset < handle & matlab.mixin.Copyable
             else
                 masked_spike_idx = cellfun(@(spike_idx, mask) spike_idx(mask), this.cutoff_spike_idx(:, cluster_ind), mask_cell, 'UniformOutput', false);
             end
-            [masked_spike_idx, whichCell] = npxutils.util.TensorUtils.catWhich(1, masked_spike_idx{:});
+            [masked_spike_idx, whichCell] = npxutils.internal.TensorUtils.catWhich(1, masked_spike_idx{:});
             trialIdMat = repmat(this.trial_ids, 1, numel(cluster_ind));
             trial_idx = trialIdMat(whichCell);
             
@@ -508,7 +508,7 @@ classdef KilosortTrialSegmentedDataset < handle & matlab.mixin.Copyable
             p.addParameter('raw_dataset', this.raw_dataset, @(x) true);
             p.parse(varargin{:});
             
-            trial_idx = npxutils.util.TensorUtils.vectorMaskToIndices(p.Results.trial_idx);
+            trial_idx = npxutils.internal.TensorUtils.vectorMaskToIndices(p.Results.trial_idx);
             nTrials = numel(trial_idx); %#ok<*PROPLC>
             ms_to_samples =  this.raw_dataset.fsAP / 1000;
             
@@ -535,7 +535,7 @@ classdef KilosortTrialSegmentedDataset < handle & matlab.mixin.Copyable
             
             % inflate back to full trials
             snippet_set = p.Results.raw_dataset.readAPSnippetSet(req_zero, window_samples, channel_ids);
-            snippet_set.data = npxutils.util.TensorUtils.inflateMaskedTensor(...
+            snippet_set.data = npxutils.internal.TensorUtils.inflateMaskedTensor(...
                 snippet_set.data, 3, mask_non_nan, 0);
             
             snippet_set.valid = mask_non_nan;

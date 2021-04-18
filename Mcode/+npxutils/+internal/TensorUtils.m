@@ -81,7 +81,7 @@ classdef TensorUtils
             contentsFn = p.Results.contentsFn;
             
             if isempty(sz)
-                varargout = npxutils.util.TensorUtils.cellvec(nargout);
+                varargout = npxutils.internal.TensorUtils.cellvec(nargout);
                 for i = 1:nargout
                     if asCell
                         varargout{i} = {};
@@ -92,7 +92,7 @@ classdef TensorUtils
                 return
             end
             
-            sz = npxutils.util.TensorUtils.expandSizeToNDims(sz, p.Results.minDims);
+            sz = npxutils.internal.TensorUtils.expandSizeToNDims(sz, p.Results.minDims);
             nDims = length(sz);
             idxEachDim = arrayfun(@(n) 1:n, sz, 'UniformOutput', false);
             [subsGrids{1:nDims}] = ndgrid(idxEachDim{:});
@@ -137,7 +137,7 @@ classdef TensorUtils
                     varargin{iArg} = num2cell(varargin{iArg});
                 end
             end
-            tSubs = npxutils.util.TensorUtils.containingSubscripts(size(varargin{1}));
+            tSubs = npxutils.internal.TensorUtils.containingSubscripts(size(varargin{1}));
             results = cellfun(fn, varargin{:}, tSubs, 'UniformOutput', false);
         end
         
@@ -148,7 +148,7 @@ classdef TensorUtils
             
             sz = size(varargin{1});
             fnWrap = @(varargin) fn(varargin{:}, sz);
-            [varargout{1:nargout}] = npxutils.util.TensorUtils.mapIncludeSubs(fnWrap, varargin{:});
+            [varargout{1:nargout}] = npxutils.internal.TensorUtils.mapIncludeSubs(fnWrap, varargin{:});
         end
         
         function varargout = mapSlices(fn, spanDim, varargin)
@@ -180,7 +180,7 @@ classdef TensorUtils
                 tCellArgs = cellfun(@(t) {t}, varargin, 'UniformOutput', false);
             else
                 % slice through each of the varargin
-                tCellArgs = cellfun(@(t) npxutils.util.TensorUtils.selectEachAlongDimension(t, dim), ...
+                tCellArgs = cellfun(@(t) npxutils.internal.TensorUtils.selectEachAlongDimension(t, dim), ...
                     varargin, 'UniformOutput', false);
             end
             
@@ -190,7 +190,7 @@ classdef TensorUtils
             varargout = resultCell;
             
             % (old) reassemble the result
-            % varargout = cellfun(@(r) npxutils.util.TensorUtils.reassemble(r, dim), resultCell, 'UniformOutput', false);
+            % varargout = cellfun(@(r) npxutils.internal.TensorUtils.reassemble(r, dim), resultCell, 'UniformOutput', false);
         end
         
         function varargout = mapSlicesInPlace(fn, spanDim, varargin)
@@ -203,11 +203,11 @@ classdef TensorUtils
             % place via slice = fn(slice) and rebuild the output tensor one
             % slice at a time.
             
-            [resultCell{1:nargout}] = npxutils.util.TensorUtils.mapSlices(fn, spanDim, varargin{:});
-            %             nonSpanDims = npxutils.util.TensorUtils.otherDims(size(resultCell{1}), spanDim, ndims(varargin{1}));
+            [resultCell{1:nargout}] = npxutils.internal.TensorUtils.mapSlices(fn, spanDim, varargin{:});
+            %             nonSpanDims = npxutils.internal.TensorUtils.otherDims(size(resultCell{1}), spanDim, ndims(varargin{1}));
             
             varargout = cellfun(@cell2mat, resultCell, 'UniformOutput', false);
-            %             varargout = cellfun(@(r) npxutils.util.TensorUtils.reassemble(r, nonSpanDims, ndims(varargin{1})), ...
+            %             varargout = cellfun(@(r) npxutils.internal.TensorUtils.reassemble(r, nonSpanDims, ndims(varargin{1})), ...
             %                 resultCell, 'UniformOutput', false);
             
             %             for iV = 1:numel(varargin)
@@ -242,10 +242,10 @@ classdef TensorUtils
                 sz = arrayfun(@numel, axisLists);
             end
             
-            [varargout{1:nargout}] = npxutils.util.TensorUtils.mapToSizeFromSubs(sz, @indexFn, 'asCell', p.Results.asCell);
+            [varargout{1:nargout}] = npxutils.internal.TensorUtils.mapToSizeFromSubs(sz, @indexFn, 'asCell', p.Results.asCell);
             
             function varargout = indexFn(varargin)
-                inputs = npxutils.util.TensorUtils.cellvec(numel(axisLists));
+                inputs = npxutils.internal.TensorUtils.cellvec(numel(axisLists));
                 for iAx = 1:numel(axisLists)
                     if iscell(axisLists{iAx})
                         inputs{iAx} = axisLists{iAx}{varargin{iAx}};
@@ -282,9 +282,9 @@ classdef TensorUtils
                 thisAsCell = struct2cell(flatVector)';
                 % which we orient to have size nFields along dim nargin+1
                 % and size nByArg(iArg) along dim iArg
-                thisAsCellOriented = npxutils.util.TensorUtils.orientSliceAlongDims(thisAsCell, [iArg, nArg+1]);
+                thisAsCellOriented = npxutils.internal.TensorUtils.orientSliceAlongDims(thisAsCell, [iArg, nArg+1]);
                 % and expand to be the same size as the full combinatorial tensor
-                asCells{iArg} = npxutils.util.TensorUtils.singletonExpandToSize(thisAsCellOriented, nByArg);
+                asCells{iArg} = npxutils.internal.TensorUtils.singletonExpandToSize(thisAsCellOriented, nByArg);
             end
             
             % combined will be size [nByArg(:) nFieldsTotal)
@@ -316,14 +316,14 @@ classdef TensorUtils
                 end
             end
             
-            S = npxutils.util.TensorUtils.mapFromAxisLists(@horzcat, listsByDim);
+            S = npxutils.internal.TensorUtils.mapFromAxisLists(@horzcat, listsByDim);
         end
         
         function t = mapCatToTensor(fn, varargin)
             % like arrayfun, except with UniformOutput false, and the
             % results will be concatenated together using cellmat to form a
             % tensor
-            t = npxutils.util.TensorUtils.map(fn, varargin{:});
+            t = npxutils.internal.TensorUtils.map(fn, varargin{:});
             if iscell(t)
                 t = cell2mat(t);
             end
@@ -349,14 +349,14 @@ classdef TensorUtils
         
         function sz = sizeMultiDim(t, dims)
             % sz = sizeMultiDim(t, dims) : sz(i) = size(t, dims(i))
-            szAll = npxutils.util.TensorUtils.expandSizeToNDims(size(t), max(dims));
+            szAll = npxutils.internal.TensorUtils.expandSizeToNDims(size(t), max(dims));
             sz = arrayfun(@(d) szAll(d), dims);
         end
         
         function sz = sizeOtherDims(t, excludeDims)
             % sz = sizeOtherDims(t, excludeDims)
-            otherDims = npxutils.util.TensorUtils.otherDims(size(t), excludeDims);
-            sz = npxutils.util.TensorUtils.sizeMultiDim(t, otherDims);
+            otherDims = npxutils.internal.TensorUtils.otherDims(size(t), excludeDims);
+            sz = npxutils.internal.TensorUtils.sizeMultiDim(t, otherDims);
         end
         
         function sz = expandScalarSize(sz)
@@ -370,7 +370,7 @@ classdef TensorUtils
         end
         
         function sz = sizeNDims(t, nDims)
-            sz = npxutils.util.TensorUtils.expandSizeToNDims(size(t), nDims);
+            sz = npxutils.internal.TensorUtils.expandSizeToNDims(size(t), nDims);
         end
         
         % pads sz with 1s to make it nDims length
@@ -381,8 +381,8 @@ classdef TensorUtils
         
         function tf = compareSizeVectors(sz1, sz2)
             nDims = max(numel(sz1), numel(sz2));
-            tf = isequal(npxutils.util.TensorUtils.expandSizeToNDims(sz1, nDims), ....
-                npxutils.util.TensorUtils.expandSizeToNDims(sz2, nDims));
+            tf = isequal(npxutils.internal.TensorUtils.expandSizeToNDims(sz1, nDims), ....
+                npxutils.internal.TensorUtils.expandSizeToNDims(sz2, nDims));
         end
         
         function other = otherDims(sz, dims, ndims)
@@ -392,7 +392,7 @@ classdef TensorUtils
                 ndims = max(numel(sz), max(dims));
             end
             allDims = 1:ndims;
-            other = npxutils.util.TensorUtils.makerow(setdiff(allDims, dims));
+            other = npxutils.internal.TensorUtils.makerow(setdiff(allDims, dims));
         end
         
         function d = firstNonSingletonDim(t)
@@ -407,18 +407,18 @@ classdef TensorUtils
     methods (Static) % Mask generation and mask utilities
         function idx = vectorMaskToIndices(mask)
             if islogical(mask)
-                idx = npxutils.util.TensorUtils.makecol(find(mask));
+                idx = npxutils.internal.TensorUtils.makecol(find(mask));
             else
-                idx = npxutils.util.TensorUtils.makecol(mask);
+                idx = npxutils.internal.TensorUtils.makecol(mask);
             end
         end
         
         function mask = vectorIndicesToMask(idx, len)
             if islogical(idx)
-                mask = npxutils.util.TensorUtils.makecol(idx);
+                mask = npxutils.internal.TensorUtils.makecol(idx);
             else
                 if ~isscalar(len) && isvector(len), len = numel(len); end % assume its a mask of the same size
-                mask = npxutils.util.TensorUtils.falsevec(len);
+                mask = npxutils.internal.TensorUtils.falsevec(len);
                 mask(idx) = true;
             end
         end
@@ -427,7 +427,7 @@ classdef TensorUtils
             % given logical maskOrig
             existingKeep = find(maskOrig);
             assert(numel(maskAnd) == numel(existingKeep), 'Subselection mask does not match nnz of original mask');
-            keep = npxutils.util.TensorUtils.vectorIndicesToMask(existingKeep(maskAnd), numel(maskOrig));
+            keep = npxutils.internal.TensorUtils.vectorIndicesToMask(existingKeep(maskAnd), numel(maskOrig));
             maskNew = maskOrig;
             maskNew(~keep) = false;
         end
@@ -448,7 +448,7 @@ classdef TensorUtils
             end
             for i = 1:numel(masks)
                 if ~islogical(masks{i})
-                    masks{i} = npxutils.util.TensorUtils.vectorIndicesToMask(masks{i}, max(masks{i}));
+                    masks{i} = npxutils.internal.TensorUtils.vectorIndicesToMask(masks{i}, max(masks{i}));
                 end
             end
             
@@ -459,13 +459,13 @@ classdef TensorUtils
                 masks = repmat(masks, numel(dims), 1);
             end
             assert(numel(masks) == numel(dims), 'Number of dimensions must match number of masks provided');
-            masks = npxutils.util.TensorUtils.makecol(masks);
+            masks = npxutils.internal.TensorUtils.makecol(masks);
             
             nInflatedVec = cellfun(@numel, masks);
             nSelectedVec = cellfun(@nnz, masks);
             
             % check size along selected dims
-            assert(isequal(npxutils.util.TensorUtils.makecol(npxutils.util.TensorUtils.sizeMultiDim(maskedTensor, dims)), nSelectedVec), ...
+            assert(isequal(npxutils.internal.TensorUtils.makecol(npxutils.internal.TensorUtils.sizeMultiDim(maskedTensor, dims)), nSelectedVec), ...
                 'Size along each masked dimension must match nnz(mask)');
             
             % compute inflated size
@@ -491,7 +491,7 @@ classdef TensorUtils
             end
             inflated = repmat(fillWith, inflatedSize);
             
-            maskByDim = npxutils.util.TensorUtils.maskByDimCellSelectAlongDimension(inflatedSize, dims, masks);
+            maskByDim = npxutils.internal.TensorUtils.maskByDimCellSelectAlongDimension(inflatedSize, dims, masks);
             inflated(maskByDim{:}) = maskedTensor;
         end
         
@@ -507,12 +507,12 @@ classdef TensorUtils
         function t = containingLinearInds(sz)
             % build a tensor with size sz where each element contains the linear
             % index it would be accessed at, e.g. t(i) = i
-            sz = npxutils.util.TensorUtils.expandScalarSize(sz);
-            t = npxutils.util.TensorUtils.mapToSizeFromSubs(sz, @(varargin) sub2ind(sz, varargin{:}), false);
+            sz = npxutils.internal.TensorUtils.expandScalarSize(sz);
+            t = npxutils.internal.TensorUtils.mapToSizeFromSubs(sz, @(varargin) sub2ind(sz, varargin{:}), false);
         end
         
         function t = containingSubscripts(sz, asCell)
-            sz = npxutils.util.TensorUtils.expandScalarSize(sz);
+            sz = npxutils.internal.TensorUtils.expandScalarSize(sz);
             
             % asCell == true means each element is itself a cell rather then a vector of
             % subscripts
@@ -523,9 +523,9 @@ classdef TensorUtils
             % build a tensor with size sz where each element contains the vector
             % of subscripts it would be accessed at, e.g. t(i) = i
             if asCell
-                t = npxutils.util.TensorUtils.mapToSizeFromSubs(sz, @(varargin) varargin, true);
+                t = npxutils.internal.TensorUtils.mapToSizeFromSubs(sz, @(varargin) varargin, true);
             else
-                t = npxutils.util.TensorUtils.mapToSizeFromSubs(sz, @(varargin) [varargin{:}]', true);
+                t = npxutils.internal.TensorUtils.mapToSizeFromSubs(sz, @(varargin) [varargin{:}]', true);
             end
         end
         
@@ -540,11 +540,11 @@ classdef TensorUtils
             % t is a tensor whose size is [numel(sz) sz]
             % t(dim, i, j, k) is the subscript of i,j,k on dimension dim.
             % e.g. if dim == 2, t(2, i, j, k, ...) == j
-            t = cell2mat(shiftdim(npxutils.util.TensorUtils.containingSubscripts(sz), -1));
+            t = cell2mat(shiftdim(npxutils.internal.TensorUtils.containingSubscripts(sz), -1));
         end
         
         function mat = ind2subAsMat(sz, inds)
-            sz = npxutils.util.TensorUtils.expandScalarSize(sz);
+            sz = npxutils.internal.TensorUtils.expandScalarSize(sz);
             
             % sz is the size of the tensor
             % mat is length(inds) x length(sz) where each row contains ind2sub(sz, inds(i))
@@ -552,7 +552,7 @@ classdef TensorUtils
             ndims = length(sz);
             subsCell = cell(ndims, 1);
             
-            [subsCell{:}] = ind2sub(sz, npxutils.util.TensorUtils.makecol(inds));
+            [subsCell{:}] = ind2sub(sz, npxutils.internal.TensorUtils.makecol(inds));
             
             mat = [subsCell{:}];
         end
@@ -565,7 +565,7 @@ classdef TensorUtils
             % subMat2Ind essentially converts back to linear indices using
             % sub2ind and is the inverse of ind2subAsMat
             
-            sz = npxutils.util.TensorUtils.expandScalarSize(sz);
+            sz = npxutils.internal.TensorUtils.expandScalarSize(sz);
             
             ndims = length(sz);
             % DO NOT UNCOMMENT. THIS WILL BREAK THINGS SINCE SZ CAN HAVE
@@ -581,7 +581,7 @@ classdef TensorUtils
     
     methods (Static) % Selection Mask generation
         function maskByDim = maskByDimCell(sz)
-            sz = npxutils.util.TensorUtils.expandScalarSize(sz);
+            sz = npxutils.internal.TensorUtils.expandScalarSize(sz);
             
             % get a cell array of selectors into each dim that would select
             % every element if used via t(maskByDim{:})
@@ -593,7 +593,7 @@ classdef TensorUtils
         % for selecting along dim. If dim is a vector, select is a cell array of
         % vectors to be used for selecting along dim(i)
         function maskByDim = maskByDimCellSelectAlongDimension(sz, dim, select)
-            sz = npxutils.util.TensorUtils.expandScalarSize(sz);
+            sz = npxutils.internal.TensorUtils.expandScalarSize(sz);
             
             % get a cell array of selectors into each dim that effectively select
             % select{i} along dim(i). These could be used by indexing a tensor t
@@ -603,23 +603,23 @@ classdef TensorUtils
             end
             
             assert(length(dim) == length(select), 'Number of dimensions must match length of select mask cell array');
-            maskByDim = npxutils.util.TensorUtils.maskByDimCell(sz);
+            maskByDim = npxutils.internal.TensorUtils.maskByDimCell(sz);
             maskByDim(dim) = select;
         end
         
         function mask = maskSelectAlongDimension(sz, dim, select)
-            sz = npxutils.util.TensorUtils.expandScalarSize(sz);
+            sz = npxutils.internal.TensorUtils.expandScalarSize(sz);
             
             % return a logical mask where for tensor with size sz
             % we select t(:, :, select, :, :) where select acts along dimension dim
             
             mask = false(sz);
-            maskByDim = npxutils.util.TensorUtils.maskByDimCellSelectAlongDimension(sz, dim, select);
+            maskByDim = npxutils.internal.TensorUtils.maskByDimCellSelectAlongDimension(sz, dim, select);
             mask(maskByDim{:}) = true;
         end
         
         function maskByDim = maskByDimCellSelectPartialFromOrigin(sz, dim, select)
-            maskByDim = npxutils.util.TensorUtils.maskByDimCell(sz);
+            maskByDim = npxutils.internal.TensorUtils.maskByDimCell(sz);
             maskByDim(dim) = arrayfun(@(n) 1:n, select, 'UniformOutput', false);
         end
         
@@ -627,7 +627,7 @@ classdef TensorUtils
             % select the first select(i) items from dim(i)
             % for i = 1:numel(sz)
             selectCell = arrayfun(@(n) 1:n, select, 'UniformOutput', false);
-            mask = npxutils.util.TensorUtils.maskSelectAlongDimension(sz, dim, selectCell);
+            mask = npxutils.internal.TensorUtils.maskSelectAlongDimension(sz, dim, selectCell);
         end
     end
     
@@ -655,8 +655,8 @@ classdef TensorUtils
         end
         
         function tsq = squeezeOtherDims(t, dims)
-            other = npxutils.util.TensorUtils.otherDims(size(t), dims);
-            tsq = npxutils.util.TensorUtils.squeezeDims(t, other);
+            other = npxutils.internal.TensorUtils.otherDims(size(t), dims);
+            tsq = npxutils.internal.TensorUtils.squeezeDims(t, other);
         end
     end
     
@@ -670,21 +670,21 @@ classdef TensorUtils
             % e.g. if size(t) = [nA nB nC nD] and dims is [1 2],
             % size(tCell) = [nA nB] and size(tCell{iA, iB}) = [nC nD]
             
-            tCell = npxutils.util.TensorUtils.squeezeSelectEachAlongDimension(t, dims);
-            tCell = npxutils.util.TensorUtils.squeezeOtherDims(tCell, dims);
+            tCell = npxutils.internal.TensorUtils.squeezeSelectEachAlongDimension(t, dims);
+            tCell = npxutils.internal.TensorUtils.squeezeOtherDims(tCell, dims);
         end
         
         function tCell = nestedRegroupAlongDimension(t, dimSets)
             % this forms cells of cells of cells of ... of tensors
             assert(iscell(dimSets), 'dimSets must be a cell array of dimension sets');
             
-            dimSets = npxutils.util.TensorUtils.makecol(cellfun(@npxutils.util.TensorUtils.makecol, dimSets, 'UniformOutput', false));
+            dimSets = npxutils.internal.TensorUtils.makecol(cellfun(@npxutils.internal.TensorUtils.makecol, dimSets, 'UniformOutput', false));
             allDims = cell2mat(dimSets);
             
             assert(length(unique(allDims)) == length(allDims), ...
                 'A dimension was included in multiple dimension sets');
             
-            otherDims = npxutils.util.TensorUtils.otherDims(size(t), allDims);
+            otherDims = npxutils.internal.TensorUtils.otherDims(size(t), allDims);
             if ~isempty(otherDims)
                 dimSets{end+1} = otherDims;
             end
@@ -702,21 +702,21 @@ classdef TensorUtils
                     end
                 elseif length(dimSets) == 2
                     % last step in recursion, call final regroup
-                    tCell = npxutils.util.TensorUtils.regroupAlongDimension(t, dimSets{1});
+                    tCell = npxutils.internal.TensorUtils.regroupAlongDimension(t, dimSets{1});
                 else
                     % call inner on each slice of dimSets{1}
-                    remainingDims = npxutils.util.TensorUtils.otherDims(size(t), dimSets{1});
-                    tCell = npxutils.util.TensorUtils.mapSlices(@(t) mapFn(t, dimSets), ...
+                    remainingDims = npxutils.internal.TensorUtils.otherDims(size(t), dimSets{1});
+                    tCell = npxutils.internal.TensorUtils.mapSlices(@(t) mapFn(t, dimSets), ...
                         remainingDims, t);
-                    tCell = npxutils.util.TensorUtils.squeezeOtherDims(tCell, dimSets{1});
+                    tCell = npxutils.internal.TensorUtils.squeezeOtherDims(tCell, dimSets{1});
                 end
             end
             
             function tCell = mapFn(t, dimSets)
                 remainingDimSets = cellfun(...
-                    @(dims) npxutils.util.TensorUtils.shiftDimsPostSqueeze(size(t), dimSets{1}, dims), ...
+                    @(dims) npxutils.internal.TensorUtils.shiftDimsPostSqueeze(size(t), dimSets{1}, dims), ...
                     dimSets(2:end), 'UniformOutput', false);
-                tCell = inner(npxutils.util.TensorUtils.squeezeDims(t, dimSets{1}), remainingDimSets);
+                tCell = inner(npxutils.internal.TensorUtils.squeezeDims(t, dimSets{1}), remainingDimSets);
             end
             
         end
@@ -726,18 +726,18 @@ classdef TensorUtils
                 squeezeResult = false;
             end
             sz = size(t);
-            maskByDim = npxutils.util.TensorUtils.maskByDimCellSelectAlongDimension(sz, dim, select);
+            maskByDim = npxutils.internal.TensorUtils.maskByDimCellSelectAlongDimension(sz, dim, select);
             res = t(maskByDim{:});
             
             if squeezeResult
                 % selectively squeeze along dim
-                res = npxutils.util.TensorUtils.squeezeDims(res, dim);
+                res = npxutils.internal.TensorUtils.squeezeDims(res, dim);
             end
         end
         
         function t = assignIntoTensorAlongDimension(t, assignThis, dims, select)
             sz = size(t);
-            maskByDim = npxutils.util.TensorUtils.maskByDimCellSelectAlongDimension(sz, dims, select);
+            maskByDim = npxutils.internal.TensorUtils.maskByDimCellSelectAlongDimension(sz, dims, select);
             t(maskByDim{:}) = assignThis;
         end
         
@@ -745,8 +745,8 @@ classdef TensorUtils
             % mask logical mask or vector of linear inds into dimensions in
             % dims. selected will be size along other dims x nnz(mask)
             sz = size(t);
-            otherDims = npxutils.util.TensorUtils.otherDims(sz, dims);
-            t_reshape = npxutils.util.TensorUtils.reshapeByConcatenatingDims(t, {otherDims, dims});
+            otherDims = npxutils.internal.TensorUtils.otherDims(sz, dims);
+            t_reshape = npxutils.internal.TensorUtils.reshapeByConcatenatingDims(t, {otherDims, dims});
             selected = t_reshape(:, mask);
             
             selected = reshape(selected, [sz(otherDims) size(selected, 2)]);
@@ -756,31 +756,31 @@ classdef TensorUtils
             % mask logical mask or vector of linear inds into dimensions in
             % dims. assignThis should scalar or be size(t)
             sz = size(t);
-            otherDims = npxutils.util.TensorUtils.otherDims(sz, dims);
-            t_reshape = npxutils.util.TensorUtils.reshapeByConcatenatingDims(t, {otherDims, dims});
+            otherDims = npxutils.internal.TensorUtils.otherDims(sz, dims);
+            t_reshape = npxutils.internal.TensorUtils.reshapeByConcatenatingDims(t, {otherDims, dims});
             
             if isscalar(assignThis)
                 t_reshape(:, mask) = assignThis;
             else
-                assignThis = npxutils.util.TensorUtils.reshapeByConcatenatingDims(assignThis, {otherDims, dims});
+                assignThis = npxutils.internal.TensorUtils.reshapeByConcatenatingDims(assignThis, {otherDims, dims});
                 t_reshape(:, mask) = assignThis;
             end
             
-            t = npxutils.util.TensorUtils.undoReshapeByConcatenatingDims(t_reshape, {otherDims, dims}, sz);
+            t = npxutils.internal.TensorUtils.undoReshapeByConcatenatingDims(t_reshape, {otherDims, dims}, sz);
         end
         
         function sel = selectAlongDimensionWithNaNs(t, dim, select, varargin)
             assert(numel(dim) == 1, 'Must be single dimension');
             nanMask = isnan(select(:));
-            selNoNan = npxutils.util.TensorUtils.selectAlongDimension(t, dim, select(~nanMask), varargin{:});
-            sel = npxutils.util.TensorUtils.inflateMaskedTensor(selNoNan, dim, ~nanMask);
+            selNoNan = npxutils.internal.TensorUtils.selectAlongDimension(t, dim, select(~nanMask), varargin{:});
+            sel = npxutils.internal.TensorUtils.inflateMaskedTensor(selNoNan, dim, ~nanMask);
         end
         
         function [res, maskByDim] = squeezeSelectAlongDimension(t, dim, select)
             % select ind along dimension dim and squeeze() the result
             % e.g. squeeze(t(:, :, ... ind, ...))
             
-            [res, maskByDim] = npxutils.util.TensorUtils.selectAlongDimension(t, dim, select, true);
+            [res, maskByDim] = npxutils.internal.TensorUtils.selectAlongDimension(t, dim, select, true);
         end
         
         function tCell = selectEachAlongDimension(t, dim, squeezeEach)
@@ -793,7 +793,7 @@ classdef TensorUtils
             sz = size(t);
             
             % generate masks by dimension that are equivalent to ':'
-            %maskByDimCell = npxutils.util.TensorUtils.maskByDimCell(sz);
+            %maskByDimCell = npxutils.internal.TensorUtils.maskByDimCell(sz);
             
             dimMask = true(ndims(t), 1);
             dimMask(dim) = false;
@@ -801,14 +801,14 @@ classdef TensorUtils
             szResult(dimMask) = 1;
             
             % oh so clever
-            tCell = npxutils.util.TensorUtils.mapToSizeFromSubs(szResult, 'minDims', max(dim), 'asCell', true, ...
-                'contentsFn', @(varargin) npxutils.util.TensorUtils.selectAlongDimension(t, dim, ...
+            tCell = npxutils.internal.TensorUtils.mapToSizeFromSubs(szResult, 'minDims', max(dim), 'asCell', true, ...
+                'contentsFn', @(varargin) npxutils.internal.TensorUtils.selectAlongDimension(t, dim, ...
                 varargin(dim), squeezeEach));
         end
         
         function tCell = squeezeSelectEachAlongDimension(t, dim)
             % returns a cell array tCell such that tCell{i} = squeezeSelectAlongDimension(t, dim, i)
-            tCell = npxutils.util.TensorUtils.selectEachAlongDimension(t, dim, true);
+            tCell = npxutils.internal.TensorUtils.selectEachAlongDimension(t, dim, true);
         end
         
         function out = splitAlongDimensionBySubscripts(t, dim, outSz, subs)
@@ -819,24 +819,24 @@ classdef TensorUtils
             
             assert(size(subs, 1) == size(t, dim), 'Number of rows of subs must match size of t along dim');
             assert(size(subs, 2) == numel(outSz), 'Number of elements in outSz should match number of columns in subs');
-            otherDims = npxutils.util.TensorUtils.otherDims(size(t), dim);
+            otherDims = npxutils.internal.TensorUtils.otherDims(size(t), dim);
             szT = size(t);
             
             mask = ~any(isnan(subs) | subs == 0, 2);
             if any(~mask)
-                t = npxutils.util.TensorUtils.selectAlongDimension(t, dim, mask);
+                t = npxutils.internal.TensorUtils.selectAlongDimension(t, dim, mask);
                 subs = subs(mask, :);
             end
             
             C = size(subs, 2);
             subsExp = nan(numel(t), C);
             for iC = 1:C
-                colOrient = npxutils.util.TensorUtils.orientSliceAlongDims(subs(:, iC), dim);
-                subcolExp = npxutils.util.TensorUtils.repmatAlongDims(colOrient, otherDims, szT(otherDims));
+                colOrient = npxutils.internal.TensorUtils.orientSliceAlongDims(subs(:, iC), dim);
+                subcolExp = npxutils.internal.TensorUtils.repmatAlongDims(colOrient, otherDims, szT(otherDims));
                 subsExp(:, iC) = subcolExp(:);
             end
             
-            outSz = npxutils.util.TensorUtils.expandScalarSize(outSz);
+            outSz = npxutils.internal.TensorUtils.expandScalarSize(outSz);
             
             szInnerArgs = num2cell(szT);
             szInnerArgs{dim} = [];
@@ -866,20 +866,20 @@ classdef TensorUtils
             end
             
             assert(numel(which) == size(t, dim), 'Number of rows of subs must match size of t along dim');
-            otherDims = npxutils.util.TensorUtils.otherDims(size(t), dim);
+            otherDims = npxutils.internal.TensorUtils.otherDims(size(t), dim);
             szT = size(t);
             
             mask = ~(isnan(which) | which == 0);
             if any(~mask)
-                t = npxutils.util.TensorUtils.selectAlongDimension(t, dim, mask);
+                t = npxutils.internal.TensorUtils.selectAlongDimension(t, dim, mask);
                 subs = which(mask, :);
             end
             
-            colOrient = npxutils.util.TensorUtils.orientSliceAlongDims(which, dim);
-            subcolExp = npxutils.util.TensorUtils.repmatAlongDims(colOrient, otherDims, szT(otherDims));
+            colOrient = npxutils.internal.TensorUtils.orientSliceAlongDims(which, dim);
+            subcolExp = npxutils.internal.TensorUtils.repmatAlongDims(colOrient, otherDims, szT(otherDims));
             subsExp = subcolExp(:);
             
-            outSz = npxutils.util.TensorUtils.expandScalarSize(outSz);
+            outSz = npxutils.internal.TensorUtils.expandScalarSize(outSz);
             
             % must be sorted to preserve order in accumarray
             [subsSorted,subSortIdx] = sort(subsExp);
@@ -918,8 +918,8 @@ classdef TensorUtils
         %             szT(~dimMask) = szInner(~dimMask);
         %
         %             % rebuild t by grabbing the appropriate element from tCell
-        %             %subs = npxutils.util.TensorUtils.containingSubscripts(szT);
-        %             t = npxutils.util.TensorUtils.mapToSizeFromSubs(szT, @getElementT, true);
+        %             %subs = npxutils.internal.TensorUtils.containingSubscripts(szT);
+        %             t = npxutils.internal.TensorUtils.mapToSizeFromSubs(szT, @getElementT, true);
         %
         %             function el = getElementT(varargin)
         %                 [innerSubs, outerSubs] = deal(varargin);
@@ -936,7 +936,7 @@ classdef TensorUtils
         %         end
         
         function vec = flatten(t)
-            vec = npxutils.util.TensorUtils.makecol(t(:));
+            vec = npxutils.internal.TensorUtils.makecol(t(:));
         end
         
         function mat = flattenAlongDimension(t, dim)
@@ -951,7 +951,7 @@ classdef TensorUtils
                 mat = nan(nAlong, nWithin);
             end
             
-            sqMask = npxutils.util.TensorUtils.maskByDimCell(size(t));
+            sqMask = npxutils.internal.TensorUtils.maskByDimCell(size(t));
             for iAlong = 1:nAlong
                 sqMask{dim} = iAlong;
                 within = t(sqMask{:});
@@ -963,7 +963,7 @@ classdef TensorUtils
             % returns a cell array of length size(t, dim)
             % where each element is the flattened vector of tensor
             % values from each t(..., i, ...) where i is along dim
-            tCell = npxutils.util.TensorUtils.regroupAlongDimension(t, dim);
+            tCell = npxutils.internal.TensorUtils.regroupAlongDimension(t, dim);
             for iAlong = 1:length(tCell)
                 tCell{iAlong} = tCell{iAlong}(:);
             end
@@ -974,25 +974,25 @@ classdef TensorUtils
             % inputs each element of out came from
             out = cat(dim, varargin{:});
             if nargout > 1
-                which = cell2mat(npxutils.util.TensorUtils.makecol(cellfun(@(in, idx) idx*ones(size(in, dim), 1), varargin, ...
+                which = cell2mat(npxutils.internal.TensorUtils.makecol(cellfun(@(in, idx) idx*ones(size(in, dim), 1), varargin, ...
                     num2cell(1:numel(varargin)), 'UniformOutput', false)));
             end
         end
         
         function paddedCell = expandToSameSizeAlongDims(dims, varargin)
             nd = max(max(dims), max(cellfun(@ndims, varargin)));
-            szMat = cell2mat(cellfun(@(x) npxutils.util.TensorUtils.sizeNDims(x, nd), npxutils.util.TensorUtils.makecol(varargin), 'UniformOutput', false));
+            szMat = cell2mat(cellfun(@(x) npxutils.internal.TensorUtils.sizeNDims(x, nd), npxutils.internal.TensorUtils.makecol(varargin), 'UniformOutput', false));
             
             szPadTo = max(szMat, [], 1);
-            padFn = @(x) npxutils.util.TensorUtils.expandOrTruncateToSize(x, dims, szPadTo(dims));
+            padFn = @(x) npxutils.internal.TensorUtils.expandOrTruncateToSize(x, dims, szPadTo(dims));
             
-            paddedCell = cellfun(padFn, npxutils.util.TensorUtils.makecol(varargin), 'UniformOutput', false);
+            paddedCell = cellfun(padFn, npxutils.internal.TensorUtils.makecol(varargin), 'UniformOutput', false);
         end
         
         function paddedCell = expandToSameSize(varargin)
             nd = max(cellfun(@ndims, varargin));
             dims = 1:nd;
-            paddedCell = npxutils.util.TensorUtils.expandToSameSizeAlongDims(dims, varargin{:});
+            paddedCell = npxutils.internal.TensorUtils.expandToSameSizeAlongDims(dims, varargin{:});
         end
         
         function out = catPad(dim, varargin)
@@ -1001,7 +1001,7 @@ classdef TensorUtils
             
             nd = max(cellfun(@ndims, varargin));
             otherDims = setdiff(1:nd, dim);
-            paddedCell = npxutils.util.TensorUtils.expandToSameSizeAlongDims(otherDims, varargin{:});
+            paddedCell = npxutils.internal.TensorUtils.expandToSameSizeAlongDims(otherDims, varargin{:});
             out = cat(dim, paddedCell{:});
         end
         
@@ -1029,7 +1029,7 @@ classdef TensorUtils
             
             % expand / align each dataCell to live on time vector
             nd = max(max([timeDim, catDim]), max(cellfun(@ndims, dataCell)));
-            szMat = cell2mat(cellfun(@(x) npxutils.util.TensorUtils.sizeNDims(x, nd), dataCell, 'UniformOutput', false));
+            szMat = cell2mat(cellfun(@(x) npxutils.internal.TensorUtils.sizeNDims(x, nd), dataCell, 'UniformOutput', false));
             
             finalSize = szMat(1, :);
             finalSize(catDim) = sum(szMat(:, catDim));
@@ -1040,13 +1040,13 @@ classdef TensorUtils
             Ncat = numel(dataCell);
             for i = 1:Ncat
                 ti = timeCell{i};
-                idxStart = npxutils.util.TensorUtils.argMin(abs(ti(1) - tvec));
+                idxStart = npxutils.internal.TensorUtils.argMin(abs(ti(1) - tvec));
                 idxEnd = idxStart + numel(ti) - 1;
                 
                 dims = [catDim, timeDim];
                 masks = {i, idxStart:idxEnd};
                 
-                out = npxutils.util.TensorUtils.assignIntoTensorAlongDimension(out, dataCell{i}, dims, masks);
+                out = npxutils.internal.TensorUtils.assignIntoTensorAlongDimension(out, dataCell{i}, dims, masks);
             end
         end
         
@@ -1055,17 +1055,17 @@ classdef TensorUtils
             
             % first slice off ends if needed
             mask = tvecCurrent >= min(tvecNew) & tvecCurrent <= max(tvecNew);
-            dataSlice = npxutils.util.TensorUtils.selectAlongDimension(dataCurrent, timeDim, mask);
+            dataSlice = npxutils.internal.TensorUtils.selectAlongDimension(dataCurrent, timeDim, mask);
             tvecCurrent = tvecCurrent(mask);
             
             % then expand as neede
-            sz = npxutils.util.TensorUtils.sizeNDims(dataSlice, timeDim);
+            sz = npxutils.internal.TensorUtils.sizeNDims(dataSlice, timeDim);
             sz(timeDim) = numel(tvecNew);
             dataNew = nan(sz, 'like', dataSlice);
             
-            idxStart = npxutils.util.TensorUtils.argMin(abs(min(tvecCurrent) - tvecNew));
+            idxStart = npxutils.internal.TensorUtils.argMin(abs(min(tvecCurrent) - tvecNew));
             idxEnd = idxStart + numel(tvecCurrent) - 1;
-            dataNew = npxutils.util.TensorUtils.assignIntoTensorAlongDimension(dataNew, dataSlice, timeDim, idxStart:idxEnd);
+            dataNew = npxutils.internal.TensorUtils.assignIntoTensorAlongDimension(dataNew, dataSlice, timeDim, idxStart:idxEnd);
         end
         
         function [out, which] = catWhichIgnoreEmpty(dim, varargin)
@@ -1079,12 +1079,12 @@ classdef TensorUtils
                 return;
             end
             if nargout > 1
-                whichMasked = cell2mat(npxutils.util.TensorUtils.makecol(cellfun(@(in, idx) idx*ones(size(in, dim), 1), varargin(~isEmpty), ...
+                whichMasked = cell2mat(npxutils.internal.TensorUtils.makecol(cellfun(@(in, idx) idx*ones(size(in, dim), 1), varargin(~isEmpty), ...
                     num2cell(1:nnz(~isEmpty)), 'UniformOutput', false)));
                 
                 % whichMasked indexes into masked varargin, reset these to
                 % index into the original varargin
-                which = npxutils.util.TensorUtils.indicesIntoMaskToOriginalIndices(whichMasked, ~isEmpty);
+                which = npxutils.internal.TensorUtils.indicesIntoMaskToOriginalIndices(whichMasked, ~isEmpty);
             end
         end
         
@@ -1093,10 +1093,10 @@ classdef TensorUtils
             % these entries along dimension, innerDim
             
             if nargout == 2
-                [out, whichCell]  = npxutils.util.TensorUtils.mapSlices(@(slice) npxutils.util.TensorUtils.catWhich(innerDim, slice{:}), outerDim, t);
+                [out, whichCell]  = npxutils.internal.TensorUtils.mapSlices(@(slice) npxutils.internal.TensorUtils.catWhich(innerDim, slice{:}), outerDim, t);
                 which = whichCell{1};
             else
-                out = npxutils.util.TensorUtils.mapSlices(@(slice) cat(innerDim, slice{:}), outerDim, t);
+                out = npxutils.internal.TensorUtils.mapSlices(@(slice) cat(innerDim, slice{:}), outerDim, t);
             end
         end
         
@@ -1146,12 +1146,12 @@ classdef TensorUtils
             if ~iscell(whichDims)
                 whichDims = {whichDims};
             end
-            whichDims = npxutils.util.TensorUtils.makecol(whichDims);
+            whichDims = npxutils.internal.TensorUtils.makecol(whichDims);
             
             allDims = cellfun(@(x) x(:), whichDims, 'UniformOutput', false);
             allDims = cat(1, allDims{:});
             
-            szIn = npxutils.util.TensorUtils.sizeNDims(in, max(allDims));
+            szIn = npxutils.internal.TensorUtils.sizeNDims(in, max(allDims));
             ndimsIn = max(max(allDims), ndims(in));
             
             assert(all(ismember(1:numel(allDims), allDims)), ...
@@ -1177,7 +1177,7 @@ classdef TensorUtils
             
             % build labels for output dimensions
             if nargout > 1
-                szInExpand = npxutils.util.TensorUtils.expandScalarSize(szIn);
+                szInExpand = npxutils.internal.TensorUtils.expandScalarSize(szIn);
                 labelsByDimTemplate = arrayfun(@(dim) 1:szInExpand(dim), 1:numel(szInExpand), 'UniformOutput', false);
                 if ~exist('labelsByDim', 'var')
                     labelsByDim = labelsByDimTemplate;
@@ -1188,13 +1188,13 @@ classdef TensorUtils
                 end
                 
                 szOut = size(out);
-                labelsByDimOut = npxutils.util.TensorUtils.cellvec(ndimsOut);
+                labelsByDimOut = npxutils.internal.TensorUtils.cellvec(ndimsOut);
                 for iDimOut = 1:ndimsOut
                     dimsFromIn = whichDims{iDimOut};
                     % temporary storage of the columns of
                     % labelsByDimOut{iDimOut}, before concatenation
-                    labelsThisOut = npxutils.util.TensorUtils.cellvec(numel(dimsFromIn));
-                    subsCell = npxutils.util.TensorUtils.cellvec(numel(dimsFromIn));
+                    labelsThisOut = npxutils.internal.TensorUtils.cellvec(numel(dimsFromIn));
+                    subsCell = npxutils.internal.TensorUtils.cellvec(numel(dimsFromIn));
                     
                     % get subscripts for each element in the dimsFromIn slice
                     [subsCell{1:numel(dimsFromIn)}] = ind2sub(szIn(dimsFromIn), 1:szOut(iDimOut));
@@ -1203,7 +1203,7 @@ classdef TensorUtils
                         % column vector
                         labelsThisIn = labelsByDim{dimsFromIn(iDimFromIn)};
                         if isvector(labelsThisIn) && length(labelsThisIn) == size(in, dimsFromIn(iDimFromIn))
-                            labelsThisIn = npxutils.util.TensorUtils.makecol(labelsThisIn);
+                            labelsThisIn = npxutils.internal.TensorUtils.makecol(labelsThisIn);
                         end
                         % and pull the correct labels by selecting the
                         % correct rows (typically multiple times)
@@ -1226,7 +1226,7 @@ classdef TensorUtils
             if ~iscell(whichDims)
                 whichDims = {whichDims};
             end
-            whichDims = npxutils.util.TensorUtils.makecol(whichDims);
+            whichDims = npxutils.internal.TensorUtils.makecol(whichDims);
             allDims = cellfun(@(x) x(:), whichDims, 'UniformOutput', false);
             allDims = cat(1, allDims{:});
             assert(all(ismember(1:numel(allDims), allDims)), ...
@@ -1257,9 +1257,9 @@ classdef TensorUtils
             % whichDims and making these a new size, e.g. tensorizes a
             % flattened dim or set of dims
             sz = size(in);
-            assert(isequal(npxutils.util.TensorUtils.makecol(whichDims), npxutils.util.TensorUtils.makecol(min(whichDims):max(whichDims))), 'Dims must be consecutive');
+            assert(isequal(npxutils.internal.TensorUtils.makecol(whichDims), npxutils.internal.TensorUtils.makecol(min(whichDims):max(whichDims))), 'Dims must be consecutive');
             
-            nElements = prod(npxutils.util.TensorUtils.sizeMultiDim(in, whichDims));
+            nElements = prod(npxutils.internal.TensorUtils.sizeMultiDim(in, whichDims));
             if nnz(isnan(newSizeInThoseDims)) == 1
                 mask = isnan(newSizeInThoseDims);
                 fillIn = nElements / prod(newSizeInThoseDims(~mask));
@@ -1277,8 +1277,8 @@ classdef TensorUtils
         end
         
         function out = flattenDimsInPlace(in, whichDims)
-            newLen = prod(npxutils.util.TensorUtils.sizeMultiDim(in, whichDims));
-            out = npxutils.util.TensorUtils.reshapeDimsInPlace(in, whichDims, newLen);
+            newLen = prod(npxutils.internal.TensorUtils.sizeMultiDim(in, whichDims));
+            out = npxutils.internal.TensorUtils.reshapeDimsInPlace(in, whichDims, newLen);
         end
         
         function out = selectSetsAlongDimension(in, dim, selectIdxCell)
@@ -1287,9 +1287,9 @@ classdef TensorUtils
             % position in dimensions 1, 3. if selectIdxCell has length
             % S2, returns cell with size s1 x S2 x s3
             
-            otherDims = npxutils.util.TensorUtils.otherDims(size(in), dim);
-            each = cellfun(@(idx) npxutils.util.TensorUtils.squeezeSelectEachAlongDimension(...
-                npxutils.util.TensorUtils.selectAlongDimension(in, dim, idx), otherDims), selectIdxCell, ...
+            otherDims = npxutils.internal.TensorUtils.otherDims(size(in), dim);
+            each = cellfun(@(idx) npxutils.internal.TensorUtils.squeezeSelectEachAlongDimension(...
+                npxutils.internal.TensorUtils.selectAlongDimension(in, dim, idx), otherDims), selectIdxCell, ...
                 'UniformOutput', false);
             out = cat(dim, each{:});
         end
@@ -1313,7 +1313,7 @@ classdef TensorUtils
                     out = slice(idx);
                 end
             end
-            out = npxutils.util.TensorUtils.mapSlices(@selectIdx, dim, in, idxThatDim);
+            out = npxutils.internal.TensorUtils.mapSlices(@selectIdx, dim, in, idxThatDim);
             if ~iscell(in)
                 out = cell2mat(out);
                 out(~maskValid) = NaN;
@@ -1330,7 +1330,7 @@ classdef TensorUtils
     
     methods (Static) % Slice orienting and repmat
         function vec = orientVectorAlongDim(vec, dim)
-            vec = shiftdim(npxutils.util.TensorUtils.makecol(vec), -dim+1);
+            vec = shiftdim(npxutils.internal.TensorUtils.makecol(vec), -dim+1);
         end
         
         % A slice is a selected region of a tensor, in which each dimension
@@ -1345,8 +1345,8 @@ classdef TensorUtils
             %szSlice = size(slice);
             ndimsSlice = length(spanDim);
             if ndimsSlice == 1
-                % when spanDim is scalar, expect column vector or npxutils.util.TensorUtils.makecol
-                slice = npxutils.util.TensorUtils.makecol(squeeze(slice));
+                % when spanDim is scalar, expect column vector or npxutils.internal.TensorUtils.makecol
+                slice = npxutils.internal.TensorUtils.makecol(squeeze(slice));
             end
             
             ndimsOut = max(2, max(spanDim));
@@ -1365,7 +1365,7 @@ classdef TensorUtils
             % orient slice such that it has the same shape as refSlice
             spanDim = find(size(refSlice) > 1);
             if ~isempty(spanDim);
-                out = npxutils.util.TensorUtils.orientSliceAlongDims(slice, spanDim);
+                out = npxutils.internal.TensorUtils.orientSliceAlongDims(slice, spanDim);
             else
                 out = slice;
             end
@@ -1379,7 +1379,7 @@ classdef TensorUtils
             %nSpan = 1:length(spanDim);
             %ndimsOut = length(szOut);
             
-            sliceOrient = npxutils.util.TensorUtils.orientSliceAlongDims(slice, spanDim);
+            sliceOrient = npxutils.internal.TensorUtils.orientSliceAlongDims(slice, spanDim);
             
             repCounts = szOut;
             repCounts(spanDim) = 1;
@@ -1407,7 +1407,7 @@ classdef TensorUtils
         end
         
         function t = unshiftdimToFirstDim(t, dim, ndimsOrig)
-            t = npxutils.util.TensorUtils.unshiftdim(t, dim-1, ndimsOrig);
+            t = npxutils.internal.TensorUtils.unshiftdim(t, dim-1, ndimsOrig);
         end
     end
     
@@ -1418,7 +1418,7 @@ classdef TensorUtils
             else
                 % check that size is okay
                 szIn = size(in);
-                szOut = npxutils.util.TensorUtils.expandScalarSize(szOut);
+                szOut = npxutils.internal.TensorUtils.expandScalarSize(szOut);
                 assert(isequal(szOut, szIn));
                 out = in;
             end
@@ -1438,14 +1438,14 @@ classdef TensorUtils
             sz(dims) = sz(dims) + by;
             
             if nargin < 4 || isempty(fillWith)
-                out = npxutils.util.TensorUtils.emptyWithSameType(in, sz);
+                out = npxutils.internal.TensorUtils.emptyWithSameType(in, sz);
             else
                 out = repmat(fillWith, sz);
             end
             
             % build the mask over out to assign in into
-            szInDims = npxutils.util.TensorUtils.sizeMultiDim(in, dims);
-            maskByDim = npxutils.util.TensorUtils.maskByDimCellSelectPartialFromOrigin(size(out), dims, szInDims);
+            szInDims = npxutils.internal.TensorUtils.sizeMultiDim(in, dims);
+            maskByDim = npxutils.internal.TensorUtils.maskByDimCellSelectPartialFromOrigin(size(out), dims, szInDims);
             
             out(maskByDim{:}) = in;
         end
@@ -1461,8 +1461,8 @@ classdef TensorUtils
         function t = expandOrTruncateToSize(t, dims, makeSize, fillWith)
             % along each dims(i), truncate or expand with NaN to be size sz(i)
             
-            sz = npxutils.util.TensorUtils.sizeMultiDim(t, dims);
-            makeSize = npxutils.util.TensorUtils.makerow(makeSize);
+            sz = npxutils.internal.TensorUtils.sizeMultiDim(t, dims);
+            makeSize = npxutils.internal.TensorUtils.makerow(makeSize);
             expandBy = makeSize - sz;
             
             if nargin < 4
@@ -1471,12 +1471,12 @@ classdef TensorUtils
             
             tooSmall = expandBy > 0;
             if any(tooSmall)
-                t = npxutils.util.TensorUtils.expandAlongDims(t, dims(tooSmall), expandBy(tooSmall), fillWith);
+                t = npxutils.internal.TensorUtils.expandAlongDims(t, dims(tooSmall), expandBy(tooSmall), fillWith);
             end
             
             tooLarge = expandBy < 0;
             if any(tooLarge)
-                maskByDim = npxutils.util.TensorUtils.maskByDimCellSelectPartialFromOrigin(size(t), dims(tooLarge), makeSize(tooLarge));
+                maskByDim = npxutils.internal.TensorUtils.maskByDimCellSelectPartialFromOrigin(size(t), dims(tooLarge), makeSize(tooLarge));
                 t = t(maskByDim{:});
             end
         end
@@ -1555,16 +1555,16 @@ classdef TensorUtils
                 replace = false;
             end
             
-            t = npxutils.util.TensorUtils.mapSlicesInPlace(@shuffleFn, iA, t);
+            t = npxutils.internal.TensorUtils.mapSlicesInPlace(@shuffleFn, iA, t);
             
             function sNew = shuffleFn(s)
-                list = npxutils.util.TensorUtils.combineListFromCells(s);
+                list = npxutils.internal.TensorUtils.combineListFromCells(s);
                 if size(list, 1) > 1
                     % randsample with scalar first input thinks we mean
                     % 1:scalar as the population rather than just [scalar]
                     list = list(randsample(size(list, 1), size(list, 1), replace), :, :, :, :);
                 end
-                sNew = npxutils.util.TensorUtils.splitListIntoCells(list, cellfun(@numel, s));
+                sNew = npxutils.internal.TensorUtils.splitListIntoCells(list, cellfun(@numel, s));
             end
         end
         
@@ -1572,7 +1572,7 @@ classdef TensorUtils
             % resample from replacement within each list, i.e. don't move
             % anything between lists, just take each list and resample with
             % replacement from itself.
-            t = npxutils.util.TensorUtils.map(@(list) list(randsample(size(list, 1), size(list, 1), true), :, :, :, :), t);
+            t = npxutils.internal.TensorUtils.map(@(list) list(randsample(size(list, 1), size(list, 1), true), :, :, :, :), t);
         end
         
         function t = listResampleFromSpecifiedAlongDimension(t, from, iA, replace)
@@ -1593,12 +1593,12 @@ classdef TensorUtils
                 replace = true;
             end
             
-            t = npxutils.util.TensorUtils.mapSlicesInPlace(@resampleFn, iA, t);
+            t = npxutils.internal.TensorUtils.mapSlicesInPlace(@resampleFn, iA, t);
             
             function sNew = resampleFn(s)
                 sNew = cell(size(s));
                 for i = 1:numel(s)
-                    list = npxutils.util.TensorUtils.combineListFromCells(s(from{i}));
+                    list = npxutils.internal.TensorUtils.combineListFromCells(s(from{i}));
                     sNew{i} = list(randsample(size(list, 1), size(s{i}, 1), replace), :, :, :, :);
                 end
             end
@@ -1617,7 +1617,7 @@ classdef TensorUtils
             % This undoes combineListFromCells
             if isempty(list)
                 % all cells will be empty, special case
-                t = npxutils.util.TensorUtils.cellvec(numel(nPerCell));
+                t = npxutils.internal.TensorUtils.cellvec(numel(nPerCell));
             else
                 szel = size(list);
                 t = mat2cell(list, nPerCell(:), szel(2:end));
@@ -1634,9 +1634,9 @@ classdef TensorUtils
             % will independently split along each dimension in dim. If
             % nPerCell is omitted, will be ones(size(t, dim))
             
-            args = npxutils.util.TensorUtils.cellvec(ndims(t));
+            args = npxutils.internal.TensorUtils.cellvec(ndims(t));
             if nargin < 3 || isempty(nPerCell)
-                nPerCell = arrayfun(@(dim) npxutils.util.TensorUtils.onesvec(size(t, dim)), dim, 'UniformOutput', false);
+                nPerCell = arrayfun(@(dim) npxutils.internal.TensorUtils.onesvec(size(t, dim)), dim, 'UniformOutput', false);
             end
             if nargin < 4
                 squeezeDims = false;
@@ -1667,7 +1667,7 @@ classdef TensorUtils
             c = mat2cell(t, args{:});
             
             if squeezeDims
-                c = cellfun(@(x) npxutils.util.TensorUtils.squeezeDims(x, dim), c, 'UniformOutput', false);
+                c = cellfun(@(x) npxutils.internal.TensorUtils.squeezeDims(x, dim), c, 'UniformOutput', false);
             end
         end
         
@@ -1676,7 +1676,7 @@ classdef TensorUtils
                 squeezeDims = false;
             end
             
-            args = npxutils.util.TensorUtils.cellvec(ndims(t));
+            args = npxutils.internal.TensorUtils.cellvec(ndims(t));
             
             assert(numel(nPerDim) == numel(dims), 'nPerCell must be vector if dim is scalar or cell with one element per dim');
             for iDim = 1:ndims(t)
@@ -1699,7 +1699,7 @@ classdef TensorUtils
             c = mat2cell(t, args{:});
             
             if squeezeDims
-                c = cellfun(@(x) npxutils.util.TensorUtils.squeezeDims(x, dim), c, 'UniformOutput', false);
+                c = cellfun(@(x) npxutils.internal.TensorUtils.squeezeDims(x, dim), c, 'UniformOutput', false);
             end
         end
         
@@ -1710,7 +1710,7 @@ classdef TensorUtils
                 asTensor = false;
             end
             
-            t = npxutils.util.TensorUtils.splitIntoBlocks(t, 1:numel(blockSz), blockSz);
+            t = npxutils.internal.TensorUtils.splitIntoBlocks(t, 1:numel(blockSz), blockSz);
             t = cellfun(fn, t, 'UniformOutput', false);
             if asTensor
                 t = cell2mat(t);
@@ -1718,7 +1718,7 @@ classdef TensorUtils
         end
         
         function t = blockMean(t, blockSz)
-            t = npxutils.util.TensorUtils.blockfun(t, blockSz, @(x) mean(x(:), 'omitnan'), true);
+            t = npxutils.internal.TensorUtils.blockfun(t, blockSz, @(x) mean(x(:), 'omitnan'), true);
         end
         
         
@@ -1761,7 +1761,7 @@ classdef TensorUtils
         end
         
         function r = nanrangeMultiDim(t, dims)
-            r = npxutils.util.TensorUtils.nanmaxMultiDim(t, dims) - npxutils.util.TensorUtils.nanminMultiDim(t, dims);
+            r = npxutils.internal.TensorUtils.nanmaxMultiDim(t, dims) - npxutils.internal.TensorUtils.nanminMultiDim(t, dims);
         end
         
         function t = quantileMultiDim(t, p, dim, placeAlongDim)
@@ -1773,7 +1773,7 @@ classdef TensorUtils
             end
             % quantile returns row vectors, so we orient them along placeAlongDim
             shift = -placeAlongDim + 2;
-            t = npxutils.util.TensorUtils.mapSlicesInPlace(@(slice) shiftdim(quantile(slice(:), p), shift), dim, t);
+            t = npxutils.internal.TensorUtils.mapSlicesInPlace(@(slice) shiftdim(quantile(slice(:), p), shift), dim, t);
         end
         
         function idxTensor = findNAlongDim(t, dim, N, direction)
@@ -1793,11 +1793,11 @@ classdef TensorUtils
             
             % create a template for findInner to use with the correct size
             % and orientation
-            sizeSlice = npxutils.util.TensorUtils.onesvec(max(dim, ndims(t)))';
+            sizeSlice = npxutils.internal.TensorUtils.onesvec(max(dim, ndims(t)))';
             sizeSlice(dim) = N;
             emptySlice = nan(sizeSlice);
             
-            idxTensor = cell2mat(npxutils.util.TensorUtils.mapSlices(@findInner, dim, t));
+            idxTensor = cell2mat(npxutils.internal.TensorUtils.mapSlices(@findInner, dim, t));
             
             function w = findInner(v)
                 w = emptySlice;
@@ -1812,14 +1812,14 @@ classdef TensorUtils
             % e.g. if t has size [s1, s2, s3, s4], then  mean(t, [2 3])
             % will compute the mean in slices along dims 2 and 3. the
             % result will have size s1 x 1 x 1 x s4
-            t = npxutils.util.TensorUtils.mapSlicesInPlace(@(slice) mean(slice(:)), dims, t);
+            t = npxutils.internal.TensorUtils.mapSlicesInPlace(@(slice) mean(slice(:)), dims, t);
         end
         
         function t = nanmeanMultiDim(t, dims)
             % e.g. if t has size [s1, s2, s3, s4], then  mean(t, [2 3])
             % will compute the mean in slices along dims 2 and 3. the
             % result will have size s1 x 1 x 1 x s4
-            t = npxutils.util.TensorUtils.mapSlicesInPlace(@(slice) nanmean(slice(:)), dims, t);
+            t = npxutils.internal.TensorUtils.mapSlicesInPlace(@(slice) nanmean(slice(:)), dims, t);
         end
         
         function t = nansumMultiDim(t, dims)
@@ -1832,28 +1832,28 @@ classdef TensorUtils
             % e.g. if t has size [s1, s2, s3, s4], then  mean(t, [2 3])
             % will compute the mean in slices along dims 2 and 3. the
             % result will have size s1 x 1 x 1 x s4
-            t = npxutils.util.TensorUtils.mapSlicesInPlace(@(slice) var(slice(:), normOpt), dims, t);
+            t = npxutils.internal.TensorUtils.mapSlicesInPlace(@(slice) var(slice(:), normOpt), dims, t);
         end
         
         function t = nanvarMultiDim(t, normOpt, dims)
             % e.g. if t has size [s1, s2, s3, s4], then  mean(t, [2 3])
             % will compute the mean in slices along dims 2 and 3. the
             % result will have size s1 x 1 x 1 x s4
-            t = npxutils.util.TensorUtils.mapSlicesInPlace(@(slice) var(slice(:), normOpt, 'omitnan'), dims, t);
+            t = npxutils.internal.TensorUtils.mapSlicesInPlace(@(slice) var(slice(:), normOpt, 'omitnan'), dims, t);
         end
         
         function t = stdMultiDim(t, dims, varargin)
             % e.g. if t has size [s1, s2, s3, s4], then  mean(t, [2 3])
             % will compute the mean in slices along dims 2 and 3. the
             % result will have size s1 x 1 x 1 x s4
-            t = npxutils.util.TensorUtils.mapSlicesInPlace(@(slice) std(slice(:), varargin{:}, 'omitnan'), dims, t);
+            t = npxutils.internal.TensorUtils.mapSlicesInPlace(@(slice) std(slice(:), varargin{:}, 'omitnan'), dims, t);
         end
         
         function t = nanstdMultiDim(t, dims, varargin)
             % e.g. if t has size [s1, s2, s3, s4], then  mean(t, [2 3])
             % will compute the mean in slices along dims 2 and 3. the
             % result will have size s1 x 1 x 1 x s4
-            t = npxutils.util.TensorUtils.mapSlicesInPlace(@(slice) std(slice(:), varargin{:}, 'omitnan'), dims, t);
+            t = npxutils.internal.TensorUtils.mapSlicesInPlace(@(slice) std(slice(:), varargin{:}, 'omitnan'), dims, t);
         end
         
         function t = zscoreMultiDim(t, alongDims)
@@ -1861,8 +1861,8 @@ classdef TensorUtils
             % along all other dimensions and subtracts it. this ensures
             % that the mean along any slice in alongDims will have zero
             % mean. Then normalizes by the std along all other dimensions.
-            t = npxutils.util.TensorUtils.centerSlicesSpanningDimension(t, alongDims);
-            stdTensor = npxutils.util.TensorUtils.nanstdMultiDim(t, alongDims);
+            t = npxutils.internal.TensorUtils.centerSlicesSpanningDimension(t, alongDims);
+            stdTensor = npxutils.internal.TensorUtils.nanstdMultiDim(t, alongDims);
             t = bsxfun(@rdivide, t, stdTensor);
         end
         
@@ -1871,8 +1871,8 @@ classdef TensorUtils
             % along all other dimensions and subtracts it. this ensures
             % that the mean along any slice in alongDims will have zero
             % mean. Then normalizes by the std along all other dimensions.
-            t = npxutils.util.TensorUtils.centerSlicesSpanningDimension(t, alongDims);
-            stdTensor = npxutils.util.TensorUtils.nanstdMultiDim(t, alongDims) + denomOffset;
+            t = npxutils.internal.TensorUtils.centerSlicesSpanningDimension(t, alongDims);
+            stdTensor = npxutils.internal.TensorUtils.nanstdMultiDim(t, alongDims) + denomOffset;
             t = bsxfun(@rdivide, t, stdTensor);
         end
         
@@ -1898,13 +1898,13 @@ classdef TensorUtils
             end
             assert(numel(namesAlongAxes) == nAx, 'Number of axes must match numel(namesAlongAxes)');
             
-            group = npxutils.util.TensorUtils.cellvec(nAx);
+            group = npxutils.internal.TensorUtils.cellvec(nAx);
             for a = 1:nAx
                 group{a} = cell(sz);
             end
             
             % construct the cell of factor level names
-            subs = npxutils.util.TensorUtils.cellvec(nAx);
+            subs = npxutils.internal.TensorUtils.cellvec(nAx);
             for i = 1:numel(valueCell)
                 [subs{1:nAx}] = ind2sub(sz, i);
                 n = numel(valueCell{i});
@@ -1912,7 +1912,7 @@ classdef TensorUtils
                     group{a}{i} = repmat(namesAlongAxes{a}(subs{a}), n, 1);
                 end
                 
-                valueCell{i} = npxutils.util.TensorUtils.makecol(valueCell{i});
+                valueCell{i} = npxutils.internal.TensorUtils.makecol(valueCell{i});
             end
             
             % collapse over treatments
@@ -1926,9 +1926,9 @@ classdef TensorUtils
             % returns the position along dim of the minimum of each
             % position
             if nargin < 2
-                dim = npxutils.util.TensorUtils.firstNonSingletonDim(t);
+                dim = npxutils.internal.TensorUtils.firstNonSingletonDim(t);
             end
-            [val, idxAlongDim] = npxutils.util.TensorUtils.mapSlices(@min, dim, t);
+            [val, idxAlongDim] = npxutils.internal.TensorUtils.mapSlices(@min, dim, t);
             val = cell2mat(val);
             idxAlongDim = cell2mat(idxAlongDim);
         end
@@ -1936,7 +1936,7 @@ classdef TensorUtils
         function [idxAlongDim, val] = argMax(t, dim)
             % returns the position along dim of the minimum of each
             % position
-            [val, idxAlongDim] = npxutils.util.TensorUtils.mapSlices(@max, dim, t);
+            [val, idxAlongDim] = npxutils.internal.TensorUtils.mapSlices(@max, dim, t);
             val = cell2mat(val);
             idxAlongDim = cell2mat(idxAlongDim);
         end
@@ -1949,14 +1949,14 @@ classdef TensorUtils
             % last dimension, and otherDims as subsequent dimensions
             
             szOrig = size(t);
-            otherDims = npxutils.util.TensorUtils.otherDims(szOrig, basisDims);
-            t = npxutils.util.TensorUtils.reshapeByConcatenatingDims(t, {otherDims, basisDims});
+            otherDims = npxutils.internal.TensorUtils.otherDims(szOrig, basisDims);
+            t = npxutils.internal.TensorUtils.reshapeByConcatenatingDims(t, {otherDims, basisDims});
             
             % deal gracefully with all nan bases
             validCols = any(~isnan(t), 1);
             [coeff, score, latent, tsquared, explained] = pca(t(:, validCols), varargin{:});
             if ~all(validCols)
-                coeff = npxutils.util.TensorUtils.inflateMaskedTensor(coeff, 1, validCols);
+                coeff = npxutils.internal.TensorUtils.inflateMaskedTensor(coeff, 1, validCols);
             end
             nC = size(coeff, 2);
             score = reshape(score, [szOrig(otherDims), nC]);
@@ -1972,25 +1972,25 @@ classdef TensorUtils
             
             assert(isscalar(basisDim));
             szOrig = size(t);
-            otherDims = npxutils.util.TensorUtils.otherDims(szOrig, basisDim);
-            t = npxutils.util.TensorUtils.reshapeByConcatenatingDims(t, {otherDims, basisDim});
+            otherDims = npxutils.internal.TensorUtils.otherDims(szOrig, basisDim);
+            t = npxutils.internal.TensorUtils.reshapeByConcatenatingDims(t, {otherDims, basisDim});
             
             % deal gracefully with all nan bases
             validCols = any(~isnan(t), 1);
             [coeff, score, latent, tsquared, explained, mu] = pca(t(:, validCols), varargin{:});
             
             if ~all(validCols)
-                coeff = npxutils.util.TensorUtils.inflateMaskedTensor(coeff, 1, validCols, 0);
-                mu = npxutils.util.TensorUtils.inflateMaskedTensor(mu', 1, validCols, 0);
+                coeff = npxutils.internal.TensorUtils.inflateMaskedTensor(coeff, 1, validCols, 0);
+                mu = npxutils.internal.TensorUtils.inflateMaskedTensor(mu', 1, validCols, 0);
             end
             
             szNew = szOrig;
             nC = size(coeff, 2);
             szNew(basisDim) = nC;
-            score = npxutils.util.TensorUtils.undoReshapeByConcatenatingDims(score, {otherDims, basisDim}, szNew);
+            score = npxutils.internal.TensorUtils.undoReshapeByConcatenatingDims(score, {otherDims, basisDim}, szNew);
             tsquared = reshape(tsquared, szOrig(otherDims));
             
-            mu = npxutils.util.TensorUtils.orientSliceAlongDims(mu, basisDim);
+            mu = npxutils.internal.TensorUtils.orientSliceAlongDims(mu, basisDim);
         end
     end
     
@@ -1999,8 +1999,8 @@ classdef TensorUtils
             % takes slices along dimensions specified, computes the mean
             % of the slice and subtracts it. this ensures
             % that the mean of each slice spanning alongDims will be zero
-            otherDims = npxutils.util.TensorUtils.otherDims(size(t), alongDims);
-            meanTensor =  npxutils.util.TensorUtils.nanmeanMultiDim(t, otherDims);
+            otherDims = npxutils.internal.TensorUtils.otherDims(size(t), alongDims);
+            meanTensor =  npxutils.internal.TensorUtils.nanmeanMultiDim(t, otherDims);
             t = bsxfun(@minus, t, meanTensor);
         end
         
@@ -2010,7 +2010,7 @@ classdef TensorUtils
             % along all other dimensions and subtracts it. this ensures
             % that the mean along any slice in alongDims will have zero
             % mean.
-            mu =  npxutils.util.TensorUtils.nanmeanMultiDim(t, alongDims);
+            mu =  npxutils.internal.TensorUtils.nanmeanMultiDim(t, alongDims);
             t = bsxfun(@minus, t, mu);
         end
         
@@ -2036,7 +2036,7 @@ classdef TensorUtils
         
         function t = makeNonDecreasing(t, dim)
             if nargin < 2
-                dim = npxutils.util.TensorUtils.firstNonSingletonDim(t);
+                dim = npxutils.internal.TensorUtils.firstNonSingletonDim(t);
             end
             
             % take cumulative max and replace each value that drops below
@@ -2048,7 +2048,7 @@ classdef TensorUtils
         
         function t = makeNonIncreasing(t, dim)
             if nargin < 2
-                dim = npxutils.util.TensorUtils.firstNonSingletonDim(t);
+                dim = npxutils.internal.TensorUtils.firstNonSingletonDim(t);
             end
             
             % take cumulative min and replace each value that rises above
@@ -2089,7 +2089,7 @@ classdef TensorUtils
             newSz(dim) = nNew;
             
             % put combination dimension first
-            pdims = [dim, npxutils.util.TensorUtils.otherDims(sz, dim)];
+            pdims = [dim, npxutils.internal.TensorUtils.otherDims(sz, dim)];
             tp = permute(t, pdims);
             
             % should be nOld x prod(size-t-other-dims)
@@ -2136,10 +2136,10 @@ classdef TensorUtils
             nNew = size(logicalNewByOld, 1);
             
             % compute min over all trial counts included in each basis
-            parts = npxutils.util.TensorUtils.cellvec(nNew);
+            parts = npxutils.internal.TensorUtils.cellvec(nNew);
             for iNew = 1:nNew
                 fnSelect = @(c) fn(c(logicalNewByOld(iNew, :) ~= 0));
-                parts{iNew} = npxutils.util.TensorUtils.mapSlices(fnSelect, dim, t);
+                parts{iNew} = npxutils.internal.TensorUtils.mapSlices(fnSelect, dim, t);
             end
             newTensor = cell2mat(cat(dim, parts{:}));
         end
@@ -2168,7 +2168,7 @@ classdef TensorUtils
             end
             
             assert(isscalar(value), 'Value must be scalar');
-            maskByDim = npxutils.util.TensorUtils.maskByDimCellSelectAlongDimension(size(in), dims, mask);
+            maskByDim = npxutils.internal.TensorUtils.maskByDimCellSelectAlongDimension(size(in), dims, mask);
             in(maskByDim{:}) = value;
         end
         

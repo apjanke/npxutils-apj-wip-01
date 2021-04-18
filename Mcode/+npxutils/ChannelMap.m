@@ -97,13 +97,13 @@ classdef ChannelMap
             d = load(fname);
             map.file = fname;
             [~, map.name, ~] = fileparts(fname);
-            map.channelIdsMapped = npxutils.util.makecol(d.chanMap);
-            map.connected = npxutils.util.makecol(d.connected);
-            map.shankInd = npxutils.util.makecol(d.shankInd);
-            map.xcoords = npxutils.util.makecol(d.xcoords);
-            map.ycoords = npxutils.util.makecol(d.ycoords);
+            map.channelIdsMapped = npxutils.internal.makecol(d.chanMap);
+            map.connected = npxutils.internal.makecol(d.connected);
+            map.shankInd = npxutils.internal.makecol(d.shankInd);
+            map.xcoords = npxutils.internal.makecol(d.xcoords);
+            map.ycoords = npxutils.internal.makecol(d.ycoords);
             if isfield(d, 'zcoords')
-                map.zcoords = npxutils.util.makecol(d.zcoords);
+                map.zcoords = npxutils.internal.makecol(d.zcoords);
                 map.nSpatialDims = 3;
             else
                 map.nSpatialDims = 2;

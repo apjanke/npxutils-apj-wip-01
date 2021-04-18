@@ -188,7 +188,7 @@ classdef KilosortMetrics < handle
             nSteps = 8;
             initStr = 'Computing KilosortMetrics for dataset';
             if isempty(p.Results.progressInitializeFn) && isempty(p.Results.progressIncrementFn)
-                prog = npxutils.util.ProgressBar(nSteps, initStr);
+                prog = npxutils.internal.ProgressBar(nSteps, initStr);
                 progIncrFn = @(text) prog.increment(text);
             else
                 if ~isempty(p.Results.progressInitializeFn)
@@ -249,14 +249,14 @@ classdef KilosortMetrics < handle
             %             templateUnscaledAmps(templateUnscaledAmps < threshAmp) = 0;
             
             %   2. compute template channel Centroids (nTemplates x nCh x nSpatialDim)
-            this.template_centroid = npxutils.util.computeWaveformImageCentroid(this.template_unw, ...
+            this.template_centroid = npxutils.internal.computeWaveformImageCentroid(this.template_unw, ...
                 1:ks.nChannelsSorted, ks.channel_positions_sorted, ...
                 'method', this.centroidMethod, 'relativeThreshold', this.ampRelativeThreshCentroid);
             
             %             templateChannelPos = reshape(ks.channel_positions_sorted(ks.templates_ind(:), :), [size(ks.templates_ind), size(ks.channel_positions_sorted, 2)]);
             
             %   3. compute template center of mass
-            %             m.template_centroid = npxutils.util.TensorUtils.squeezeDims(sum(templateUnscaledAmps .* templateChannelPos, 2) ./ ...
+            %             m.template_centroid = npxutils.internal.TensorUtils.squeezeDims(sum(templateUnscaledAmps .* templateChannelPos, 2) ./ ...
             %                 sum(templateUnscaledAmps, 2), 2);
             
             % C. determine which templates are localized
@@ -312,11 +312,11 @@ classdef KilosortMetrics < handle
                 
                 %   2. compute center of mass. (spikeFeatureChannelPos is nSpikes x nCh x nSpatialDim)
                 spike_pcfeat_chind = ks.pc_feature_ind(ks.spike_templates, :);
-                this.spike_centroid = npxutils.util.computeWaveformImageCentroid(reshape(pc1weight, [size(pc1weight, 1), 1, size(pc1proj, 2)]), ...
+                this.spike_centroid = npxutils.internal.computeWaveformImageCentroid(reshape(pc1weight, [size(pc1weight, 1), 1, size(pc1proj, 2)]), ...
                     spike_pcfeat_chind, ks.channel_positions_sorted, ...
                     'method', 'com_via_provided_amplitudes', 'relativeThreshold', this.ampRelativeThreshCentroid);
                 %                 spikeFeatureChannelPos = reshape(ks.channel_positions_sorted(spike_pcfeat_chind(:), :), [size(spike_pcfeat_chind), size(ks.channel_positions_sorted, 2)]);
-                %                 m.spike_centroid = npxutils.util.TensorUtils.squeezeDims(sum(pc1weight .* spikeFeatureChannelPos, 2) ./ ...
+                %                 m.spike_centroid = npxutils.internal.TensorUtils.squeezeDims(sum(pc1weight .* spikeFeatureChannelPos, 2) ./ ...
                 %                     sum(pc1weight, 2), 2);
             end
             
@@ -325,7 +325,7 @@ classdef KilosortMetrics < handle
                 progIncrFn('Recomputing template similarity scores');
                 % recompute cluster similarity from W and U
                 [this.similar_templates_recomputed, this.similar_templates_best_lag] = ...
-                    npxutils.util.computeTemplateSimilarity(ks.W, ks.U);
+                    npxutils.internal.computeTemplateSimilarity(ks.W, ks.U);
             else
                 this.similar_templates_recomputed = [];
                 this.similar_templates_best_lag = zeros(size(ks.similar_templates), 'int16');
@@ -355,7 +355,7 @@ classdef KilosortMetrics < handle
             
             progIncrFn('Cluster center of mass');
             % K. find cluster center of mass
-            this.cluster_centroid = npxutils.util.TensorUtils.linearCombinationAlongDimension(this.template_centroid, 1, ...
+            this.cluster_centroid = npxutils.internal.TensorUtils.linearCombinationAlongDimension(this.template_centroid, 1, ...
                 this.cluster_template_weight, 'replaceNaNWithZero', true); % needed in case any templates have nan centroid
             
             % L. cluster waveforms
@@ -422,7 +422,7 @@ classdef KilosortMetrics < handle
             nSteps = 1 + this.nTemplates + this.nClusters;
             initStr = 'Computing batchwise KilosortMetrics for dataset';
             if isempty(p.Results.progressInitializeFn) && isempty(p.Results.progressIncrementFn)
-                prog = npxutils.util.ProgressBar(nSteps, initStr);
+                prog = npxutils.internal.ProgressBar(nSteps, initStr);
                 progIncrFn = @(varargin) prog.increment(varargin{:});
             else
                 if ~isempty(p.Results.progressInitializeFn)
@@ -465,7 +465,7 @@ classdef KilosortMetrics < handle
                         'average_skipped_batches', average_skipped_batches), [4 2 3 1]);
                     
                     % some of these can be nan if the template is entirely zero
-                    template_centroid_batchwise(iT, :, :) = npxutils.util.computeWaveformImageCentroid(...
+                    template_centroid_batchwise(iT, :, :) = npxutils.internal.computeWaveformImageCentroid(...
                         template_batch_time_channel, 1:this.nChannelsSorted, this.ks.channel_positions_sorted);
                     
                     template_waveform_batchwise(iT, :, :) = template_batch_time_channel(:, :, this.template_waveform_ch(iT))';
@@ -651,7 +651,7 @@ classdef KilosortMetrics < handle
             p.addParameter('min_similarity', 0, @isscalar);
             p.parse(varargin{:});
             
-            cluster_ids = npxutils.util.makecol(cluster_ids);
+            cluster_ids = npxutils.internal.makecol(cluster_ids);
             [cluster_inds, ~] = this.lookup_clusterIds(cluster_ids);
             if isempty(this.similar_clusters_recomputed)
                 sim = this.similar_clusters;
@@ -1083,7 +1083,7 @@ classdef KilosortMetrics < handle
                 [cmap, cmap_base] = amplitudeCmap(cluAmpNormalized);
                 cmap_lims = [0 cluAmpMax];
             else
-                cmap = npxutils.util.distinguishable_colors(nClu, [1 1 1; 0 1 0]);
+                cmap = npxutils.internal.distinguishable_colors(nClu, [1 1 1; 0 1 0]);
                 cmap_base = cmap;
                 if nClu == 1
                     cmap_lims = [1 2];
@@ -1169,7 +1169,7 @@ classdef KilosortMetrics < handle
                 ylabel(hbar, 'Amplitude (uV)');
             end
             
-            npxutils.util.configureDataTipsFromUserData(gcf);
+            npxutils.internal.configureDataTipsFromUserData(gcf);
             
             function [xb, yb, gaps] = binsmooth(x, y, edges, smoothBy, minSpikesPerBin, minGap)
                 [nSp, ~, whichBin] = histcounts(x, edges);
@@ -1204,7 +1204,7 @@ classdef KilosortMetrics < handle
             end
             
             function [cmap, cmap_base] = amplitudeCmap(amp)
-                cmap_base = npxutils.util.cmocean('thermal');
+                cmap_base = npxutils.internal.cmocean('thermal');
                 N = size(cmap_base, 1);
                 lerp = @(x, a, b) x*(b-a) + a; % map x from [0 1] to [a b]
                 cmap_ind = round(lerp(amp, 1, N));
@@ -1216,7 +1216,7 @@ classdef KilosortMetrics < handle
                 % %                 sat = lerp(amp, 0, 0.9);
                 % %                 cmap_hsl(:, 2) = sat;
                 %                 cmap_hsl(:, 3) = lum;
-                %                 cmap = npxutils.util.hsl2rgb(cmap_hsl);
+                %                 cmap = npxutils.internal.hsl2rgb(cmap_hsl);
             end
         end
         
@@ -1351,7 +1351,7 @@ classdef KilosortMetrics < handle
                     driftTimes = driftEvents(:, 1);
                     if p.Results.plotDriftEventTicks
                         hold on;
-                        npxutils.util.rugplot(driftTimes + xOffset, 'side', 'top', 'Color', [1 0.2 0.2]);
+                        npxutils.internal.rugplot(driftTimes + xOffset, 'side', 'top', 'Color', [1 0.2 0.2]);
                     end
                 else
                     driftTimes = [];
@@ -1371,7 +1371,7 @@ classdef KilosortMetrics < handle
                     uinds = unique(cIndex);
                     uinds = setdiff(uinds, [NaN 0]);
                     N = numel(uinds);
-                    cmap = npxutils.util.colorcet('C2', 'N', N);
+                    cmap = npxutils.internal.colorcet('C2', 'N', N);
                     for iC = 1:N
                         mask_this = cIndex == uinds(iC);
                         if ~any(mask_this), continue; end
@@ -1383,7 +1383,7 @@ classdef KilosortMetrics < handle
                 
                 % optionally mark specific trial starts
                 if ~isempty(p.Results.markSpecificTrialIds)
-                    markTrialIds = npxutils.util.makecol(p.Results.markSpecificTrialIds);
+                    markTrialIds = npxutils.internal.makecol(p.Results.markSpecificTrialIds);
                     markTrialLabels = p.Results.markSpecificTrialLabels;
                     tsi.markSpecificTrials(markTrialIds, 'labels', markTrialLabels, 'Color', cmap, 'sample_window', sample_window, ...
                         'timeInSeconds', timeInSeconds, 'time_shifts', timeShiftsAppliedHere, 'xOffset', xOffset);
@@ -1665,7 +1665,7 @@ classdef KilosortMetrics < handle
             h.MarkerFaceAlpha = 0.4;
             h.MarkerEdgeAlpha = 0.7;
             if ~isempty(color)
-                colormap(npxutils.util.phy_cluster_colors());
+                colormap(npxutils.internal.phy_cluster_colors());
             end
             
             valueLabel = p.Results.valueLabel;
@@ -1770,16 +1770,16 @@ classdef KilosortMetrics < handle
         end
         
         function cmap = getDefaultLinearColormap(this, N) %#ok<INUSL>
-            %             cmap = npxutils.util.colorcet('CBL2', 'N', N);
-            cmap = npxutils.util.cmocean('thermal', N);
+            %             cmap = npxutils.internal.colorcet('CBL2', 'N', N);
+            cmap = npxutils.internal.cmocean('thermal', N);
         end
         
         function cmap = getDefaultBatchColormap(this, nBatch)
             if nargin < 2
                 nBatch = this.nBatchesComputed;
             end
-            cmap = npxutils.util.colorcet('d6', 'N', nBatch);
-            %             cmap = npxutils.util.cmocean('haline', nBatch);
+            cmap = npxutils.internal.colorcet('d6', 'N', nBatch);
+            %             cmap = npxutils.internal.cmocean('haline', nBatch);
         end
         
         function cmap = getDefaultCategoricalColormap(this, nItems) %#ok<INUSL>
@@ -1787,10 +1787,10 @@ classdef KilosortMetrics < handle
                 nItems = 10;
             end
             if nItems <= 10
-                cmap = npxutils.util.seaborn_color_palette('colorblind');
+                cmap = npxutils.internal.seaborn_color_palette('colorblind');
                 cmap = cmap(1:nItems, :);
             else
-                cmap = npxutils.util.distinguishable_colors(nItems);
+                cmap = npxutils.internal.distinguishable_colors(nItems);
             end
         end
         
@@ -1904,13 +1904,13 @@ classdef KilosortMetrics < handle
                 
                 for iC = 1:nChannelsSorted
                     if batchwise
-                        waves = npxutils.util.TensorUtils.squeezeDims(data(iT, :, iC, :), [1 3]) + yc(iC);
+                        waves = npxutils.internal.TensorUtils.squeezeDims(data(iT, :, iC, :), [1 3]) + yc(iC);
                         h = plot(axh, tvec_shift + xc(iC), waves, 'LineWidth', 0.5);
                         for iH = 1:numel(h)
                             h(iH).Color = batch_cmap(iH, :);
                         end
                     else
-                        wave = npxutils.util.TensorUtils.squeezeDims(data(iT, :, iC), 1) + yc(iC);
+                        wave = npxutils.internal.TensorUtils.squeezeDims(data(iT, :, iC), 1) + yc(iC);
                         
                         %                     ud = struct('template_ind', template_inds(iT), 'template_amplitude', sprintf('%.1f uV', m.template_amplitude(template_inds(iT)),
                         %                     'channel_id', this_channel_ids(iC), 'template_is_localized', m.template_is_localized(template_inds(iT)), ...
@@ -1920,16 +1920,16 @@ classdef KilosortMetrics < handle
                         
                     end
                     if iC == 1
-                        npxutils.util.showFirstInLegend(h, templateLabels{iT});
+                        npxutils.internal.showFirstInLegend(h, templateLabels{iT});
                     else
-                        npxutils.util.hideInLegend(h);
+                        npxutils.internal.hideInLegend(h);
                     end
                     hold(axh, 'on');
                 end
                 
                 if plotCentroids
                     if batchwise
-                        centroid = npxutils.util.TensorUtils.squeezeDims(this.template_centroid_batchwise(templateInds(iT), :, [1 2]), 1);
+                        centroid = npxutils.internal.TensorUtils.squeezeDims(this.template_centroid_batchwise(templateInds(iT), :, [1 2]), 1);
                         plot(axh, centroid(:, 1), centroid(:, 2), '-', 'Color', [0.8 0.8 0.8]);
                         scatter(axh, centroid(:, 1), centroid(:, 2), p.Results.centroidSize^2, batch_cmap, '+');
                         
@@ -1997,7 +1997,7 @@ classdef KilosortMetrics < handle
             if p.Results.batchwise
                 for iT = 1:numel(template_inds)
                     mask_valid = this.template_useCount_batchwise(template_inds(iT), :) >= p.Results.batchMinSpikes;
-                    centroid = npxutils.util.TensorUtils.squeezeDims(this.template_centroid_batchwise(template_inds(iT), :, [1 2]), 1);
+                    centroid = npxutils.internal.TensorUtils.squeezeDims(this.template_centroid_batchwise(template_inds(iT), :, [1 2]), 1);
                     
                     xv = centroid(mask_valid, 1);
                     if p.Results.ignoreDriftX && ~isempty(xv)
@@ -2057,7 +2057,7 @@ classdef KilosortMetrics < handle
             if p.Results.batchwise
                 for iT = 1:numel(cluster_inds)
                     mask_valid = cluster_count_batchwise(cluster_inds(iT), 1, :) >= p.Results.batchMinSpikes;
-                    centroid = npxutils.util.TensorUtils.squeezeDims(this.cluster_centroid_batchwise(cluster_inds(iT), :, [1 2]), 1);
+                    centroid = npxutils.internal.TensorUtils.squeezeDims(this.cluster_centroid_batchwise(cluster_inds(iT), :, [1 2]), 1);
                     
                     xv = centroid(mask_valid, 1);
                     if p.Results.ignoreDriftX && ~isempty(xv)
@@ -2217,12 +2217,12 @@ classdef KilosortMetrics < handle
                 if exist('turbo', 'file')
                     colormap = turbo(numel(clusterInds));
                 else
-                    colormap = npxutils.util.turbomap(numel(clusterInds));
+                    colormap = npxutils.internal.turbomap(numel(clusterInds));
                 end
                 %                     colormap = cbrewer('div', 'Spectral', numel(clusterInds));
                 %                 % color by cluster amplitude
                 %                 colormap = cmocean('haline', numel(clusterInds));
-                % %                 colormap = npxutils.util.evalColorMapAt(colormap, linspace(0, 1, numel(clusterInds)));
+                % %                 colormap = npxutils.internal.evalColorMapAt(colormap, linspace(0, 1, numel(clusterInds)));
                 %                 [~, sortIdx] = sort(m.cluster_amplitude(clusterInds), 'ascend');
                 %                 [~, cmapSort] = ismember(1:numel(clusterInds), sortIdx);
                 %                 colormap = colormap(cmapSort, :);
@@ -2280,7 +2280,7 @@ classdef KilosortMetrics < handle
             %             axh.Color = bgcolor;
             box off;
             
-            npxutils.util.configureDataTipsFromUserData(gcf);
+            npxutils.internal.configureDataTipsFromUserData(gcf);
             if p.Results.useAutoAxis
                 aa.update();
             end
@@ -2317,9 +2317,9 @@ classdef KilosortMetrics < handle
             data = this.template_scaled(template_inds, :, ch_inds_sorted);
             
             % nTemplates x nTemplates x nBestChannels --> (nBestChannels*nTemplates) x nTime
-            data_stacked = npxutils.util.TensorUtils.reshapeByConcatenatingDims(data, {[1 3], 2});
+            data_stacked = npxutils.internal.TensorUtils.reshapeByConcatenatingDims(data, {[1 3], 2});
             
-            npxutils.util.pmatbal(data_stacked, 'x', time);
+            npxutils.internal.pmatbal(data_stacked, 'x', time);
             
             label_templates = p.Results.label_templates;
             if isempty(label_templates)
@@ -2378,7 +2378,7 @@ classdef KilosortMetrics < handle
             lagRadius = (lagWindow(2) - lagWindow(1)) / 2;
             inds2 = rangesearch(times2 - lagCentral, times1, lagRadius);
             
-            [inds2, inds1] = npxutils.util.TensorUtils.catWhich(2, inds2{:});
+            [inds2, inds1] = npxutils.internal.TensorUtils.catWhich(2, inds2{:});
             inds1 = inds1';
             inds2 = inds2';
             
@@ -2578,12 +2578,12 @@ classdef KilosortMetrics < handle
             p.addParameter('timeInSeconds', true, @islogical);
             
             p.addParameter('waveform_window', [-40 41], @isvector); % Number of samples before and after spiketime to include in waveform
-            p.addParameter('cluster_colormap', npxutils.util.distinguishable_colors(numel(cluster_ids)), @(x) ismatrix(x));
+            p.addParameter('cluster_colormap', npxutils.internal.distinguishable_colors(numel(cluster_ids)), @(x) ismatrix(x));
             p.parse(varargin{:});
             waveform_window = p.Results.waveform_window;
             
             df = this.ks.raw_dataset;
-            sampleIdx = npxutils.util.makecol(sampleIdx);
+            sampleIdx = npxutils.internal.makecol(sampleIdx);
             mat = df.readAP_idx(sampleIdx); % C x T
             
             [channelInds, channelIds] = df.lookup_channelIds(p.Results.channel_ids);
@@ -2632,7 +2632,7 @@ classdef KilosortMetrics < handle
                 waveformOverlayLabels(cinds, within_window) = iC;
             end
             
-            out = npxutils.util.plotStackedTraces(time, mat', 'labels', labels, ...
+            out = npxutils.internal.plotStackedTraces(time, mat', 'labels', labels, ...
                 'gain', p.Results.gain, 'invertChannels', p.Results.invertChannels, 'normalizeEach', false, ...
                 'colorOverlayLabels', waveformOverlayLabels', 'colorOverlayMap', p.Results.cluster_colormap);
         end

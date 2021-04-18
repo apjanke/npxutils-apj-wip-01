@@ -17,7 +17,7 @@ for i = 1:Nrank
         
         % this replaces mexWtW2
         % [Nfilt, Nfilt, ntimelag == 2*nt0-1] correlation over all time lags
-        XC = reshape(npxutils.util.xcorrAB(single(W(:, :, i)), single(W(:, :, j))), 2*nt0-1, Nfilt, Nfilt);
+        XC = reshape(npxutils.internal.xcorrAB(single(W(:, :, i)), single(W(:, :, j))), 2*nt0-1, Nfilt, Nfilt);
         wtw0 = utu0 .* permute(XC, [2 3 1]); % --> ntimelag x nfilt x nfilt
         
         WtW = WtW + wtw0; % add it to the full correlation array

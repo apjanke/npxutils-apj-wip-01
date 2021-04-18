@@ -11,7 +11,7 @@ if exist(dirPath, 'dir')
 else
     parent = fileparts(dirPath);
     if ~isempty(parent)
-        npxutils.util.mkdirRecursive(parent);
+        npxutils.internal.mkdirRecursive(parent);
     end
     
     mkdir(dirPath);

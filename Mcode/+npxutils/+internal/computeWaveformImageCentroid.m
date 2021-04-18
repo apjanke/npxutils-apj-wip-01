@@ -30,7 +30,7 @@ image_ch_pos = reshape(ch_pos(channel_inds_by_image(:), :), [nImages, nChPerImag
 switch method
     case 'com_via_range'
         % compute the center of mass taking the amplitude as the range of each channel individually
-        amp_data_raw = npxutils.util.TensorUtils.squeezeDims(max(image_data,[],2) - min(image_data,[],2), 2); % nImages x nChannelsPerImage
+        amp_data_raw = npxutils.internal.TensorUtils.squeezeDims(max(image_data,[],2) - min(image_data,[],2), 2); % nImages x nChannelsPerImage
         peak_amp = max(amp_data_raw, [], 2);
         amp_data_thresh = amp_data_raw;
         amp_data_thresh(amp_data_raw < peak_amp * relThresh) = 0;
@@ -38,19 +38,19 @@ switch method
         % weighted sum over channels in each dimension
         % amp (nImages x nChPerImage) .* pos (nImages x nChPerImage x spatialDim) over ch, divide by sum amps over ch
         % --> nImages x 1 x spatialDim --> nIamges x spatialDim
-        image_pos = npxutils.util.TensorUtils.squeezeDims(sum(amp_data_thresh .* image_ch_pos, 2) ./ ...
+        image_pos = npxutils.internal.TensorUtils.squeezeDims(sum(amp_data_thresh .* image_ch_pos, 2) ./ ...
             sum(amp_data_thresh, 2), 2);
         
     case 'com_via_provided_amplitudes'
         % compute the center of mass taking the amplitude as given by the single timepoint in image_data
         assert(nTime == 1);
-        amp_data_raw = npxutils.util.TensorUtils.squeezeDims(image_data, 2);
+        amp_data_raw = npxutils.internal.TensorUtils.squeezeDims(image_data, 2);
         peak_amp = max(amp_data_raw, [], 2);
         
         amp_data_thresh = amp_data_raw;
         amp_data_thresh(image_data < peak_amp * relThresh) = 0;
         
-        image_pos = npxutils.util.TensorUtils.squeezeDims(sum(amp_data_thresh .* image_ch_pos, 2) ./ ...
+        image_pos = npxutils.internal.TensorUtils.squeezeDims(sum(amp_data_thresh .* image_ch_pos, 2) ./ ...
             sum(amp_data_thresh, 2), 2);
         
     case 'com_best_timepoint'
@@ -76,7 +76,7 @@ switch method
         % weighted sum over channels in each dimension
         % amp (nImages x nChPerImage) .* pos (nImages x nChPerImage x spatialDim) over ch, divide by sum amps over ch
         % --> nImages x 1 x spatialDim --> nIamges x spatialDim
-        image_pos = npxutils.util.TensorUtils.squeezeDims(sum(amp_data_thresh .* image_ch_pos, 2) ./ ...
+        image_pos = npxutils.internal.TensorUtils.squeezeDims(sum(amp_data_thresh .* image_ch_pos, 2) ./ ...
             sum(amp_data_thresh, 2), 2);
         
     otherwise

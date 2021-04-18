@@ -53,7 +53,7 @@ Y = addRowCol(Y);
 h = pcolor(X,Y, m);
 
 set(h, 'EdgeColor', 'none');
-npxutils.util.cmocean('haline');
+npxutils.internal.cmocean('haline');
 
 if p.Results.addColorbar
     hcbar = colorbar;

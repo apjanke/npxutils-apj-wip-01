@@ -6,10 +6,10 @@ if nargin == 0
     xlim([-4 4]);
     ylim([-4 4]);
     hold on;
-    npxutils.util.rugplot(pos(:, 1), 'side', 'top', 'Color', 'r');
-    npxutils.util.rugplot(pos(:, 2), 'side', 'right', 'Color', 'g');
-    npxutils.util.rugplot(pos(:, 3), 'side', 'bottom', 'Color', 'c');
-    npxutils.util.rugplot(pos(:, 4), 'side', 'left', 'Color', 'm');
+    npxutils.internal.rugplot(pos(:, 1), 'side', 'top', 'Color', 'r');
+    npxutils.internal.rugplot(pos(:, 2), 'side', 'right', 'Color', 'g');
+    npxutils.internal.rugplot(pos(:, 3), 'side', 'bottom', 'Color', 'c');
+    npxutils.internal.rugplot(pos(:, 4), 'side', 'left', 'Color', 'm');
     return;
 end
 
@@ -87,7 +87,7 @@ h = plot(X(:), Y(:), '-', 'Color', p.Results.Color, 'LineWidth', p.Results.LineW
 if ~isempty(p.Results.dataTipTemplateRows) && ~verLessThan('matlab', '9.6.0')
     rows = p.Results.dataTipTemplateRows;
     for iR = 1:numel(rows)
-        vals = npxutils.util.makerow(double(rows(iR).Value));
+        vals = npxutils.internal.makerow(double(rows(iR).Value));
         vals = repmat(vals, 3, 1);
         rows(iR).Value = vals(:)';
     end

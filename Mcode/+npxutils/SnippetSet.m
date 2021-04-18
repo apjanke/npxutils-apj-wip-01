@@ -164,7 +164,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             colormap = zeros(nLabels, 3);
             unique_labels = setdiff(unique(overlay_labels(:)), 0);
             label_found = ismember(1:nLabels, unique_labels);
-            colormap(label_found, :) = npxutils.util.distinguishable_colors(nnz(label_found), backgroundColor);
+            colormap(label_found, :) = npxutils.internal.distinguishable_colors(nnz(label_found), backgroundColor);
         end
         
         function this = selectClusters(this, cluster_ids)
@@ -401,7 +401,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                         'AlignVertexCenters', true, p.Results.plotArgs{:}); % [snippets for ch1; snippets for ch2; ... ]
                     % split handles by channel
                     handlesIndiv(:, iClu) = mat2cell(hthis, repmat(nSnippetsThis, nChannelsMaxPerCluster, 1), 1);
-                    npxutils.util.hideInLegend(hthis);
+                    npxutils.internal.hideInLegend(hthis);
                     hold(axh, 'on');
                 end
                 
@@ -417,20 +417,20 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                 end
                 
                 if p.Results.showMean
-                    npxutils.util.showFirstInLegend(handlesMean(1, iClu), sprintf('cluster %d', this_cluster_id));
+                    npxutils.internal.showFirstInLegend(handlesMean(1, iClu), sprintf('cluster %d', this_cluster_id));
                 elseif p.Results.showMedian
-                    npxutils.util.showFirstInLegend(handlesMedian(1, iClu), sprintf('cluster %d', this_cluster_id));
+                    npxutils.internal.showFirstInLegend(handlesMedian(1, iClu), sprintf('cluster %d', this_cluster_id));
                 else
-                    npxutils.util.showFirstInLegend(handlesIndiv{1, iClu}, sprintf('cluster %d', this_cluster_id));
+                    npxutils.internal.showFirstInLegend(handlesIndiv{1, iClu}, sprintf('cluster %d', this_cluster_id));
                 end
                 %
                 %                 for iC = 1:nChannelsMaxPerCluster
-                %                     dmat = npxutils.util.TensorUtils.squeezeDims(data(iC, :, this_snippet_mask_subset), 1) + yc(iC);
+                %                     dmat = npxutils.internal.TensorUtils.squeezeDims(data(iC, :, this_snippet_mask_subset), 1) + yc(iC);
                 %
                 %                     if p.Results.showIndividual
                 %                         handlesIndiv{iC, iClu} = plot(axh, tvec + xc(iC), dmat, 'Color', [cmap(cmapIdx, :), p.Results.alpha], ...
                 %                             'AlignVertexCenters', true, p.Results.plotArgs{:});
-                %                         npxutils.util.hideInLegend(handlesIndiv{iC, iClu});
+                %                         npxutils.internal.hideInLegend(handlesIndiv{iC, iClu});
                 %                         hold(axh, 'on');
                 %                     end
                 %                     if p.Results.showMean
@@ -445,14 +445,14 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                 %                     end
                 %                     if iC == 1
                 %                         if p.Results.showMean
-                %                             npxutils.util.showFirstInLegend(handlesMean(iC, iClu), sprintf('cluster %d', this_cluster_id));
+                %                             npxutils.internal.showFirstInLegend(handlesMean(iC, iClu), sprintf('cluster %d', this_cluster_id));
                 %                         elseif p.Results.showMedian
-                %                             npxutils.util.showFirstInLegend(handlesMedian(iC, iClu), sprintf('cluster %d', this_cluster_id));
+                %                             npxutils.internal.showFirstInLegend(handlesMedian(iC, iClu), sprintf('cluster %d', this_cluster_id));
                 %                         else
-                %                             npxutils.util.showFirstInLegend(handlesIndiv{iC, iClu}, sprintf('cluster %d', this_cluster_id));
+                %                             npxutils.internal.showFirstInLegend(handlesIndiv{iC, iClu}, sprintf('cluster %d', this_cluster_id));
                 %                         end
                 %                     else
-                %                         npxutils.util.hideInLegend(handlesMean(iC, iClu));
+                %                         npxutils.internal.hideInLegend(handlesMean(iC, iClu));
                 %                     end
                 %                 end
                 %
@@ -707,7 +707,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             % plot stacked traces wants time x ch x layers
             data_txcxl = permute(data(:, :, :), [2 1 3]);
             
-            npxutils.util.plotStackedTraces(time, data_txcxl, 'colors', traceColor, ...
+            npxutils.internal.plotStackedTraces(time, data_txcxl, 'colors', traceColor, ...
                 'lineWidth', 0.5, 'lineOpacity', p.Results.lineOpacity, ...
                 'gain', p.Results.gain, 'invertChannels', this.channelMap.invertChannelsY, 'normalizeEach', false, ...
                 'channel_ids', channel_ids, 'showChannelDataTips', p.Results.showChannelDataTips);
@@ -794,7 +794,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             data_txcxl = permute(data(:, :, :), [2 1 3]);
             overlay_labels_txcxl = permute(overlay_labels(:, :, :), [2 1 3]);
             
-            [~, transform] = npxutils.util.plotStackedTraces(time, data_txcxl, 'colors', traceColor, ...
+            [~, transform] = npxutils.internal.plotStackedTraces(time, data_txcxl, 'colors', traceColor, ...
                 'lineWidth', 0.5, 'lineOpacity', p.Results.lineOpacity, ...
                 'gain', p.Results.gain, 'invertChannels', this.channelMap.invertChannelsY, 'normalizeEach', false, ...
                 'colorOverlayLabels', overlay_labels_txcxl, 'colorOverlayMap', overlay_colormap, ...
@@ -831,7 +831,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                         dataTipArgs = {};
                     end
                     hold on;
-                    npxutils.util.plotStackedTraces(time_this(t_mask), template_this(:, t_mask)', ...
+                    npxutils.internal.plotStackedTraces(time_this(t_mask), template_this(:, t_mask)', ...
                         'colors', overlay_cluster_colormap(cluster_ind_this, :), ...
                         'transformInfo', transform, ...
                         dataTipArgs{:});
@@ -889,7 +889,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                 time = this.time_samples;
             end
             
-            npxutils.util.plotStackedTraces(time, data_txcxl, 'layerColors', traceColors, ...
+            npxutils.internal.plotStackedTraces(time, data_txcxl, 'layerColors', traceColors, ...
                 'lineWidth', 0.5, 'lineOpacity', p.Results.lineOpacity, ...
                 'gain', p.Results.gain, 'invertChannels', this.channelMap.invertChannelsY, 'normalizeEach', false, ...
                 'channel_ids', channel_ids_ch_by_snippet, 'showChannelDataTips', false);
@@ -912,7 +912,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             end
             data = this.data(:, :, snippet_ind, 1);
             
-            npxutils.util.pmatbal(data, 'x', time);
+            npxutils.internal.pmatbal(data, 'x', time);
             yline(0.5, '-', sprintf('snippet %d', snippet_ind), 'LabelVerticalAlignment', 'bottom');
         end
         
@@ -955,12 +955,12 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                     templates(:, :, iT) = residual;
                 end
             end
-            templates_stacked = npxutils.util.TensorUtils.reshapeByConcatenatingDims(templates, {[1 3], 2});
+            templates_stacked = npxutils.internal.TensorUtils.reshapeByConcatenatingDims(templates, {[1 3], 2});
             
             
             data_stacked = cat(1, data, templates_stacked);
             
-            npxutils.util.pmatbal(data_stacked, 'x', time);
+            npxutils.internal.pmatbal(data_stacked, 'x', time);
             
             yline(0.5, '-', sprintf('snippet %d', snippet_ind), 'LabelVerticalAlignment', 'bottom');
             for iC = 1:size(templates, 3)
@@ -1018,7 +1018,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             else
                 data_stacked = cat(1, data, reconstruction);
             end
-            npxutils.util.pmatbal(data_stacked, 'x', time);
+            npxutils.internal.pmatbal(data_stacked, 'x', time);
             
             if ~hasClusterId
                 labelMain = sprintf('snippet %d', snippet_ind);

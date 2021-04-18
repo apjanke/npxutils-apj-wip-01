@@ -59,9 +59,9 @@ classdef ConcatenationInfo < handle
                 namescat = getor(meta, 'concatenated', []);
                 if ~isempty(namescat)
                     if contains(namescat, ';')
-                        ci.names = string(npxutils.util.makecol(strsplit(namescat, ';')));
+                        ci.names = string(npxutils.internal.makecol(strsplit(namescat, ';')));
                     else
-                        ci.names = string(npxutils.util.makecol(strsplit(namescat, ':')));
+                        ci.names = string(npxutils.internal.makecol(strsplit(namescat, ':')));
                     end
                 else
                     ci.names = strings(nC, 1);
@@ -73,11 +73,11 @@ classdef ConcatenationInfo < handle
                 
                 switch mode
                     case 'ap'
-                        rmin = npxutils.util.makecol(getor(meta, 'concatenatedAiRangeMin', imec.apRange(1) * ones(nC, 1)));
-                        rmax = npxutils.util.makecol(getor(meta, 'concatenatedAiRangeMax', imec.apRange(2) * ones(nC, 1)));
+                        rmin = npxutils.internal.makecol(getor(meta, 'concatenatedAiRangeMin', imec.apRange(1) * ones(nC, 1)));
+                        rmax = npxutils.internal.makecol(getor(meta, 'concatenatedAiRangeMax', imec.apRange(2) * ones(nC, 1)));
                     case 'lf'
-                        rmin = npxutils.util.makecol(getor(meta, 'concatenatedAiRangeMin', imec.lfRange(1) * ones(nC, 1)));
-                        rmax = npxutils.util.makecol(getor(meta, 'concatenatedAiRangeMax', imec.lfRange(2) * ones(nC, 1)));
+                        rmin = npxutils.internal.makecol(getor(meta, 'concatenatedAiRangeMin', imec.lfRange(1) * ones(nC, 1)));
+                        rmax = npxutils.internal.makecol(getor(meta, 'concatenatedAiRangeMax', imec.lfRange(2) * ones(nC, 1)));
                     otherwise
                         error ('unknown mode');
                 end

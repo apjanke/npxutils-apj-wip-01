@@ -59,8 +59,8 @@ end
 
 if isempty(traceColors) && isempty(layerColors)
     if nLayers > 1
-        %layerColors = npxutils.util.phy_cluster_colors(nLayers);
-        layerColors = npxutils.util.linspecer(nLayers);
+        %layerColors = npxutils.internal.phy_cluster_colors(nLayers);
+        layerColors = npxutils.internal.linspecer(nLayers);
     else
         traceColors = repmat([0 0 0], nTraces, 1);
     end
@@ -211,7 +211,7 @@ switch style
         
     case 'heatmap'
         assert(nLayers == 1);
-        npxutils.util.pmatbal(data');
+        npxutils.internal.pmatbal(data');
 end
 
 % do color overlays
@@ -227,7 +227,7 @@ if ~isempty(p.Results.colorOverlayLabels)
     
     labelCmap = p.Results.colorOverlayMap;
     if isempty(labelCmap)
-        labelCmap = npxutils.util.distinguishable_colors(maxLabel, {'k', 'w'});
+        labelCmap = npxutils.internal.distinguishable_colors(maxLabel, {'k', 'w'});
     end
     
     hLabel = cell(maxLabel, nLayers);

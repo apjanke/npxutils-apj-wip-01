@@ -1,4 +1,8 @@
 function rezFull = runKilosort2_modified(imec, varargin)
+% A modified version of runKilosort2
+%
+% TODO: Document what's different about this version. And is this part of the library
+% public API, or is it just a work-in-progress thing?
 
 p = inputParser();
 p.addParameter('saveDir', imec.pathRoot, @ischar);

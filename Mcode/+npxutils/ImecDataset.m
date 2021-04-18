@@ -412,7 +412,7 @@ classdef ImecDataset < handle
             if nargin < 3
                 newStem = this.fileStem;
             end
-            npxutils.util.mkdirRecursive(newRoot);
+            npxutils.internal.mkdirRecursive(newRoot);
             
             f = @(suffix) fullfile(newRoot, [newStem suffix]);
             docopy(this.pathAP, f('.imec.ap.bin'));
@@ -479,7 +479,7 @@ classdef ImecDataset < handle
         function [syncRaw, fsSync] = readSync(imec, varargin)
             p = inputParser();
             p.addOptional('reload', false, @islogical); % if true, ignore cache in memory imec.syncRaw
-            p.addParameter('preferredBand', '', @npxutils.util.isstringlike); % prefer a band (ap or lf), though will only be obeyed if not already loaded / cached
+            p.addParameter('preferredBand', '', @npxutils.internal.isstringlike); % prefer a band (ap or lf), though will only be obeyed if not already loaded / cached
             p.addParameter('ignoreCached', false, @islogical); % if true, ignore cache on disk in imec.pathSyncCached
             p.parse(varargin{:});
             preferredBand = string(p.Results.preferredBand);
@@ -559,7 +559,7 @@ classdef ImecDataset < handle
         
         function vec = readSync_idx(imec, idx, varargin)
             p = inputParser();
-            p.addParameter('band', '', @npxutils.util.isstringlike);
+            p.addParameter('band', '', @npxutils.internal.isstringlike);
             p.addParameter('fromSourceDatasets', false, @islogical);
             p.parse(varargin{:});
             
@@ -654,7 +654,7 @@ classdef ImecDataset < handle
         
         function data = internal_read_idx(imec, sampleIdx, varargin)
             p = inputParser();
-            p.addParameter('band', 'ap', @npxutils.util.isstringlike);
+            p.addParameter('band', 'ap', @npxutils.internal.isstringlike);
             p.addParameter('applyScaling', true, @islogical); % convert to uV before processing
             p.addParameter('fromSourceDatasets', false, @islogical);
             p.addParameter('scaleSourceToMatch', false, @islogical); % when fromSourceDatasets is true, scale the raw data to match the scaling of the cleaned datsets
@@ -694,7 +694,7 @@ classdef ImecDataset < handle
                 if any(isnan(sampleIdx))
                     mask = ~isnan(sampleIdx);
                     data = single(mm.Data.x(:, sampleIdx)); % must be single to support NaNs
-                    data = npxutils.util.TensorUtils.inflateMaskedTensor(data, 2, mask, NaN);
+                    data = npxutils.internal.TensorUtils.inflateMaskedTensor(data, 2, mask, NaN);
                 else
                     data = mm.Data.x(:, sampleIdx);
                 end
@@ -813,7 +813,7 @@ classdef ImecDataset < handle
             p.addParameter('markSampleMode', 'rug', @ischar);
             p.addParameter('markSampleColor', [0.5 0 0.5], @(x) true);
             
-            p.addParameter('style', 'traces', @npxutils.util.isstringlike);
+            p.addParameter('style', 'traces', @npxutils.internal.isstringlike);
             
             p.parse(varargin{:});
             
@@ -918,7 +918,7 @@ classdef ImecDataset < handle
             
             switch style
                 case 'traces'
-                    npxutils.util.plotStackedTraces(time, mat', 'colors', colors, 'labels', labels, ...
+                    npxutils.internal.plotStackedTraces(time, mat', 'colors', colors, 'labels', labels, ...
                         'gain', p.Results.gain, 'invertChannels', false, ...
                         'normalizeMask', normalizeMask, 'normalizeEach', false);
                 case 'pmatbal'
@@ -929,7 +929,7 @@ classdef ImecDataset < handle
                         labelsF = labels;
                     end
                     ytick = 1:size(mat, 1);
-                    npxutils.util.pmatbal(mat, 'x', time, 'y', ytick);
+                    npxutils.internal.pmatbal(mat, 'x', time, 'y', ytick);
                     set(gca, 'YTick', ytick, 'YTickLabel', labelsF);
                     
                 otherwise
@@ -956,7 +956,7 @@ classdef ImecDataset < handle
                 end
                 
                 if strcmp(p.Results.markSampleMode, 'rug')
-                    npxutils.util.rugplot(markTimes, 'side', 'top', 'Color', p.Results.markSampleColor, 'expand_limits', true);
+                    npxutils.internal.rugplot(markTimes, 'side', 'top', 'Color', p.Results.markSampleColor, 'expand_limits', true);
                 else
                     for iM = 1:numel(markTimes)
                         xline(markTimes(iM), 'Color', p.Results.markSampleColor);
@@ -1133,7 +1133,7 @@ classdef ImecDataset < handle
             % of samples around this time from some channels
             
             p = inputParser();
-            p.addParameter('band', 'ap', @npxutils.util.isstringlike);
+            p.addParameter('band', 'ap', @npxutils.internal.isstringlike);
             p.addParameter('fromSourceDatasets', false, @islogical);
             p.addParameter('syncFromSourceDatasets', [], @(x) isempty(x) || islogical(x));
             
@@ -1196,7 +1196,7 @@ classdef ImecDataset < handle
                 channel_ids_by_snippet = channel_ids_by_cluster(:, cluster_inds);
                 
             elseif ~isempty(channel_ids)
-                channel_ids = npxutils.util.makecol(channel_ids);
+                channel_ids = npxutils.internal.makecol(channel_ids);
                 channel_ids_by_snippet = repmat(channel_ids, 1, numel(times));
                 
             else
@@ -1278,7 +1278,7 @@ classdef ImecDataset < handle
             
             assert(nSamples > 0, 'nSamples inferred for dataset is 0');
             
-            times = npxutils.util.makecol(uint64(times));
+            times = npxutils.internal.makecol(uint64(times));
             nC = size(channel_ids_by_snippet, 1);
             nC_all = imec.nChannels;
             nS = numel(times); % actual number of input snippets extracted
@@ -1343,7 +1343,7 @@ classdef ImecDataset < handle
             end
             
             if numel(times) > 10
-                prog = npxutils.util.ProgressBar(numel(times), 'Extracting %s snippets', upper(band));
+                prog = npxutils.internal.ProgressBar(numel(times), 'Extracting %s snippets', upper(band));
             else
                 prog = [];
             end
@@ -1489,7 +1489,7 @@ classdef ImecDataset < handle
             ch_mask = imec.lookup_channelIds(imec.mappedChannels); % for common average referencing
             
             sumByChunk = nan(imec.nChannels, useChunks);
-            %             prog = npxutils.util.ProgressBar(useChunks, 'Computing RMS per channel');
+            %             prog = npxutils.internal.ProgressBar(useChunks, 'Computing RMS per channel');
             for iC =  1:useChunks
                 %                 prog.increment();
                 data = mm.Data(iC+skipChunks).x;
@@ -1891,22 +1891,22 @@ classdef ImecDataset < handle
             newFolder = char(newFolder);
             
             if ~exist(newFolder, 'dir')
-                npxutils.util.mkdirRecursive(newFolder);
+                npxutils.internal.mkdirRecursive(newFolder);
             end
             newAPPath = fullfile(newFolder, imec.fileAP);
-            npxutils.util.makeSymLink(imec.pathAP, newAPPath, p.Results.relative);
+            npxutils.internal.makeSymLink(imec.pathAP, newAPPath, p.Results.relative);
             
             newAPMetaPath = fullfile(newFolder, imec.fileAPMeta);
-            npxutils.util.makeSymLink(imec.pathAPMeta, newAPMetaPath, p.Results.relative);
+            npxutils.internal.makeSymLink(imec.pathAPMeta, newAPMetaPath, p.Results.relative);
             
             if ~imec.syncInAPFile && exist(imec.pathSync, 'file')
                 newSyncPath = fullfile(newFolder, imec.fileSync);
-                npxutils.util.makeSymLink(imec.pathSync, newSyncPath, p.Results.relative);
+                npxutils.internal.makeSymLink(imec.pathSync, newSyncPath, p.Results.relative);
             end
             
             if exist(imec.pathSyncCached, 'file')
                 newSyncCachedPath = fullfile(newFolder, imec.fileSyncCached);
-                npxutils.util.makeSymLink(imec.pathSyncCached, newSyncCachedPath, p.Results.relative);
+                npxutils.internal.makeSymLink(imec.pathSyncCached, newSyncCachedPath, p.Results.relative);
             end
             
             imecSym = npxutils.ImecDataset(newAPPath, 'channelMap', imec.channelMapFile);
@@ -1914,7 +1914,7 @@ classdef ImecDataset < handle
         
         function imecOut = saveTransformedDataset(imec, outPath, varargin)
             p = inputParser();
-            p.addParameter('stem', "", @npxutils.util.isstringlike);
+            p.addParameter('stem', "", @npxutils.internal.isstringlike);
             
             p.addParameter('transformAP', {}, @(x) iscell(x) || isa(x, 'function_handle')); % list of transformation functions that accept (imec, dataChunk) and return dataChunk someplace
             p.addParameter('transformLF', {}, @(x) iscell(x) || isa(x, 'function_handle')); % list of transformation functions that accept (imec, dataChunk) and return dataChunk someplace
@@ -1957,14 +1957,14 @@ classdef ImecDataset < handle
             p.addParameter('clusterNames', [], @(x) isempty(x) || iscellstr(x) || isstring(x));
             p.parse(varargin{:});
             
-            spikeTimes = npxutils.util.makecol(p.Results.spikeTimes);
+            spikeTimes = npxutils.internal.makecol(p.Results.spikeTimes);
             nSpikes = numel(spikeTimes);
             assert(nSpikes >= 2, 'At least 2 spikes are required for Phy');
             
             if isempty(p.Results.spikeClusters)
                 spikeClusters = zeros(nSpikes, 1, 'uint32');
             else
-                spikeClusters = uint32(npxutils.util.makecol(p.Results.spikeClusters));
+                spikeClusters = uint32(npxutils.internal.makecol(p.Results.spikeClusters));
                 assert(numel(spikeClusters) == nSpikes);
             end
             
@@ -2034,7 +2034,7 @@ classdef ImecDataset < handle
             if isempty(p.Results.clusterNames)
                 clusterNames = strings(nClusters, 1);
             else
-                clusterNames = string(npxutils.util.makecol(p.Results.clusterNames));
+                clusterNames = string(npxutils.internal.makecol(p.Results.clusterNames));
                 assert(numel(clusterNames) == nClusters, 'clusterNames must be nClusters long');
             end
             fileID = fopen(fullfile(savePath, 'cluster_names.tsv'),'w');
@@ -2125,7 +2125,7 @@ classdef ImecDataset < handle
             
             dataSize = size(mm.Data.x, 2);
             nChunks = ceil(dataSize / chunkSize);
-            prog = npxutils.util.ProgressBar(nChunks, 'Modifying %s file in place', mode);
+            prog = npxutils.internal.ProgressBar(nChunks, 'Modifying %s file in place', mode);
             for iCh = 1:nChunks
                 [source_idx, keepIdx] = npxutils.ImecDataset.determineChunkIdx(dataSize, iCh, nChunks, chunkSize, chunkExtra);
                 
@@ -2517,7 +2517,7 @@ classdef ImecDataset < handle
         
         function [imecOut, transformAPExtraArg, transformLFExtraArg] = writeConcatenatedFileMatchGains(imecList, outPath, varargin)
             p = inputParser();
-            p.addParameter('stem', "", @npxutils.util.isstringlike);
+            p.addParameter('stem', "", @npxutils.internal.isstringlike);
             p.addParameter('writeAP', true, @islogical);
             p.addParameter('goodChannelsOnly', false, @islogical);
             p.addParameter('mappedChannelsOnly', false, @islogical);
@@ -2562,7 +2562,7 @@ classdef ImecDataset < handle
                 outPath = fullfile(parent, [leaf, ext]);
             end
             if ~exist(outPath, 'dir') && ~dryRun
-                npxutils.util.mkdirRecursive(outPath);
+                npxutils.internal.mkdirRecursive(outPath);
             end
             
             if p.Results.stem ~= ""
@@ -2798,7 +2798,7 @@ classdef ImecDataset < handle
                     end
                     
                     nChunks = ceil(outSize / chunkSize);
-                    prog = npxutils.util.ProgressBar(nChunks, 'Copying %s file %d / %d: %s', mode, iF, nFiles, imecList{iF}.fileStem);
+                    prog = npxutils.internal.ProgressBar(nChunks, 'Copying %s file %d / %d: %s', mode, iF, nFiles, imecList{iF}.fileStem);
                     
                     testChunkSize = true;
                     if testChunkSize

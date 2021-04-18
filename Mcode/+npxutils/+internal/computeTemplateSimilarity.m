@@ -1,6 +1,6 @@
 function [simScore, bestLag] = computeTemplateSimilarity(W, U)
 % covariance matrix between all templates
-WtW = npxutils.util.getMeWtW_nomex(single(W), single(U));
+WtW = npxutils.internal.getMeWtW_nomex(single(W), single(U));
 
 nt0 = size(W, 1);
 lags = nt0:-1:-nt0;

@@ -127,12 +127,12 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
                 
                 idx = (1:numel(times))';
                 [mask_in_cluster, cluster_ind] = ismember(clusters, cluster_ids);
-                window_ind = npxutils.util.discretize_windows(times, windows);
+                window_ind = npxutils.internal.discretize_windows(times, windows);
                 mask_in_window = ~isnan(window_ind);
                 
                 mask = mask_in_cluster & mask_in_window;
                 subs = [window_ind(mask), cluster_ind(mask)];
-                idx_segmented = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(idx(mask), 1, [nWindows, nClusters], subs);
+                idx_segmented = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(idx(mask), 1, [nWindows, nClusters], subs);
             end
         end
         
@@ -150,7 +150,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
             
             % used mostly for evaluating the response, quickly segments spike times into sort_windows and cluster_ids
             % spike_idx_segmented is a nSortWindows x nClusters
-            sort_window_mask = npxutils.util.TensorUtils.vectorIndicesToMask(p.Results.sort_window_mask, this.nSortWindows);
+            sort_window_mask = npxutils.internal.TensorUtils.vectorIndicesToMask(p.Results.sort_window_mask, this.nSortWindows);
             cluster_ids = p.Results.cluster_ids;
             elide_padding = p.Results.elide_padding;
             convert_to_ms = p.Results.convert_to_ms;
@@ -181,7 +181,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
                 end
                 
                 [mask_in_cluster, cluster_ind] = ismember(clusters, cluster_ids);
-                window_ind = npxutils.util.discretize_windows(times, windows);
+                window_ind = npxutils.internal.discretize_windows(times, windows);
                 mask_in_window = ~isnan(window_ind);
                 
                 times_rel = int64(times);
@@ -193,7 +193,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
                 
                 mask = mask_in_cluster & mask_in_window;
                 subs = [window_ind(mask), cluster_ind(mask)];
-                time_seg_rel = npxutils.util.TensorUtils.splitAlongDimensionBySubscripts(times_rel(mask), 1, [nWindows, nClusters], subs);
+                time_seg_rel = npxutils.internal.TensorUtils.splitAlongDimensionBySubscripts(times_rel(mask), 1, [nWindows, nClusters], subs);
             end
         end
         
@@ -207,7 +207,7 @@ classdef KilosortPartialResort < handle & matlab.mixin.Copyable
             
             function counts_segmented = do_count(times, clusters)
                 [mask_in_cluster, cluster_ind] = ismember(clusters, cluster_ids);
-                window_ind = npxutils.util.discretize_windows(times, windows);
+                window_ind = npxutils.internal.discretize_windows(times, windows);
                 mask_in_window = ~isnan(window_ind);
                 
                 mask = mask_in_cluster & mask_in_window;

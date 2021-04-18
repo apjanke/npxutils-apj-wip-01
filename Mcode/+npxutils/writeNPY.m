@@ -1,13 +1,18 @@
 function writeNPY(var, filename)
-% function writeNPY(var, filename)
+% Write data in NPY format
 %
-% Only writes little endian, fortran (column-major) ordering; only writes
+% npxutils.writeNPY(var, filename)
+%
+% Only writes little endian, Fortran (column-major) ordering; only writes
 % with NPY version number 1.0.
 %
 % Always outputs a shape according to matlab's convention, e.g. (10, 1)
 % rather than (10,).
 % This function is from github.com/kwitkteam/npy-matlab
-
+arguments
+    var
+    filename (1,1) string
+end
 
 shape = size(var);
 dataType = class(var);
@@ -18,7 +23,6 @@ fid = fopen(filename, 'w');
 fwrite(fid, header, 'uint8');
 fwrite(fid, var, dataType);
 fclose(fid);
-
 
 end
 

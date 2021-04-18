@@ -83,15 +83,15 @@ end
 if any(str == ';')
     delim = ';';
     multDelimsAsOne = false;
-    orientFn = @npxutils.util.makecol;
+    orientFn = @npxutils.internal.makecol;
 elseif any(str == ',')
     delim = ',';
     multDelimsAsOne = false;
-    orientFn = @npxutils.util.makerow;
+    orientFn = @npxutils.internal.makerow;
 else
     delim = ' ';
     multDelimsAsOne = true;
-    orientFn = @npxutils.util.makerow;
+    orientFn = @npxutils.internal.makerow;
 end
 
 asCell = false;

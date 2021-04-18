@@ -7,7 +7,7 @@ function which_window = discretize_windows(values, windows)
 % but if two windows share a common edge, the value will be assigned to the later window (whose lower bound matches the value)
 %
 % test:
-% >> npxutils.util.discretize_windows([0.5 1 1.5 2 2.5 3 3.5 4.5], [0.5 1.5; 1.5 2.5; 3.5 4.5])
+% >> npxutils.internal.discretize_windows([0.5 1 1.5 2 2.5 3 3.5 4.5], [0.5 1.5; 1.5 2.5; 3.5 4.5])
 %
 % ans =
 %

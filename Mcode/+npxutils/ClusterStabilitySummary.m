@@ -107,7 +107,7 @@ classdef ClusterStabilitySummary < handle & matlab.mixin.Copyable
             conditionIndByTrial = this.conditionIndInList;
             nCondsTotal = numel(condition_list);
             x = this.getStartTimeSec();
-            cmap = npxutils.util.distinguishable_colors(nCondsTotal);
+            cmap = npxutils.internal.distinguishable_colors(nCondsTotal);
             
             for iClu = 1:numel(clusterInd)
                 for iCond = 1:numel(conditionIndToPlot)
