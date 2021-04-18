@@ -17,7 +17,6 @@
 * Create a new GitHub release from the tag.
   * Just use `<version>` as the name for the release.
   * Upload the dist zip, tarball, and `.mltbx` files as files for the release.
-  * 
 * Open development for next version
   * Update version number in `VERSION` to next patch or minor version, as appropriate, and put a `-SNAPSHOT` suffix at the end of it.
 
