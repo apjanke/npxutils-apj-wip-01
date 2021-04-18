@@ -3,7 +3,7 @@ classdef globals
     
     properties (Constant)
         % Path to the root directory of this Neuropixel Utils library repo/installation.
-        distroot = string(fileparts(fileparts(mfilename('fullpath'))));
+        distroot = string(fileparts(fileparts(fileparts(mfilename('fullpath')))));
     end
     
     methods (Static)
