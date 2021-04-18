@@ -1,35 +1,49 @@
 classdef TimeShiftSpec < handle & matlab.mixin.Copyable
-    % a simple class for holding information about a time shift that takes a set of specific time intervals
-    % in the original file and maps them to new indices that have been squished together by excising some intervening intervals
-    % This is used primarily for skipping over bad regions in a raw data file we don't want to sort
+    % Specification of a time shift.
+    %
+    % A simple class for holding information about a time shift that takes a set
+    % of specific time intervals in the original file and maps them to new
+    % indices that have been squished together by excising some intervening
+    % intervals This is used primarily for skipping over bad regions in a raw
+    % data file we don't want to sort
     
     properties
-        idxStart (:,1) uint64 % original start index for interval
-        idxStop (:,1) uint64 % last index within interval
-        idxShiftStart (:,1) uint64 % new, shifted start index for interval
+        % Original start index for interval.
+        idxStart (:,1) uint64
+        % Last index within interval.
+        idxStop (:,1) uint64
+        % New, shifted start index for interval.
+        idxShiftStart (:,1) uint64
     end
     
     properties (Dependent)
+        % Number of intervals.
         nIntervals
+        % Durations of each interval.
         intervalDurations
-        nShiftedTimes % number of output samples that the source will be compressed into
+        % Number of output samples that the source will be compressed into.
+        nShiftedTimes
     end
     
     methods
-        function spec = TimeShiftSpec(idxStart, idxStop, idxShiftStart)
+        function this = TimeShiftSpec(idxStart, idxStop, idxShiftStart)
+            % Construct a new object
+            %
+            % npxutils.TimeShiftSpec(idxStart, idxStop, idxShiftStart)
+            % npxutils.TimeShiftSpec(timeShiftSpec)
             if nargin == 1
                 if isa(idxStart, 'npxutils.TimeShiftSpec')
-                    spec = idxStart;
+                    this = idxStart;
                 else
                     mat = idxStart;
-                    spec.idxStart = uint64(mat(:, 1));
-                    spec.idxStop = uint64(mat(:, 2));
-                    spec.idxShiftStart = uint64(mat(:, 3));
+                    this.idxStart = uint64(mat(:, 1));
+                    this.idxStop = uint64(mat(:, 2));
+                    this.idxShiftStart = uint64(mat(:, 3));
                 end
             elseif nargin == 3
-                spec.idxStart = uint64(idxStart);
-                spec.idxStop = uint64(idxStop);
-                spec.idxShiftStart = uint64(idxShiftStart);
+                this.idxStart = uint64(idxStart);
+                this.idxStop = uint64(idxStop);
+                this.idxShiftStart = uint64(idxShiftStart);
             end
         end
         
@@ -43,12 +57,18 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
         end
         
         function mat = as_matrix(this)
-            % see from_matrixd
+            % Convert to a matrix.
+            %
+            % See also:
+            % from_matrixd
             mat = cat(2, this.idxStart, this.idxStop, this.idxShiftStart);
         end
         
         function str = as_string(this)
-            % see from_string
+            % Convert to a string.
+            %
+            % See also:
+            % from_string
             mat = this.as_matrix();
             if isempty(mat)
                 str = "[]";
@@ -72,8 +92,21 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
         end
         
         function [times_out, mask] = shiftTimes(this, times)
-            % reassign the times provided by shifting them according the delta between idxStart and idxShiftStart
-            % if a time doesn't fit within any of the specified windows, it will be marked as NaN.
+            % Reassign given times by shifting them.
+            %
+            % [times_out, mask] = shiftTimes(this, times)
+            %
+            % Reassigns the times provided by shifting them according the delta
+            % between idxStart and idxShiftStart. If a time doesn't fit within
+            % any of the specified windows, it will be marked as NaN.
+            %
+            % Returns:
+            %   times_out - the shifted times.
+            %   mask - a logical vector indicating whether each time fit within
+            %     a window.
+            %
+            % See also:
+            % unshiftTimes
             mask = false(numel(times), 1);
             times_out = times;
             for iR = 1:this.nIntervals
@@ -86,7 +119,14 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
         end
         
         function time_src = unshiftTimes(this, times)
-            % recover the original time that was mapped to times by shiftTimes
+            % Recover the original time that was mapped to times by shiftTimes
+            %
+            % time_src = unshiftTimes(this, times)
+            %
+            % Times is the shifted times you want to unshift.
+            %
+            % See also:
+            % shiftTimes
             dur = this.intervalDurations;
             
             time_src = zeros(size(times), 'like', times);
@@ -114,9 +154,11 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
         end
         
         function shiftIndices = computeSourceIndices(this, nSamplesSource)
-            % compute a nShiftedTimes x 1 vector of indices into the source file imec
-            % that would occupy times 1:nShiftedTimes in the shifted output file
-            % if a given slot isn't filled, it will be set to 0
+            % Compute source IMEC indices for given number of samples.
+            %
+            % Computes a nShiftedTimes x 1 vector of indices into the source
+            % file imec that would occupy times 1:nShiftedTimes in the shifted
+            % output file. If a given slot isn't filled, it will be set to 0.
             
             if nargin > 1
                 this.constrainToNumSamples(nSamplesSource);
@@ -171,17 +213,21 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
     
     methods (Static)
         function spec = non_shift(nSamples)
-            % returns a TimeShiftSpec that takes all samples without any shifting
+            % Create a TimeShiftSpec that takes all samples without any shifting.
             spec = npxutils.TimeShiftSpec(1, nSamples, 1);
         end
         
         function spec = take_no_samples()
-            % returns a TimeShiftSpec that takes no samples
+            % Create a TimeShiftSpec that takes no samples.
             spec = npxutils.TimeShiftSpec(0, 0, 1);
         end
         
         function spec = from_matrix(mat, nSamplesFull)
-            % mat is mat = cat(2, spec.idxStart, spec.idxStop, spec.idxShiftStart)
+            % Create a TimeShiftSpec from a matrix.
+            %
+            % spec = from_matrix(mat, nSamplesFull)
+            %
+            % mat is cat(2, spec.idxStart, spec.idxStop, spec.idxShiftStart).
             if isempty(mat)
                 spec = npxutils.TimeShiftSpec.non_shift(nSamplesFull);
             else
@@ -191,7 +237,12 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
         end
         
         function spec = from_string(str, nSamplesFull)
-            % string is as generated from to_string, possibly multiple strings concatenated
+            % Create a TimeShiftSpec from a string representation.
+            %
+            % spec = from_string(str, nSamplesFull)
+            %
+            % Str is as generated from to_string, possibly multiple strings
+            % concatenated.
             str = strtrim(string(str));
             if str == ""
                 spec = npxutils.TimeShiftSpec.non_shift(nSamplesFull);
@@ -221,6 +272,12 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
         end
         
         function spec = buildToVisualizeMultipleWindows(idxStart, idxStop, varargin)
+            % Create a TimeShiftSpec to visualize multiple windows.
+            %
+            % spec = buildToVisualizeMultipleWindows(idxStart, idxStop, ...)
+            %
+            % Options:
+            %   padding - defaults to 100.
             p = inputParser();
             p.addParameter('padding', 100, @isscalar);
             p.parse(varargin{:});

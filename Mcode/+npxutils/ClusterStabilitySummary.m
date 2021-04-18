@@ -3,29 +3,40 @@ classdef ClusterStabilitySummary < handle & matlab.mixin.Copyable
     % built by KilosortSegmentedDatset .buildClusterStabilitySummary()
     
     properties
-        % nTrials x 1
-        trial_ids(:,1) uint32 % trial id of each trial included
+        % Trial id of each trial included (nTrials x 1).
+        trial_ids(:,1) uint32
+        % Whether each trial has data.
         trial_has_data(:,1) logical
-        condition_ids(:,1) % condition id of each trial included (numeric or categorical)
+        % Condition id of each trial included (numeric or categorical).
+        condition_ids(:,1)
         
-        idxStart(:,1) uint64 % sample idx of each trial start window, used for x axis in plotting
-        fs(1,1) % sampling rate
-        tBinWidth(1,1) % time bin width in ms
+        % Sample idx of each trial start window, used for x axis in plotting.
+        idxStart(:,1) uint64
+        % Sampling rate
+        fs(1,1)
+        % Time bin width in ms
+        tBinWidth(1,1)
         
-        % nClusters x 1
-        cluster_ids(:,1) uint32 % id of each cluster
+        % Id of each cluster (nClusters x 1).
+        cluster_ids(:,1) uint32
         
         % nTrials x nClusters x nTime bins
         rates(:,:)
         
-        fileBoundaries(:,1) uint64 % where the file splits occur
-        fileNames(:,1) string % the names of the split files
+        % Where the file splits occur
+        fileBoundaries(:,1) uint64
+        % The names of the split files
+        fileNames(:,1) string
     end
     
     properties(Dependent)
+        % Number of trials.
         nTrials
+        % Number of clusters.
         nClusters
+        % Number of time bins.
         nTimeBins
+        % Distinct non-missing condition Ids
         condition_list
         conditionIndInList
     end
@@ -53,8 +64,22 @@ classdef ClusterStabilitySummary < handle & matlab.mixin.Copyable
         end
         
         function clusterInd = lookup_clusterIds(this, cluster_ids)
-            [tf, clusterInd] = ismember(uint32(cluster_ids), this.cluster_ids);
-            assert(all(tf), 'Clusters not found');
+            % Get indexes for given cluster IDs.
+            %
+            % clusterInd = lookup_clusterIds(this, cluster_ids)
+            %
+            % Cluster_ids (uint32) is a list of cluster IDs to look up.
+            %
+            % Returns a corresponding array of numeric indexes.
+            arguments
+                this
+                cluster_ids uint32
+            end
+            [tf, clusterInd] = ismember(cluster_ids, this.cluster_ids);
+            if ~all(tf)
+                badClusterIds = unique(cluster_ids(~tf));
+                error('Clusters not found: %s', mat2str(badClusterIds));
+            end
         end
         
         function [conditionInd, condition_list] = lookup_conditionIdsInList(this, condition_ids)

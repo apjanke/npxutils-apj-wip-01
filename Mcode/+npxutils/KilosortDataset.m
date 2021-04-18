@@ -1,12 +1,16 @@
 classdef KilosortDataset < handle & matlab.mixin.Copyable
-    % wrapper around a Kilosort dataset
-    % todo - load cluster ratings from cluster_groups.tsv
-    % Note 1: in the context of this file, time refers to samples, 1-indexed
-    % Note 2: this file will differ from raw_dataset in nChannelsSorted. Here, nChannelsSorted means the number of channels
-    %   in .channel_ids_sorted (which will match the other properties)
+    % A wrapper around a Kilosort dataset
+    %
+    % TODO: load cluster ratings from cluster_groups.tsv
+    %
+    % Note 1: in the context of this file, time refers to samples, 1-indexed.
+    %
+    % Note 2: this file will differ from raw_dataset in nChannelsSorted. Here,
+    % nChannelsSorted means the number of channels in .channel_ids_sorted (which
+    % will match the other properties)
     
     properties
-        path(1, :) char
+        path (1, :) char
         
         dataset_variant char;
         
@@ -34,11 +38,11 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
     end
     
     % Computed properties
-    properties(Hidden)
+    properties (Hidden)
         metrics
     end
     
-    properties(Dependent)
+    properties (Dependent)
         pathLeaf
         hasRawDataset
         hasFeaturesLoaded
@@ -64,11 +68,11 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
         isLoadedAll
     end
     
-    properties(Constant)
+    properties (Constant)
         CUTOFF_SPIKES_EXPORT_OFFSET = 10000;
     end
     
-    properties(SetAccess=protected)
+    properties (SetAccess=protected)
         syncBitNames(:, 1) string
     end
     
@@ -246,7 +250,7 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
         cutoff_template_features(:, :) single
     end
     
-    properties(Dependent)
+    properties (Dependent)
         clusters_good
         clusters_mua
         clusters_noise
@@ -1130,6 +1134,8 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
         end
         
         function accept_cutoff_spikes(ks, ratings_or_cluster_ids)
+            % Accept cutoff spikes.
+            
             % assumes that cutoff spikes are already loaded
             assert(ks.isLoadedCutoff, 'Must have loaded cutoff spikes');
             
