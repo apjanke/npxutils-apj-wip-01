@@ -9,23 +9,28 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
     end
     
     properties (SetAccess=protected)
-        cluster_ids(:, 1) uint32
-        subgroupSet(:, 1) string
+        cluster_ids (:,1) uint32
+        subgroupSet (:,1) string
         
-        ratingValueSet(:, 1) string;
+        ratingValueSet (:,1) string;
     end
     
     properties
-        % list of ratings corresponding to cluster_ids
-        ratings(:, 1) categorical % nClusters
+        % List of ratings corresponding to cluster_ids.
+        ratings (:,1) categorical % nClusters
         
-        % is cluster i usable within subgroup j?
-        usableWithin(:, :) logical % nClusters x nSubgroups
+        % Is cluster i usable within subgroup j?
+        % This is an nClusters x nSubgroups sized array.
+        usableWithin (:,:) logical % 
         
-        % is cluster i stable across subgroups j and j+1
-        stableAcross(:, :) logical % nClusters x nSubgroups-1 indiciating whether cluster is stable across the two adjacent subgroups
+        % Is cluster i stable across subgroups j and j+1?
+        % This is an nClusters x nSubgroups-1 array indicating whether cluster 
+        % is stable across the two adjacent subgroups.
+        stableAcross (:,:) logical 
         
-        includeCutoffSpikes(:, 1) logical % nClusters
+        % Include cutoff spikes?
+        % An nClusters-long vector.
+        includeCutoffSpikes (:, 1) logical
     end
     
     properties (Dependent)
@@ -37,7 +42,19 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
     end
     
     methods
-        function r = ClusterRatingInfo(varargin)
+        function this = ClusterRatingInfo(varargin)
+            % Construct a new object
+            %
+            % obj = npxutils.ClusterRatingInfo(...)
+            %
+            % Accepts a list of name/value options. Options:
+            %
+            %   subgroupSet: (string) required
+            %   ks:
+            %   app:
+            %   ratingValueSet: optional
+            %
+            % One of either ks or app is required.
             p = inputParser();
             % specify this
             p.addParameter('subgroupSet', "All", @isstring);
@@ -47,29 +64,32 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
             p.addParameter('app', [], @(x) isempty(x) || isvector(x));
             
             % optional
-            p.addParameter('ratingValueSet', r.defaultRatingValueSet, @isstring);
+            p.addParameter('ratingValueSet', this.defaultRatingValueSet, @isstring);
             
             p.parse(varargin{:})
             
-            r.ratingValueSet = p.Results.ratingValueSet;
+            this.ratingValueSet = p.Results.ratingValueSet;
             
-            r.ks = p.Results.ks;
-            if isempty(r.ks)
+            this.ks = p.Results.ks;
+            if isempty(this.ks)
                 cluster_ids = p.Results.cluster_ids;
                 assert(~isempty(cluster_ids));
             else
-                r.ks.load('loadFeatures', false, 'loadBatchwise', false, 'loadCutoff', false);
-                cluster_ids = r.ks.cluster_ids;
+                this.ks.load('loadFeatures', false, 'loadBatchwise', false, 'loadCutoff', false);
+                cluster_ids = this.ks.cluster_ids;
                 assert(~isempty(cluster_ids));
             end
             subgroupSet = p.Results.subgroupSet;
             if isempty(subgroupSet)
                 subgroupSet = "";
             end
-            r.initializeBlank(cluster_ids, subgroupSet);
+            this.initializeBlank(cluster_ids, subgroupSet);
         end
         
         function initializeBlank(this, cluster_ids, subgroupSet)
+            % Initialize to blank data for a given set of clusters
+            %
+            % initializeBlank(this, cluster_ids, subgroupSet)
             this.cluster_ids = cluster_ids;
             this.subgroupSet = string(subgroupSet);
             
@@ -80,11 +100,23 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
         end
         
         function rating = convertToRatingCategorical(this, value)
+            % Convert a string rating value to categorical using this' mapping
+            %
+            % rating = convertToRatingCategorical(this, value)
+            %
+            % Value (string) is the rating to convert.
+            %
+            % Returns the ratings as categorical, using this' rating value set.
+            % They will be ordinal.
             rating = categorical(string(value), this.ratingValueSet, 'Ordinal', true);
         end
         
         function setKilosortDataset(this, ks)
-            assert(isa(ks, 'npxutils.KilosortDataset'));
+            % Set the Kilosort dataset
+            arguments
+                this
+                ks npxutils.KilosortDataset
+            end
             if ~ks.isLoaded
                 ks.load('loadBatchwise', false, 'loadFeatures', false);
             end
@@ -130,6 +162,16 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
         end
         
         function [clusterInds, cluster_ids] = lookup_clusterIds(this, cluster_ids)
+            % Lookup clusters from a logical mask or numeric list
+            %
+            % [clusterInds, cluster_ids] = lookup_clusterIds(this, cluster_ids)
+            %
+            % cluster_ids may be either a logical index into this' cluster_ids
+            % list, or a numeric list of cluster ids (not indexes).
+            %
+            % Returns:
+            %   clusterInds - list of corresponding cluster indexes
+            %   cluster_ids - numeric cluster ids
             if islogical(cluster_ids)
                 cluster_ids = this.cluster_ids(cluster_ids);
             end
@@ -240,6 +282,10 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
         end
         
         function countsByRatingSubgroup = computeClusterCounts(this, ratingValueSet, countUsableOnlyMask)
+            % Compute cluster counts, possibly filtered by rating value set.
+            %
+            % countsByRatingSubgroup = computeClusterCounts(this, ratingValueSet, countUsableOnlyMask)
+            %
             % countsByRatingSubgroup is numel(ratingValueSet) x nSubgroups count of clusters
             % that have that rating and are listed as usableWithin that subgroup
             
@@ -258,8 +304,8 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
             
             for iS = 1:this.nSubgroups
                 % count a rating if cluster marked usable, or rated something where we count it usable or not
-                ratingsCountable = this.usableWithin(:, iS) | ratingsMaskCountAlways;
-                countsByRatingSubgroup(:, iS) = histcounts(this.ratings(ratingsCountable), ratingValueSet);
+                ratingsCountable = this.usableWithin(:,iS) | ratingsMaskCountAlways;
+                countsByRatingSubgroup(:,iS) = histcounts(this.ratings(ratingsCountable), ratingValueSet);
             end
         end
         
@@ -270,8 +316,14 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
         
         function [countsByRatingSubgroup, nClustersPostMerge] = ...
                 computeClusterCountsAfterApplyingMerges(this, mergeInfo, ratingValueSet, countUsableOnlyMask)
-            % countsByRatingSubgroup is numel(ratingValueSet) x nSubgroups count of clusters
-            % that have that rating and are listed as usableWithin that subgroup
+            % Compute cluster counts after applying merges.
+            %
+            % [countsByRatingSubgroup, nClustersPostMerge] = ...
+            %     computeClusterCountsAfterApplyingMerges(this, mergeInfo, ratingValueSet, countUsableOnlyMask)
+            %
+            % countsByRatingSubgroup is numel(ratingValueSet) x nSubgroups count
+            % of clusters that have that rating and are listed as usableWithin
+            % that subgroup.
             
             if nargin < 3
                 ratingValueSet = [];
@@ -302,13 +354,16 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
         end
         
         function cluster_ids = listClusterIdsUsableWithinSubgroup(this, subgroup, ratingsAccepted)
+            % List cluster IDs that are usable within a subgroup.
+            %
             % cluster_ids = listClusterIdsUsableWithinSubgroup(r, subgroup, ratingsAccepted)
             %
-            % list all cluster_ids that are:
+            % Lists all cluster_ids that are:
             % - rated as one of the ratings in ratingsAccepted
             % - usable within the subgroup listed
             %
-            % see listClusterIdsUsableAcrossSubgroupsWithRating if aggregating across multiple subgroups
+            % See also:
+            % listClusterIdsUsableAcrossSubgroupsWithRating if aggregating across multiple subgroups
             
             subgroup_ind = sort(this.lookup_subgroups(subgroup), 'ascend');
             mask_rating_accepted = ismember(this.ratings, this.convertToRatingCategorical(ratingsAccepted));
@@ -320,9 +375,11 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
         
         function [cluster_ids, cluster_ratings] = ...
                 listClusterIdsUsableAcrossSubgroupsWithRating(this, subgroups, ratingsAccepted)
+            % List cluster IDs usable across subgroups.
+            %
             % cluster_ids = listClusterIdsUsableAcrossSubgroupsWithRating(r, subgroups, ratingsAccepted)
             %
-            % list all cluster_ids that are:
+            % Lists all cluster_ids that are:
             % - rated as one of the ratings in ratingsAccepted
             % - usable within each subgroup listed,
             % - stable across all interspersed subgroups

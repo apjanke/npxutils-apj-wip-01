@@ -12,13 +12,15 @@ classdef ChannelMap
         connected (:,1) logical
         shankInd (:,1)
         
-        nSpatialDims = 2;
+        nSpatialDims (1,1) double = 2;
         xcoords (:,1)
         ycoords (:,1)
         zcoords (:,1)
         
-        syncChannelIndex (:,1) uint32 % actual index in the AP & LF bin file
-        syncChannelId (:,1) uint32 % arbitrary channel id, typically the same as index
+        % Actual index in the AP & LF bin file
+        syncChannelIndex (:,1) uint32
+        % Arbitrary channel id, typically the same as index
+        syncChannelId (:,1) uint32
     end
     
     properties(Dependent)
@@ -32,7 +34,8 @@ classdef ChannelMap
         connectedChannels
         referenceChannels
         
-        invertChannelsY % plot first channel at bottom?
+        % Plot first channel at bottom?
+        invertChannelsY
         
         yspacing
         xspacing
@@ -332,7 +335,11 @@ classdef ChannelMap
             distSq(logical(eye(N))) = Inf; % don't localize each channel to itself
             
             [tf, channel_inds] = ismember(channelIds, eligibleChannelInds);
-            assert(all(tf), 'Cannot localize non-connected channels or channels not in eligibleChannelIds');
+            if ~all(tf)
+                badChannelIds = unique(channelIds(~tf));
+                error(['Cannot localize non-connected channels or channels not ' ...
+                    'in eligibleChannelIds. Bad channel IDs: %s', mat2str(badChannelIds));
+            end
             
             closest_ids = nan(numel(channel_inds), nClosest);
             for iC = 1:numel(channel_inds)
@@ -348,6 +355,9 @@ classdef ChannelMap
         end
         
         function channel_ids_sorted = sortChannelsVertically(this, channel_ids)
+            % Get this' channels, sorted vertically (by y, then x, then z
+            %
+            %
             channel_inds = this.lookup_channelIds(channel_ids);
             if size(this.coords, 2) == 3
                 % sort by y (high to low), x (low to high), then z (low to high)
