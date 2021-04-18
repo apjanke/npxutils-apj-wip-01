@@ -5,9 +5,11 @@ function make_doc(varargin)
 % make_doc --preview
 % make_doc --build-only
 %
-% This will require special configuration on Windows to get it working.
+% This will require special configuration on Windows to get it working. And this
+% is probably broken on Mac, because you need to use the Anaconda version of
+% mkdocs there.
 %
-% Requires mkdocs to be installed. See https://www.mkdocs.org/.
+% Requires MkDocs and its "material" theme to be installed. See https://www.mkdocs.org/.
 
 action = "install";
 args = string(varargin);

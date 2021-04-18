@@ -7,12 +7,23 @@ function npxutils_make(target, varargin)
 %
 % Operations:
 %   npxutils_make build        - "build" the source code
-%   npxutils_make doc          - build the project documentation
-%   npxutils_make doc-preview  - live-preview the project documentation
+%   npxutils_make doc          - build the project doco (probably broken)
+%   npxutils_make doc-preview  - live-preview the project documentation (broken)
 %   npxutils_make test         - run the tests
 %   npxutils_make dist         - build the distribution files
 %   npxutils_make toolbox      - build the Matlab Toolbox .mltbx installer file
 %   npxutils_make clean        - delete all the derived artifacts
+%
+% The "doc" build targets are probably broken for you, because they require 
+% MkDocs with its "material" theme, and the only way (apparently) to get that
+% installed and working (at least on Mac) is with Anaconda. The "doc" targets
+% here don't pull in Anaconda; they assume you have a working `mkdocs` command
+% on the path. Instead, open a shell, cd in to `doc-src`, and run the `make_doc`
+% command there.
+%
+% The "dist" target does not automatically build the docs for you. You need to
+% do that first, if you want the docs in the distribution files to be up to date
+% (which you probably do).
 
 %#ok<*STRNU>
 
@@ -32,7 +43,6 @@ elseif target == "doc"
 elseif target == "doc-preview"
   preview_docs;
 elseif target == "m-doc"
-  npxutils_make doc;
   make_mdoc;
 elseif target == "toolbox"
   npxutils_make m-doc;
@@ -57,7 +67,7 @@ end
 function make_mdoc
 rmrf('build/M-doc')
 mkdir2('build/M-doc')
-copyfile2('doc/*', 'build/M-doc')
+copyfile2('docs/*', 'build/M-doc')
 if isfile('build/M-doc/feed.xml')
   delete('build/M-doc/feed.xml')
 end
@@ -65,7 +75,7 @@ end
 
 function preview_docs
 import npxutils.internal.util.*;
-RAII.cd = withcd('docs');
+RAII.cd = withcd('doc-src');
 make_doc --preview
 end
 
@@ -73,7 +83,7 @@ function make_dist
 program = "neuropixel-utils";
 distName = program + "-" + npxutils.globals.version;
 verDistDir = fullfile("dist", distName);
-distfiles = ["build/Mcode" "doc" "lib" "examples" "README.md" "LICENSE" "CHANGES.md"];
+distfiles = ["build/Mcode" "docs" "lib" "examples" "README.md" "LICENSE" "CHANGES.md"];
 rmrf([verDistDir, distName+".tar.gz", distName+".zip"])
 if ~isfolder('dist')
   mkdir2('dist')
@@ -86,7 +96,7 @@ zip(distName+".zip", distName)
 end
 
 function make_clean
-rmrf(strsplit("dist/* build docs/site docs/_site M-doc test-output", " "));
+rmrf(strsplit("dist/* build doc-src/_site M-doc test-output", " "));
 end
 
 function make_package_docs(varargin)
@@ -97,17 +107,13 @@ if ~doOnlySrc
 end
 end
 
-function build_docs
-% Build the generated parts of the doc sources
+function build_doc_src
+% Build the generated parts of the doc-src sources
+%
+% This includes the live scripts from the examples directory.
 RAII.cd = withcd(reporoot);
-docsDir = fullfile(reporoot, 'docs');
-% Copy over examples
-docsExsDir = fullfile(docsDir, 'examples');
-if isfolder(docsExsDir)
-  rmdir2(docsExsDir, 's');
-end
-copyfile('examples', fullfile('docs', 'examples'));
-% TODO: Generate API Reference
+docSrcDir = fullfile(reporoot, 'doc-src');
+% TODO: Build stuff from live scripts
 end
 
 function build_doc

@@ -4,7 +4,9 @@
 
 * `Mcode/` – Matlab source code for the Neuropixel Utils library itself
 * `doc-project/` – developer-oriented doco for people working on the library itself
-* `docs/` – User-facing doco
+* `doc-src/` – Source for user-facing doco
+* `docs/` – Built user-facing doco and GitHub Pages site
+  * This is generated from `doc-src/`. Don't edit it directly here!
 * `dev-kit/` – Developer tools for working on the library
 * `examples/` – Example code to go with the library, and for building into the `docs/` stuff
 
