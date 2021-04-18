@@ -31,7 +31,7 @@ git clone https://github.com/djoshea/neuropixel-utils.git
 And add it to your path in Matlab:
 
 ```matlab
->> addpath('/path/to/neuropixel-utils')
+>> addpath('/path/to/neuropixel-utils/Mcode')
 ```
 
 ## Requirements
