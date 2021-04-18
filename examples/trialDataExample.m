@@ -1,8 +1,9 @@
+
 % dsPath = '/Volumes/pixin/will_sort/Pierre_20180609_08';
 kilosortDatasetPath = '/path/to/kilosort_output';
 
 % build path to channel map file
-channelMapFile '/path/to/neuropixel-utils/map_files/neuropixPhase3A_kilosortChanMap.mat');
+channelMapFile('/path/to/neuropixel-utils/map_files/neuropixPhase3A_kilosortChanMap.mat');
 
 % load the kilosort dataset
 ds = Kilosort.Dataset(kilosortDatasetPath, channelMapFile);
