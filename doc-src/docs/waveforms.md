@@ -21,7 +21,7 @@ snippetSet =
                  trial_idx: [0×1 uint32]
                     window: [-1000 999]
                      valid: [10×1 logical]
-                channelMap: [1×1 Neuropixel.ChannelMap]
+                channelMap: [1×1 npxutils.ChannelMap]
                  scaleToUv: 2.3438
                         fs: 30000
                  nChannels: 384

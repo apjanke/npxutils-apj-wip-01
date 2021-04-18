@@ -483,7 +483,7 @@
 <p>More computed statistics can be computed on demand by calling:</p>
 <div class="highlight"><pre><span></span><code><span class="n">metrics</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">ks</span><span class="p">.</span><span class="n">computeMetrics</span><span class="p">();</span><span class="w"></span>
 </code></pre></div>
-<p>which returns a <code>Neuropixel.KilosortMetrics</code> instance. This is a catch-all class for storing all the statistics we want to compute about the results of a Kilosort run. At the moment, most of these properties are related to localizing spikes / templates / clusters in spatial coordinates on the probe. The details of these computations borrow heavily from code written by Nick Steinmetz described on the <a href="https://github.com/cortex-lab/neuropixels/wiki/Other_analysis_methods">Neuropixels wiki</a>.</p>
+<p>which returns a <code>npxutils.KilosortMetrics</code> instance. This is a catch-all class for storing all the statistics we want to compute about the results of a Kilosort run. At the moment, most of these properties are related to localizing spikes / templates / clusters in spatial coordinates on the probe. The details of these computations borrow heavily from code written by Nick Steinmetz described on the <a href="https://github.com/cortex-lab/neuropixels/wiki/Other_analysis_methods">Neuropixels wiki</a>.</p>
 <p>Many properties are computed for each cluster, for each template (as multiple templates may comprise each cluster), and for each individual spike.</p>
 <ul>
 <li>Spatial location properties end in <code>_centerOfMass</code>, and have x,y (and someday z) along the second dimension.</li>
@@ -493,7 +493,7 @@
 <li><code>is_localized</code> properties indicate whether the electrical image is sufficiently well localized in space.</li>
 </ul>
 <p>KilosortMetrics with properties:</p>
-<div class="highlight"><pre><span></span><code>                           ks: [1×1 Neuropixel.KilosortDataset]
+<div class="highlight"><pre><span></span><code>                           ks: [1×1 npxutils.KilosortDataset]
                       nSpikes: 8181228
               nChannelsSorted: 371
                    nTemplates: 653
@@ -502,7 +502,7 @@
            nConcatenatedFiles: 1
        maxTemplatesPerCluster: 11
                            fs: 30000
-                   channelMap: [1×1 Neuropixel.ChannelMap]
+                   channelMap: [1×1 npxutils.ChannelMap]
                   channel_ids: [nChannelsSorted × 1 uint32]
           concatenatedSamples: 112412208
            concatenatedStarts: 1

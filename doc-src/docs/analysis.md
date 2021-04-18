@@ -37,7 +37,7 @@ More computed statistics can be computed on demand by calling:
 metrics = ks.computeMetrics();
 ```
 
-which returns a `Neuropixel.KilosortMetrics` instance. This is a catch-all class for storing all the statistics we want to compute about the results of a Kilosort run. At the moment, most of these properties are related to localizing spikes / templates / clusters in spatial coordinates on the probe. The details of these computations borrow heavily from code written by Nick Steinmetz described on the [Neuropixels wiki](https://github.com/cortex-lab/neuropixels/wiki/Other_analysis_methods).
+which returns a `npxutils.KilosortMetrics` instance. This is a catch-all class for storing all the statistics we want to compute about the results of a Kilosort run. At the moment, most of these properties are related to localizing spikes / templates / clusters in spatial coordinates on the probe. The details of these computations borrow heavily from code written by Nick Steinmetz described on the [Neuropixels wiki](https://github.com/cortex-lab/neuropixels/wiki/Other_analysis_methods).
 
 Many properties are computed for each cluster, for each template (as multiple templates may comprise each cluster), and for each individual spike.
 
@@ -50,7 +50,7 @@ Many properties are computed for each cluster, for each template (as multiple te
   KilosortMetrics with properties:
 
 ```
-                           ks: [1×1 Neuropixel.KilosortDataset]
+                           ks: [1×1 npxutils.KilosortDataset]
                       nSpikes: 8181228
               nChannelsSorted: 371
                    nTemplates: 653
@@ -59,7 +59,7 @@ Many properties are computed for each cluster, for each template (as multiple te
            nConcatenatedFiles: 1
        maxTemplatesPerCluster: 11
                            fs: 30000
-                   channelMap: [1×1 Neuropixel.ChannelMap]
+                   channelMap: [1×1 npxutils.ChannelMap]
                   channel_ids: [nChannelsSorted × 1 uint32]
           concatenatedSamples: 112412208
            concatenatedStarts: 1

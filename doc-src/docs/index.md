@@ -34,7 +34,7 @@ And add it to your path in Matlab:
 ```matlab
 % Create an ImecDataset pointing at a specific
 >> channelMapFile = 'neuropixPhase3A_kilosortChanMap.mat';
->> imec = Neuropixel.ImecDataset('/data/raw_datasets/neuropixel_01.imec.ap.bin', 'channelMap', channelMapFile);
+>> imec = npxutils.ImecDataset('/data/raw_datasets/neuropixel_01.imec.ap.bin', 'channelMap', channelMapFile);
 
 ImecDataset with properties:
 
@@ -53,7 +53,7 @@ ImecDataset with properties:
                lfGain: 250
               lfRange: [-0.6000 0.6000]
               adcBits: 10
-           channelMap: [1×1 Neuropixel.ChannelMap]
+           channelMap: [1×1 npxutils.ChannelMap]
      syncChannelIndex: 385
          syncInAPFile: 1
           badChannels: [3×1 double]
@@ -91,7 +91,7 @@ ImecDataset with properties:
 >> cleanedPath = '/data/cleaned_datasets/neuropixel_01.imec.ap.bin';
 >> extraMeta = struct();
 >> extraMeta.commonAverageReferenced = true;
->> fnList = {@Neuropixel.DataProcessFn.commonAverageReference};
+>> fnList = {@npxutils.DataProcessFn.commonAverageReference};
 >> imec = imec.saveTransformedDataset(cleanedPath, 'transformAP', fnList, 'extraMeta', extraMeta);
 
 % Sym link the cleaned dataset into a separate directory for Kilosort2
@@ -108,17 +108,17 @@ Zoomed in view of data inspection figure. Black are good channels, blue are refe
 
 ```matlab
 % Run Kilosort2
->> Neuropixel.runKilosort2(imec);
+>> npxutils.runKilosort2(imec);
 
 % Load the Kilosort2 results
->> ks = Neuropixel.KilosortDataset();
+>> ks = npxutils.KilosortDataset();
 >> ks.load()
 
 KilosortDataset with properties:
 
                   path: '/data/kilosort/neuropixel_01'
-           raw_dataset: [1×1 Neuropixel.ImecDataset]
-            channelMap: [1×1 Neuropixel.ChannelMap]
+           raw_dataset: [1×1 npxutils.ImecDataset]
+            channelMap: [1×1 npxutils.ChannelMap]
                   fsAP: 30000
            apScaleToUv: 2.3438
                   meta: [1×1 struct]
@@ -180,11 +180,11 @@ KilosortDataset with properties:
 % Each of seg's properties are now nTrials x ... cells containing the data
 % corresponding to that trial
 >> trial_ids = min(tsi.trialId):max(tsi.trialId);
->> seg = Neuropixel.KilosortTrialSegmentedDataset(ks, tsi, trial_ids)
+>> seg = npxutils.KilosortTrialSegmentedDataset(ks, tsi, trial_ids)
 
 KilosortTrialSegmentedDataset with properties:
 
-                   dataset: [1×1 Neuropixel.KilosortDataset]
+                   dataset: [1×1 npxutils.KilosortDataset]
                  trial_ids: [1072×1 uint32]
             trial_has_data: [1072×1 logical]
                trial_start: [1072×1 uint64]
@@ -194,7 +194,7 @@ KilosortTrialSegmentedDataset with properties:
             cluster_groups: [592×1 categorical]
                       sync: {1072×1 cell}
               syncBitNames: [16×1 string]
-               raw_dataset: [1×1 Neuropixel.ImecDataset]
+               raw_dataset: [1×1 npxutils.ImecDataset]
                    nTrials: 1072
            nTrialsHaveData: 1072
                  nClusters: 592
@@ -213,9 +213,9 @@ KilosortTrialSegmentedDataset with properties:
 
 KilosortMetrics with properties:
 
-                         ks: [1×1 Neuropixel.KilosortDataset]
+                         ks: [1×1 npxutils.KilosortDataset]
                          fs: 30000
-                 channelMap: [1×1 Neuropixel.ChannelMap]
+                 channelMap: [1×1 npxutils.ChannelMap]
                 channel_ids: [371×1 uint32]
          concatenatedStarts: 1
           concatenatedNames: {'neuropixel_01'}
@@ -272,7 +272,7 @@ SnippetSet with properties:
                trial_idx: [0×1 uint32]
                   window: [-40 41]
                    valid: [100×1 logical]
-             channelMap: [1×1 Neuropixel.ChannelMap]
+             channelMap: [1×1 npxutils.ChannelMap]
                scaleToUv: 2.3438
                       fs: 30000
                nChannels: 24

@@ -67,7 +67,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#neuropixelimecdataset" class="md-skip">
+        <a href="#npxutilsimecdataset" class="md-skip">
           Skip to content
         </a>
       
@@ -249,11 +249,11 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#constructing-a-neuropixelimecdataset" class="md-nav__link">
-    Constructing a Neuropixel.ImecDataset
+  <a href="#constructing-a-npxutilsimecdataset" class="md-nav__link">
+    Constructing a npxutils.ImecDataset
   </a>
   
-    <nav class="md-nav" aria-label="Constructing a Neuropixel.ImecDataset">
+    <nav class="md-nav" aria-label="Constructing a npxutils.ImecDataset">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -497,11 +497,11 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#constructing-a-neuropixelimecdataset" class="md-nav__link">
-    Constructing a Neuropixel.ImecDataset
+  <a href="#constructing-a-npxutilsimecdataset" class="md-nav__link">
+    Constructing a npxutils.ImecDataset
   </a>
   
-    <nav class="md-nav" aria-label="Constructing a Neuropixel.ImecDataset">
+    <nav class="md-nav" aria-label="Constructing a npxutils.ImecDataset">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -669,24 +669,24 @@
                   </a>
                 
                 
-                <h1 id="neuropixelimecdataset">Neuropixel.ImecDataset<a class="headerlink" href="#neuropixelimecdataset" title="Permanent link">&para;</a></h1>
-<p>The <code>Neuropixel.ImecDataset</code> class wraps one individual recording session acquired with SpikeGLX. Currently, four files with extensions <code>.imec.ap.bin</code>, <code>.imec.ap.meta</code>, <code>.imec.lf.bin</code>, and <code>.imec.lf.meta</code> comprise one ImecDataset.</p>
-<h2 id="constructing-a-neuropixelimecdataset">Constructing a <code>Neuropixel.ImecDataset</code><a class="headerlink" href="#constructing-a-neuropixelimecdataset" title="Permanent link">&para;</a></h2>
-<p>You construct a Neuropixel.ImecDataset by pointing it at the path to your dataset. How you specify the path is flexible. You can point directly at one of the files:</p>
-<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Neuropixel</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="s">&#39;/data/raw_datasets/neuropixel_01_g0_t0.imec.ap.bin&#39;</span><span class="p">);</span><span class="w"></span>
+                <h1 id="npxutilsimecdataset">npxutils.ImecDataset<a class="headerlink" href="#npxutilsimecdataset" title="Permanent link">&para;</a></h1>
+<p>The <code>npxutils.ImecDataset</code> class wraps one individual recording session acquired with SpikeGLX. Currently, four files with extensions <code>.imec.ap.bin</code>, <code>.imec.ap.meta</code>, <code>.imec.lf.bin</code>, and <code>.imec.lf.meta</code> comprise one ImecDataset.</p>
+<h2 id="constructing-a-npxutilsimecdataset">Constructing a <code>npxutils.ImecDataset</code><a class="headerlink" href="#constructing-a-npxutilsimecdataset" title="Permanent link">&para;</a></h2>
+<p>You construct a npxutils.ImecDataset by pointing it at the path to your dataset. How you specify the path is flexible. You can point directly at one of the files:</p>
+<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="s">&#39;/data/raw_datasets/neuropixel_01_g0_t0.imec.ap.bin&#39;</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
 <p>Or specify the common prefix to the <code>.imec.*</code> files comprising the dataset:</p>
-<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Neuropixel</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="s">&#39;/data/raw_datasets/neuropixel_01_g0_t0&#39;</span><span class="p">);</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="s">&#39;/data/raw_datasets/neuropixel_01_g0_t0&#39;</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
 <p>The common prefix can be shorter as long as there is no ambiguity:</p>
-<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Neuropixel</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="s">&#39;/data/raw_datasets/neuropixel_01&#39;</span><span class="p">);</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="s">&#39;/data/raw_datasets/neuropixel_01&#39;</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
 <p>You can also point at the parent directory as long as only one <code>.ap.bin</code> file is contained within.</p>
-<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Neuropixel</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="s">&#39;/data/raw_datasets/&#39;</span><span class="p">);</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="s">&#39;/data/raw_datasets/&#39;</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
 <p>These are all equivalent, in that the resulting <code>imec</code> instance will wrap both AP and LF bin and meta files. (Though it&rsquo;s okay if the LF files are missing).</p>
 <h3 id="specifying-a-channel-map">Specifying a Channel Map<a class="headerlink" href="#specifying-a-channel-map" title="Permanent link">&para;</a></h3>
-<p>When constructing the ImecDataset, you can specify a channel map. If you don&rsquo;t specify one, the default will be returned by <code>Neuropixel.Utils.getDefaultChannelMapFile()</code>, which in turn will look for the file pointed to by the environment variables <code>'NEUROPIXEL_MAP_FILE'</code> or <code>'NPIX_MAP_FILE'</code>. You can set these using Matlab&rsquo;s <code>setenv</code> function.</p>
+<p>When constructing the ImecDataset, you can specify a channel map. If you don&rsquo;t specify one, the default will be returned by <code>npxutils.Utils.getDefaultChannelMapFile()</code>, which in turn will look for the file pointed to by the environment variables <code>'NEUROPIXEL_MAP_FILE'</code> or <code>'NPIX_MAP_FILE'</code>. You can set these using Matlab&rsquo;s <code>setenv</code> function.</p>
 <p>These .mat files are expected to be in the same format as found on the <a href="https://github.com/cortex-lab/neuropixels">neuropixels repo</a>. For the phase 3A probe with 384 channels, the file <code>neuropixPhase3A_kilosortChanMap.mat</code> contains:</p>
 <div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">ld</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">load</span><span class="p">(</span><span class="s">&#39;neuropixPhase3A_kilosortChanMap.mat&#39;</span><span class="p">)</span><span class="w"></span>
 
@@ -700,11 +700,11 @@
 <span class="w">      </span><span class="n">ycoords</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">384</span>×<span class="mi">1</span><span class="w"> </span><span class="nb">double</span><span class="p">]</span><span class="w"></span>
 </code></pre></div>
 <p>You can construct a ChannelMap directly by pointing at the <code>.mat</code> file, although every function within <code>neuropixel-utils</code> will also accept the filename and construct the <code>ChannelMap</code> for you:</p>
-<div class="highlight"><pre><span></span><code><span class="n">chanMap</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Neuropixel</span><span class="p">.</span><span class="n">ChannelMap</span><span class="p">(</span><span class="n">mat_file_path</span><span class="p">);</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">chanMap</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ChannelMap</span><span class="p">(</span><span class="n">mat_file_path</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
 <p>Then you can use this map for an ImecDataset using:</p>
-<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Neuropixel</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="s">&#39;channelMap&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">chanMap</span><span class="p">);</span><span class="w"></span>
-<span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Neuropixel</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="s">&#39;channelMap&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">mat_file_path</span><span class="p">);</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="s">&#39;channelMap&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">chanMap</span><span class="p">);</span><span class="w"></span>
+<span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="s">&#39;channelMap&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">mat_file_path</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
 <h2 id="exploring-metadata">Exploring metadata<a class="headerlink" href="#exploring-metadata" title="Permanent link">&para;</a></h2>
 <p>When the ImecDataset is created, the metadata are loaded from the <code>.ap.meta</code> file. You can request the full metadata using</p>
@@ -741,7 +741,7 @@
 <span class="w">              </span><span class="n">lfGain</span><span class="p">:</span><span class="w"> </span><span class="mi">250</span><span class="w"> </span><span class="c">% LF gain selected</span><span class="w"></span>
 <span class="w">             </span><span class="n">lfRange</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="o">-</span><span class="mf">0.6000</span><span class="w"> </span><span class="mf">0.6000</span><span class="p">]</span><span class="w"> </span><span class="c">% voltage range on ADC</span><span class="w"></span>
 <span class="w">             </span><span class="n">adcBits</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="c">% number of ADC bits used</span><span class="w"></span>
-<span class="w">          </span><span class="n">channelMap</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span>×<span class="mi">1</span><span class="w"> </span><span class="n">Neuropixel</span><span class="p">.</span><span class="n">ChannelMap</span><span class="p">]</span><span class="w"> </span><span class="c">% channel map for this recording</span><span class="w"></span>
+<span class="w">          </span><span class="n">channelMap</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span>×<span class="mi">1</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ChannelMap</span><span class="p">]</span><span class="w"> </span><span class="c">% channel map for this recording</span><span class="w"></span>
 <span class="w">    </span><span class="n">syncChannelIndex</span><span class="p">:</span><span class="w"> </span><span class="mi">385</span><span class="w"> </span><span class="c">% index of the sync channel if present in AP file</span><span class="w"></span>
 <span class="w">        </span><span class="n">syncInAPFile</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="c">% whether the sync channels is present in the AP file</span><span class="w"></span>
 <span class="w">         </span><span class="n">badChannels</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">3</span>×<span class="mi">1</span><span class="w"> </span><span class="nb">double</span><span class="p">]</span><span class="w"> </span><span class="c">% list of channels marked as bad</span><span class="w"></span>
@@ -816,7 +816,7 @@
 <span class="n">value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">mmap</span><span class="p">.</span><span class="n">Data</span><span class="p">.</span><span class="n">x</span><span class="p">(</span><span class="n">ch_index</span><span class="p">,</span><span class="w"> </span><span class="n">sample_index</span><span class="p">);</span><span class="w"> </span><span class="c">% access a specific sample</span><span class="w"></span>
 </code></pre></div>
 <p>Equivalent functionality is available for LF files using <code>imec.memmapLF_full()</code>. If you wish to modify the underlying data file directly, you can also request a Writeable version of the memory map:</p>
-<div class="highlight"><pre><span></span><code><span class="n">mmap</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">memmapAP_full</span><span class="p">(</span><span class="s">&#39;Writiable&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">mmap</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">memmapAP_full</span><span class="p">(</span><span class="s">&#39;Writable&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
 <span class="n">mmap</span><span class="p">.</span><span class="n">Data</span><span class="p">.</span><span class="n">x</span><span class="p">(</span><span class="n">ch_index</span><span class="p">,</span><span class="w"> </span><span class="n">sample_index</span><span class="p">)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">new_value</span><span class="p">;</span><span class="w"> </span><span class="c">% overwrite a specific sample</span><span class="w"></span>
 </code></pre></div>
 <h3 id="reading-specific-time-window">Reading specific time window<a class="headerlink" href="#reading-specific-time-window" title="Permanent link">&para;</a></h3>
@@ -856,7 +856,7 @@
 <span class="n">trialStart_partial</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">readSyncBits_idx</span><span class="p">(</span><span class="s">&quot;trialStart&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">idxWindow</span><span class="p">);</span><span class="w"> </span><span class="c">% nTime x 1</span><span class="w"></span>
 </code></pre></div>
 <h2 id="building-a-preprocessing-pipeline">Building a preprocessing pipeline<a class="headerlink" href="#building-a-preprocessing-pipeline" title="Permanent link">&para;</a></h2>
-<p>If the raw <code>.imec.ap.bin</code> file must be processed in some way before running Kilosort, e.g. to remove artifacts, you can implement this efficiently by writing a transformation function that will act on chunks of the data. One example is found in <code>Neuropixel.DataProcessFn.commonAverageReference</code>:</p>
+<p>If the raw <code>.imec.ap.bin</code> file must be processed in some way before running Kilosort, e.g. to remove artifacts, you can implement this efficiently by writing a transformation function that will act on chunks of the data. One example is found in <code>npxutils.DataProcessFn.commonAverageReference</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="k">function</span><span class="w"> </span><span class="nf">[data, extra] = commonAverageReference</span><span class="p">(</span>imec, data, chIds, sampleIdx<span class="p">)</span><span class="w"> </span><span class="c">%#ok&lt;INUSD&gt;</span><span class="w"></span>
 <span class="w">    </span><span class="c">% chIds are the channel ids and imec.goodChannels is a list of channel ids</span><span class="w"></span>
 <span class="w">    </span><span class="c">% so this will lookup the channel indices of those channels both in chIdx that</span><span class="w"></span>
@@ -881,7 +881,7 @@
 <div class="highlight"><pre><span></span><code><span class="p">[</span><span class="n">imecOut</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">saveTransformedDataset</span><span class="p">(</span><span class="s">&#39;/path/to/datasets/&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;stem&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;modifiedDataset&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c"> )</span><span class="w"></span>
 <span class="c">% creates /path/to/datasets/modifiedDataset.ap.bin, .ap.meta, etc.</span><span class="w"></span>
 </code></pre></div>
-<p>You can provide one or more function handles (e.g. <code>@Neuropixel.DataProcessFn.commonAverageReference</code>) that will be applied sequentially. Other optional parameters include:</p>
+<p>You can provide one or more function handles (e.g. <code>@npxutils.DataProcessFn.commonAverageReference</code>) that will be applied sequentially. Other optional parameters include:</p>
 <ul>
 <li><code>dryRun</code>: If true, no actual data will be modified on disk, facilitating testing or step by step debugging of the transform functions before writing data. (default false).</li>
 <li><code>gpuArray</code>: If true, the data chunks will be copied to the GPU and the transformation functions will receive and return GPU arrays.</li>
@@ -893,7 +893,7 @@
 <li><code>mappedChannelsOnly</code>: Send only the mapped channels to the transform function.</li>
 <li><code>chunkSize</code>: Specify the number of time samples sent to transform functions at once.</li>
 <li><code>extraMeta</code>: A struct with extra meta fields to include or overwrite with the output file.</li>
-<li><code>timeShifts</code>: A <code>Neuropixel.TimeShiftSpec</code> instance used to excise time windows, see <a href="#excising-time-windows">excising time windows</a>.</li>
+<li><code>timeShifts</code>: A <code>npxutils.TimeShiftSpec</code> instance used to excise time windows, see <a href="#excising-time-windows">excising time windows</a>.</li>
 </ul>
 <div class="admonition warning">
 <p class="admonition-title">Save transformed data to a new folder!</p>
@@ -907,7 +907,7 @@
 <h3 id="concatenating-multiple-files-together">Concatenating multiple files together<a class="headerlink" href="#concatenating-multiple-files-together" title="Permanent link">&para;</a></h3>
 <p>If you have multiple separate recording files that you wish to process and sort together, you can concatenate them together during the copy. The code will also scale the datasets up to a common gain factor if the file gains differ from each other. This will not of course increase the resolution of low-gain files, but it will ensure that the signal amplitudes match across files with different gains.</p>
 <div class="highlight"><pre><span></span><code><span class="n">imecList</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="n">imec1</span><span class="p">,</span><span class="w"> </span><span class="n">imec2</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c">};</span><span class="w"></span>
-<span class="n">imecOut</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Neuropixel</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">.</span><span class="n">writeConcatenatedFileMatchGains</span><span class="p">(</span><span class="n">imecList</span><span class="p">,</span><span class="w"> </span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<span class="n">imecOut</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">.</span><span class="n">writeConcatenatedFileMatchGains</span><span class="p">(</span><span class="n">imecList</span><span class="p">,</span><span class="w"> </span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
 <span class="w">        </span><span class="s">&#39;transformAP&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="nb">cell</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">handles</span><span class="p">},</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
 <span class="w">        </span><span class="s">&#39;transformLF&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="nb">cell</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">handles</span><span class="p">},</span><span class="w"> </span><span class="k">...</span><span class="c">);</span><span class="w"></span>
 </code></pre></div>
@@ -920,24 +920,24 @@
 </code></pre></div>
 <p>This is useful for running Kilosort with varying parameters, since each run would ideally live in its own directory but there&rsquo;s no need for a real copy of the raw data.</p>
 <h3 id="excising-time-windows">Excising time windows<a class="headerlink" href="#excising-time-windows" title="Permanent link">&para;</a></h3>
-<p>Occasionally it can be beneficial to remove certain time windows from a file, or to omit them while plotting data. This may be accomplished using <code>Neuropixel.TimeShiftSpec</code> instances to indicate which windows of time to keep and how to shift them so as to remove gaps. A <code>TimeShiftSpec</code> specifies a list of sample intervals bounded by a start and stop index in properties <code>idxStart</code> and <code>idxStop</code>. The start index in <code>idxStart</code> will be shifted to lie at sample index <code>idxShiftStart</code>. You can calculate these shifts directly, but it is typically easier to specify only the sample intervals you wish to keep and then construct the <code>TimeShiftSpec</code> using:</p>
-<div class="highlight"><pre><span></span><code><span class="n">timeShifts</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Neuropixel</span><span class="p">.</span><span class="n">TimeShiftSpec</span><span class="p">.</span><span class="n">buildToExciseGaps</span><span class="p">(</span><span class="n">idxStartList</span><span class="p">,</span><span class="w"> </span><span class="n">idxStopList</span><span class="p">);</span><span class="w"></span>
+<p>Occasionally it can be beneficial to remove certain time windows from a file, or to omit them while plotting data. This may be accomplished using <code>npxutils.TimeShiftSpec</code> instances to indicate which windows of time to keep and how to shift them so as to remove gaps. A <code>TimeShiftSpec</code> specifies a list of sample intervals bounded by a start and stop index in properties <code>idxStart</code> and <code>idxStop</code>. The start index in <code>idxStart</code> will be shifted to lie at sample index <code>idxShiftStart</code>. You can calculate these shifts directly, but it is typically easier to specify only the sample intervals you wish to keep and then construct the <code>TimeShiftSpec</code> using:</p>
+<div class="highlight"><pre><span></span><code><span class="n">timeShifts</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">TimeShiftSpec</span><span class="p">.</span><span class="n">buildToExciseGaps</span><span class="p">(</span><span class="n">idxStartList</span><span class="p">,</span><span class="w"> </span><span class="n">idxStopList</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
 <p>If you have known trial boundaries in your file (see <a href="kilosort.html#segmenting-a-kilosort-dataset-into-trials">Segmenting a Kilosort dataset into trials</a> for more information), you can also excise the regions of time far from trial boundaries using the <code>TrialSegmentationInfo</code> instance. I&rsquo;ve found this to be useful to exclude time windows where the subject was asleep from further analysis.</p>
 <div class="highlight"><pre><span></span><code><span class="n">timeShifts</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">tsi</span><span class="p">.</span><span class="n">computeShiftsExciseRegionsOutsideTrials</span><span class="p">(</span><span class="s">&#39;maxPauseSec&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
-<p>You can then pass along this <code>Neuropixel.TimeShiftSpec</code> to any of the data transform functions. Depending on whether the <code>timeShifts</code> object was created in indices of <code>AP</code> band sample rate or <code>LF</code> band sample rate, you should pass it along as <code>timeShiftsAP</code> or <code>timeShiftsLF</code>. The conversion to the other sampling rate will be handled automatically so that the excision is performed on both datasets appropriately.</p>
+<p>You can then pass along this <code>npxutils.TimeShiftSpec</code> to any of the data transform functions. Depending on whether the <code>timeShifts</code> object was created in indices of <code>AP</code> band sample rate or <code>LF</code> band sample rate, you should pass it along as <code>timeShiftsAP</code> or <code>timeShiftsLF</code>. The conversion to the other sampling rate will be handled automatically so that the excision is performed on both datasets appropriately.</p>
 <div class="highlight"><pre><span></span><code><span class="n">imecOut</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">saveTransformedDataset</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;timeShiftsAP&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">timeShifts</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c"> );</span><span class="w"></span>
 </code></pre></div>
-<p>A cell array of <code>Neuropixel.TimeShiftSpec</code> instances can be provided when concatenating multiple files:</p>
-<div class="highlight"><pre><span></span><code><span class="n">imecOut</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Neuropixel</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">.</span><span class="n">writeConcatenatedFileMatchGains</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="n">imecList</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<p>A cell array of <code>npxutils.TimeShiftSpec</code> instances can be provided when concatenating multiple files:</p>
+<div class="highlight"><pre><span></span><code><span class="n">imecOut</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">.</span><span class="n">writeConcatenatedFileMatchGains</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="n">imecList</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
 <span class="w">        </span><span class="s">&#39;timeShiftsAP&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">timeShift1</span><span class="p">,</span><span class="w"> </span><span class="n">timeShift2</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c"> }, ...);</span><span class="w"></span>
 </code></pre></div>
 <h3 id="referring-to-source-datasets">Referring to Source Datasets<a class="headerlink" href="#referring-to-source-datasets" title="Permanent link">&para;</a></h3>
 <p>If helpful, when loading a derived <code>ImecDataset</code>, you can specify the <code>sourceDatasets</code> parameter to provide an array of <code>ImecDataset</code> instances corresponding to the original, pre-processed source datasets. Here, this would be the set of raw datasets provided as the <code>imecList</code> argument above. For certain methods, you can then pass parameter <code>fromSourceDatasets</code>, true and the corresponding window of time from the source datasets will be plotted instead of the processed data. This will automatically handle any time shifts and excisions performed; consequently it is helpful for debugging processing pipelines to see the before and after data.</p>
-<div class="highlight"><pre><span></span><code><span class="n">imecProcessed</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Neuropixel</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">.</span><span class="n">writeConcatenatedFileMatchGains</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="n">imecList</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c"> );</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">imecProcessed</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">.</span><span class="n">writeConcatenatedFileMatchGains</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="n">imecList</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c"> );</span><span class="w"></span>
 
-<span class="n">imecProcessed</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Neuropixel</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;sourceDatasets&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">imecRaw1</span><span class="p">,</span><span class="w"> </span><span class="n">imecRaw2</span><span class="p">});</span><span class="w"></span>
+<span class="n">imecProcessed</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;sourceDatasets&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">imecRaw1</span><span class="p">,</span><span class="w"> </span><span class="n">imecRaw2</span><span class="p">});</span><span class="w"></span>
 <span class="n">imecProcessed</span><span class="p">.</span><span class="n">inspectAP_timeWindow</span><span class="p">([</span><span class="mi">1</span><span class="w"> </span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="s">&#39;fromSourceDatasets&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
                 

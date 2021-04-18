@@ -7,20 +7,20 @@
 To run Kilosort or Kilosort2 on an ImecDataset:
 
 ```matlab
-Neuropixel.runKilosort1(imec, ...);
+npxutils.runKilosort1(imec, ...);
 ```
 
 Or for Kilosort 2:
 
 ```matlab
-Neuropixel.runKilosort2(imec, ...);
+npxutils.runKilosort2(imec, ...);
 ```
 
 By default, the standard configuration settings will be used. For Kilosort1, these are hardcoded based on `configFiles/StandardConfig_MOVEME.m`. For Kilosort2, the script `configFiles/configFile384.m` will be run to produce the `ops` struct, unless a different configuration file is set in the environment variable `KILOSORT_CONFIG_FILE`, which must be on the path. Default configuration settings can be overridden by passing in extra parameters, e.g.
 
 ```matlab
-Neuropixel.runKilosort1(imec, 'Th', [4 10], 'GPU', false);
-Neuropixel.runKilosort2(imec, 'minfr_goodchannels', 0.1);
+npxutils.runKilosort1(imec, 'Th', [4 10], 'GPU', false);
+npxutils.runKilosort2(imec, 'minfr_goodchannels', 0.1);
 ```
 
 ## Loading Kilosort results
@@ -28,11 +28,11 @@ Neuropixel.runKilosort2(imec, 'minfr_goodchannels', 0.1);
 You can create a KilosortDataset instance by pointing at the folder containing the Kilosort output:
 
 ```matlab
-ks = Neuropixel.KilosortDataset(pathToKilosortOutput();
+ks = npxutils.KilosortDataset(pathToKilosortOutput();
 ks.load();
 ```
 
-The constructor will optionally take an 'imecDataset' parameter providing the `Neuropixel.ImecDataset` instance if there is no `.imec.ap.bin` file in the Kilosort directory, and a 'channelMap' parameter in case the default is not correct. The results can then be loaded using `ks.load()`.
+The constructor will optionally take an 'imecDataset' parameter providing the `npxutils.ImecDataset` instance if there is no `.imec.ap.bin` file in the Kilosort directory, and a 'channelMap' parameter in case the default is not correct. The results can then be loaded using `ks.load()`.
 
 The descriptions of each property can be found in the `+Neuropixel/KilosortDataset.m` code, copied here for convenience, originally described in the [Phy documentation](https://phy-contrib.readthedocs.io/en/latest/template-gui/):
 
@@ -42,8 +42,8 @@ The descriptions of each property can be found in the `+Neuropixel/KilosortDatas
 KilosortDataset with properties:
 
                   path: '/data/kilosort/neuropixel_01'
-           raw_dataset: [1×1 Neuropixel.ImecDataset]
-            channelMap: [1×1 Neuropixel.ChannelMap]
+           raw_dataset: [1×1 npxutils.ImecDataset]
+            channelMap: [1×1 npxutils.ChannelMap]
                   fsAP: 30000
            apScaleToUv: 2.3438
                   meta: [1×1 struct]
@@ -138,10 +138,10 @@ similar_templates(:, :) single
 `ks.spike_times` contains the times for each spike in samples from the beginning of the file, but there is a more useful representation for data collected with a trial structure: split the spikes into separate groups based on which trial they occurred in, and convert the times to milliseconds since the start of the trial.
 
 ### TrialSegmentationInfo
-In order to do this, you need to figure out where trials start and stop. You'll need to write this code, since this will differ for each experimental setup. Essentially, you need to create a `Neuropixel.TrialSegmentationInfo` instance and populate its fields with the correct values:
+In order to do this, you need to figure out where trials start and stop. You'll need to write this code, since this will differ for each experimental setup. Essentially, you need to create a `npxutils.TrialSegmentationInfo` instance and populate its fields with the correct values:
 
 ```matlab
-tsi = Neuropixel.TrialSegmentationInfo(nTrials, fsAP);
+tsi = npxutils.TrialSegmentationInfo(nTrials, fsAP);
 tsi.idxStart = [list of start sample indices]
 tsi.idxStop = [list of stop sample indices];
 tsi.trialId = [list of trial ids];
@@ -173,7 +173,7 @@ function tsi = parseTrialInfoFromSync(syncRaw, fs, syncBitNames)
     idxStart = find(diff(trialStart) == 1) + 1;
     nTrials = numel(idxStart);
 
-    tsi = Neuropixel.TrialSegmentationInfo(nTrials, fs);
+    tsi = npxutils.TrialSegmentationInfo(nTrials, fs);
 
     samplesEachBit = round(fs / 1000); % each bit delivered per ms
     for iR = 1:nTrials
@@ -231,7 +231,7 @@ end
 
 ### KilosortTrialSegmentedDataset
 
-Once you have the trial boundaries stored in your `TrialSegmentationInfo` instance, you can split the properties of the `KilosortDataset` into each trial, resulting in a `Neuropixel.KilosortTrialSegmentedDataset` instance. To facilitate merging this into another data structure later, you will need to specify the ultimate `trialId` order you want the `KilosortTrialSegmentedDataset` to have. For example, if you have a behavioral data structure, you can extract the list of trial ids from that so that your `KilosortTrialSegmentedDataset` will have a matching trial sequence.
+Once you have the trial boundaries stored in your `TrialSegmentationInfo` instance, you can split the properties of the `KilosortDataset` into each trial, resulting in a `npxutils.KilosortTrialSegmentedDataset` instance. To facilitate merging this into another data structure later, you will need to specify the ultimate `trialId` order you want the `KilosortTrialSegmentedDataset` to have. For example, if you have a behavioral data structure, you can extract the list of trial ids from that so that your `KilosortTrialSegmentedDataset` will have a matching trial sequence.
 
 ```matlab
 trialIds = cat(1, behaviorStruct.trialId);
@@ -246,11 +246,11 @@ trialIds = tsi.trialIds;
 You can then segment the KilosortDataset using:
 
 ```matlab
->> seg = Neuropixel.KilosortTrialSegmentedDataset(ks, tsi, trial_ids)
+>> seg = npxutils.KilosortTrialSegmentedDataset(ks, tsi, trial_ids)
 
 KilosortTrialSegmentedDataset with properties:
 
-                   dataset: [1×1 Neuropixel.KilosortDataset] % unsegmented KilosortDataset
+                   dataset: [1×1 npxutils.KilosortDataset] % unsegmented KilosortDataset
                  trial_ids: [nTrials × 1 uint32] % trial ids
             trial_has_data: [nTrials × 1 logical] % indicator if trial found in tsi
                trial_start: [nTrials × 1 uint64] % nTrials start sample idx copied from tsi
@@ -260,7 +260,7 @@ KilosortTrialSegmentedDataset with properties:
             cluster_groups: [nClusters × 1 categorical] % copied from ks
                       sync: {1×1 cell} %  segmented contents of sync channel
               syncBitNames: [16×1 string] % copied from ImecDataset
-               raw_dataset: [1×1 Neuropixel.ImecDataset] % original ImecDataset copied from ks
+               raw_dataset: [1×1 npxutils.ImecDataset] % original ImecDataset copied from ks
                    nTrials: 1092 % number of trials as numel(trialIds)
            nTrialsHaveData: 1092 % number of trials with matching trialIds in tsi
                  nClusters: 592 % number of clusters (sorted units)

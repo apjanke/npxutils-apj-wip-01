@@ -1,38 +1,38 @@
-# Neuropixel.ImecDataset
+# npxutils.ImecDataset
 
-The `Neuropixel.ImecDataset` class wraps one individual recording session acquired with SpikeGLX. Currently, four files with extensions `.imec.ap.bin`, `.imec.ap.meta`, `.imec.lf.bin`, and `.imec.lf.meta` comprise one ImecDataset.
+The `npxutils.ImecDataset` class wraps one individual recording session acquired with SpikeGLX. Currently, four files with extensions `.imec.ap.bin`, `.imec.ap.meta`, `.imec.lf.bin`, and `.imec.lf.meta` comprise one ImecDataset.
 
-## Constructing a `Neuropixel.ImecDataset`
+## Constructing a `npxutils.ImecDataset`
 
-You construct a Neuropixel.ImecDataset by pointing it at the path to your dataset. How you specify the path is flexible. You can point directly at one of the files:
+You construct a npxutils.ImecDataset by pointing it at the path to your dataset. How you specify the path is flexible. You can point directly at one of the files:
 
 ```matlab
-imec = Neuropixel.ImecDataset('/data/raw_datasets/neuropixel_01_g0_t0.imec.ap.bin');
+imec = npxutils.ImecDataset('/data/raw_datasets/neuropixel_01_g0_t0.imec.ap.bin');
 ```
 
 Or specify the common prefix to the `.imec.*` files comprising the dataset:
 
 ```matlab
-imec = Neuropixel.ImecDataset('/data/raw_datasets/neuropixel_01_g0_t0');
+imec = npxutils.ImecDataset('/data/raw_datasets/neuropixel_01_g0_t0');
 ```
 
 The common prefix can be shorter as long as there is no ambiguity:
 
 ```matlab
-imec = Neuropixel.ImecDataset('/data/raw_datasets/neuropixel_01');
+imec = npxutils.ImecDataset('/data/raw_datasets/neuropixel_01');
 ```
 
 You can also point at the parent directory as long as only one `.ap.bin` file is contained within.
 
 ```matlab
-imec = Neuropixel.ImecDataset('/data/raw_datasets/');
+imec = npxutils.ImecDataset('/data/raw_datasets/');
 ```
 
 These are all equivalent, in that the resulting `imec` instance will wrap both AP and LF bin and meta files. (Though it's okay if the LF files are missing).
 
 ### Specifying a Channel Map
 
-When constructing the ImecDataset, you can specify a channel map. If you don't specify one, the default will be returned by `Neuropixel.Utils.getDefaultChannelMapFile()`, which in turn will look for the file pointed to by the environment variables `'NEUROPIXEL_MAP_FILE'` or `'NPIX_MAP_FILE'`. You can set these using Matlab's `setenv` function.
+When constructing the ImecDataset, you can specify a channel map. If you don't specify one, the default will be returned by `npxutils.Utils.getDefaultChannelMapFile()`, which in turn will look for the file pointed to by the environment variables `'NEUROPIXEL_MAP_FILE'` or `'NPIX_MAP_FILE'`. You can set these using Matlab's `setenv` function.
 
 These .mat files are expected to be in the same format as found on the [neuropixels repo](https://github.com/cortex-lab/neuropixels). For the phase 3A probe with 384 channels, the file `neuropixPhase3A_kilosortChanMap.mat` contains:
 
@@ -52,14 +52,14 @@ struct with fields:
 You can construct a ChannelMap directly by pointing at the `.mat` file, although every function within `neuropixel-utils` will also accept the filename and construct the `ChannelMap` for you:
 
 ```matlab
-chanMap = Neuropixel.ChannelMap(mat_file_path);
+chanMap = npxutils.ChannelMap(mat_file_path);
 ```
 
 Then you can use this map for an ImecDataset using:
 
 ```matlab
-imec = Neuropixel.ImecDataset('channelMap', chanMap);
-imec = Neuropixel.ImecDataset('channelMap', mat_file_path);
+imec = npxutils.ImecDataset('channelMap', chanMap);
+imec = npxutils.ImecDataset('channelMap', mat_file_path);
 ```
 
 ## Exploring metadata
@@ -103,7 +103,7 @@ ImecDataset with properties:
               lfGain: 250 % LF gain selected
              lfRange: [-0.6000 0.6000] % voltage range on ADC
              adcBits: 10 % number of ADC bits used
-          channelMap: [1×1 Neuropixel.ChannelMap] % channel map for this recording
+          channelMap: [1×1 npxutils.ChannelMap] % channel map for this recording
     syncChannelIndex: 385 % index of the sync channel if present in AP file
         syncInAPFile: 1 % whether the sync channels is present in the AP file
          badChannels: [3×1 double] % list of channels marked as bad
@@ -271,7 +271,7 @@ trialStart_partial = imec.readSyncBits_idx("trialStart", idxWindow); % nTime x 1
 
 ## Building a preprocessing pipeline
 
-If the raw `.imec.ap.bin` file must be processed in some way before running Kilosort, e.g. to remove artifacts, you can implement this efficiently by writing a transformation function that will act on chunks of the data. One example is found in `Neuropixel.DataProcessFn.commonAverageReference`:
+If the raw `.imec.ap.bin` file must be processed in some way before running Kilosort, e.g. to remove artifacts, you can implement this efficiently by writing a transformation function that will act on chunks of the data. One example is found in `npxutils.DataProcessFn.commonAverageReference`:
 
 ```matlab
 function [data, extra] = commonAverageReference(imec, data, chIds, sampleIdx) %#ok<INUSD>
@@ -307,7 +307,7 @@ Here, `outPath` should include the folder where the new datasets should be writt
 % creates /path/to/datasets/modifiedDataset.ap.bin, .ap.meta, etc.
 ```
 
-You can provide one or more function handles (e.g. ```@Neuropixel.DataProcessFn.commonAverageReference```) that will be applied sequentially. Other optional parameters include:
+You can provide one or more function handles (e.g. ```@npxutils.DataProcessFn.commonAverageReference```) that will be applied sequentially. Other optional parameters include:
 
 * `dryRun`: If true, no actual data will be modified on disk, facilitating testing or step by step debugging of the transform functions before writing data. (default false).
 * `gpuArray`: If true, the data chunks will be copied to the GPU and the transformation functions will receive and return GPU arrays.
@@ -319,7 +319,7 @@ You can provide one or more function handles (e.g. ```@Neuropixel.DataProcessFn.
 * `mappedChannelsOnly`: Send only the mapped channels to the transform function.
 * `chunkSize`: Specify the number of time samples sent to transform functions at once.
 * `extraMeta`: A struct with extra meta fields to include or overwrite with the output file.
-* `timeShifts`: A `Neuropixel.TimeShiftSpec` instance used to excise time windows, see [excising time windows](#excising-time-windows).
+* `timeShifts`: A `npxutils.TimeShiftSpec` instance used to excise time windows, see [excising time windows](#excising-time-windows).
 
 !!! warning "Save transformed data to a new folder!"
     Ensure that `outPath` refers to separate directory so that you make a copy of the dataset rather than writing over the same location. An error will be thrown if any existing files would be overwritten by this call.
@@ -339,7 +339,7 @@ If you have multiple separate recording files that you wish to process and sort 
 
 ```matlab
 imecList = {imec1, imec2, ...};
-imecOut = Neuropixel.ImecDataset.writeConcatenatedFileMatchGains(imecList, outPath, ...
+imecOut = npxutils.ImecDataset.writeConcatenatedFileMatchGains(imecList, outPath, ...
         'transformAP', {cell of function handles}, ...
         'transformLF', {cell of function handles}, ...);
 ```
@@ -362,10 +362,10 @@ This is useful for running Kilosort with varying parameters, since each run woul
 
 ### Excising time windows
 
-Occasionally it can be beneficial to remove certain time windows from a file, or to omit them while plotting data. This may be accomplished using `Neuropixel.TimeShiftSpec` instances to indicate which windows of time to keep and how to shift them so as to remove gaps. A `TimeShiftSpec` specifies a list of sample intervals bounded by a start and stop index in properties `idxStart` and `idxStop`. The start index in `idxStart` will be shifted to lie at sample index `idxShiftStart`. You can calculate these shifts directly, but it is typically easier to specify only the sample intervals you wish to keep and then construct the `TimeShiftSpec` using:
+Occasionally it can be beneficial to remove certain time windows from a file, or to omit them while plotting data. This may be accomplished using `npxutils.TimeShiftSpec` instances to indicate which windows of time to keep and how to shift them so as to remove gaps. A `TimeShiftSpec` specifies a list of sample intervals bounded by a start and stop index in properties `idxStart` and `idxStop`. The start index in `idxStart` will be shifted to lie at sample index `idxShiftStart`. You can calculate these shifts directly, but it is typically easier to specify only the sample intervals you wish to keep and then construct the `TimeShiftSpec` using:
 
 ```matlab
-timeShifts = Neuropixel.TimeShiftSpec.buildToExciseGaps(idxStartList, idxStopList);
+timeShifts = npxutils.TimeShiftSpec.buildToExciseGaps(idxStartList, idxStopList);
 ```
 
 If you have known trial boundaries in your file (see [Segmenting a Kilosort dataset into trials](kilosort.md#segmenting-a-kilosort-dataset-into-trials) for more information), you can also excise the regions of time far from trial boundaries using the `TrialSegmentationInfo` instance. I've found this to be useful to exclude time windows where the subject was asleep from further analysis.
@@ -374,16 +374,16 @@ If you have known trial boundaries in your file (see [Segmenting a Kilosort data
 timeShifts = tsi.computeShiftsExciseRegionsOutsideTrials('maxPauseSec', 20);
 ```
 
-You can then pass along this `Neuropixel.TimeShiftSpec` to any of the data transform functions. Depending on whether the `timeShifts` object was created in indices of `AP` band sample rate or `LF` band sample rate, you should pass it along as `timeShiftsAP` or `timeShiftsLF`. The conversion to the other sampling rate will be handled automatically so that the excision is performed on both datasets appropriately.
+You can then pass along this `npxutils.TimeShiftSpec` to any of the data transform functions. Depending on whether the `timeShifts` object was created in indices of `AP` band sample rate or `LF` band sample rate, you should pass it along as `timeShiftsAP` or `timeShiftsLF`. The conversion to the other sampling rate will be handled automatically so that the excision is performed on both datasets appropriately.
 
 ```matlab
 imecOut = imec.saveTransformedDataset(outPath, 'timeShiftsAP', timeShifts, ... );
 ```
 
-A cell array of `Neuropixel.TimeShiftSpec` instances can be provided when concatenating multiple files:
+A cell array of `npxutils.TimeShiftSpec` instances can be provided when concatenating multiple files:
 
 ```matlab
-imecOut = Neuropixel.ImecDataset.writeConcatenatedFileMatchGains(outPath, imecList, ...
+imecOut = npxutils.ImecDataset.writeConcatenatedFileMatchGains(outPath, imecList, ...
         'timeShiftsAP', {timeShift1, timeShift2, ... }, ...);
 ```
 
@@ -392,9 +392,9 @@ imecOut = Neuropixel.ImecDataset.writeConcatenatedFileMatchGains(outPath, imecLi
 If helpful, when loading a derived `ImecDataset`, you can specify the `sourceDatasets` parameter to provide an array of `ImecDataset` instances corresponding to the original, pre-processed source datasets. Here, this would be the set of raw datasets provided as the `imecList` argument above. For certain methods, you can then pass parameter `fromSourceDatasets`, true and the corresponding window of time from the source datasets will be plotted instead of the processed data. This will automatically handle any time shifts and excisions performed; consequently it is helpful for debugging processing pipelines to see the before and after data.
 
 ```matlab 
-imecProcessed = Neuropixel.ImecDataset.writeConcatenatedFileMatchGains(outPath, imecList, ... );
+imecProcessed = npxutils.ImecDataset.writeConcatenatedFileMatchGains(outPath, imecList, ... );
 
-imecProcessed = Neuropixel.ImecDataset(outPath, 'sourceDatasets', {imecRaw1, imecRaw2});
+imecProcessed = npxutils.ImecDataset(outPath, 'sourceDatasets', {imecRaw1, imecRaw2});
 imecProcessed.inspectAP_timeWindow([1 2], 'fromSourceDatasets', true);
 ```
 
