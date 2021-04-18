@@ -82,34 +82,34 @@ classdef ProgressBar < handle
             pbar.update(0);
         end
         
-        function increment(pbar, varargin)
+        function increment(this, varargin)
             if nargin > 1 && isnumeric(varargin{1})
                 by = varargin{1};
                 varargin = varargin(2:end);
             else
                 by = 1;
             end
-            pbar.update(pbar.n+by, varargin{:});
+            this.update(this.n+by, varargin{:});
         end
         
-        function update(pbar, n, message, varargin)
+        function update(this, n, message, varargin)
             if nargin > 2
-                pbar.message = sprintf(message, varargin{:});
+                this.message = sprintf(message, varargin{:});
             else
             end
-            pbar.n = n; % store last update
+            this.n = n; % store last update
             
             % don't run too often
-            if isempty(pbar.lastCalled)
-                pbar.lastCalled = clock;
-            elseif etime(clock, pbar.lastCalled) < pbar.minInterval
+            if isempty(this.lastCalled)
+                this.lastCalled = clock;
+            elseif etime(clock, this.lastCalled) < this.minInterval
                 return;
             end
             
-            pbar.lastCalled = clock;
+            this.lastCalled = clock;
             
-            if pbar.N > 0
-                numWidth = ceil(log10(pbar.N));
+            if this.N > 0
+                numWidth = ceil(log10(this.N));
             else
                 numWidth = 1;
             end
@@ -117,7 +117,7 @@ classdef ProgressBar < handle
             if n < 0
                 n = 0;
             end
-            if isempty(pbar.N) || pbar.N == 1
+            if isempty(this.N) || this.N == 1
                 ratio = n;
                 if ratio < 0
                     ratio = 0;
@@ -128,9 +128,9 @@ classdef ProgressBar < handle
                 percentage = ratio * 100;
                 progStr = sprintf('[ %5.1f%% ]', percentage);
             else
-                ratio = (n-1)/pbar.N;
+                ratio = (n-1)/this.N;
                 percentage = min(max(ratio*100, 0), 100);
-                progStr = sprintf('%*d / %*d [ %5.1f%% ]', numWidth, n, numWidth, pbar.N, percentage);
+                progStr = sprintf('%*d / %*d [ %5.1f%% ]', numWidth, n, numWidth, this.N, percentage);
             end
             
             progLen = length(progStr);
@@ -142,74 +142,74 @@ classdef ProgressBar < handle
                 ratio = 1;
             end
             
-            if length(pbar.message) + progLen + 3 > pbar.cols
-                message = [pbar.message(1:(pbar.cols - progLen - 6)), '...'];
+            if length(this.message) + progLen + 3 > this.cols
+                message = [this.message(1:(this.cols - progLen - 6)), '...'];
             else
-                message = pbar.message;
+                message = this.message;
             end
             
-            gap = pbar.cols - 1 - (length(message)+1) - progLen;
+            gap = this.cols - 1 - (length(message)+1) - progLen;
             spaces = repmat(' ', 1, gap);
-            if pbar.usingTerminal
+            if this.usingTerminal
                 str = [message spaces progStr];
             else
                 str = [message spaces blanks(numel(progStr))];
             end
             
             % separate into colored portion of bar and non-colored portion of bar
-            ind = min(length(str), ceil(ratio*pbar.cols));
+            ind = min(length(str), ceil(ratio*this.cols));
             preStr = str(1:ind);
             postStr = str(ind+1:end);
             
             % try using 24 color
-            if pbar.trueColor
+            if this.trueColor
                 newPreStr = '';
                 for i = 1:numel(preStr)
-                    color = pbar.trueCmap(i, :);
+                    color = this.trueCmap(i, :);
                     %                     color = pbar.trueCmap(mod(i-1, size(pbar.trueCmap, 1))+1, :);
                     newPreStr = [newPreStr, sprintf('\x1b[48;2;%d;%d;%dm%s' , color, preStr(i))];
                 end
                 preStr = newPreStr;
             end
             
-            if pbar.usingTerminal
-                if pbar.firstUpdate
+            if this.usingTerminal
+                if this.firstUpdate
                     fprintf(' '); % don't delete whole line on first update
                 end
-                if pbar.trueColor
+                if this.trueColor
                     fprintf('\b\r%s\033[49;37m%s\033[0m ', preStr, postStr);
                 else
                     fprintf('\b\r\033[1;44;37m%s\033[49;37m%s\033[0m  ', preStr, postStr);
                 end
             else
-                pbar.textprogressbar(ratio);
+                this.textprogressbar(ratio);
             end
-            pbar.firstUpdate = false;
+            this.firstUpdate = false;
             
             %str = sprintf('\b\r\033[1;44;37m %s\033[49;37m%s\033[0m ', preStr, postStr);
             %disp(str);
             
         end
         
-        function finish(pbar, message, varargin)
+        function finish(this, message, varargin)
             % if message is provided (also in printf format), the message
             % will be displayed. Otherwise, the progress bar will disappear
             % and output will resume on the same line.
             
-            if pbar.usingTerminal
+            if this.usingTerminal
                 fprintf('\033[1Acll\033[2K\r');
             else
-                pbar.textprogressbar(1);
+                this.textprogressbar(1);
                 fprintf('\n');
             end
             if nargin > 1
-                pbar.message = sprintf(message, varargin{:});
-                fprintf('%s\n', pbar.message);
+                this.message = sprintf(message, varargin{:});
+                fprintf('%s\n', this.message);
             end
             
         end
         
-        function textprogressbar(pbar, c)
+        function textprogressbar(this, c)
             %
             % Original Author: Paul Proteus (e-mail: proteus.paul (at) yahoo (dot) com)
             % Version: 1.0
@@ -224,9 +224,9 @@ classdef ProgressBar < handle
             strPercentageLength = 9;   %   Length of percentage string (must be >5)
             strDotsMaximum      = 15;   %   The total number of dots in a progress bar
             
-            if pbar.firstUpdate
-                fprintf('%s : ', pbar.message);
-                pbar.textprogressStrCR = -1;
+            if this.firstUpdate
+                fprintf('%s : ', this.message);
+                this.textprogressStrCR = -1;
             end
             
             c = round(c*100, 1);
@@ -238,21 +238,21 @@ classdef ProgressBar < handle
             strOut = [percentageOut dotOut];
             
             % Print it on the screen
-            if pbar.textprogressStrCR == -1
+            if this.textprogressStrCR == -1
                 % Don't do carriage return during first run
                 fprintf(strOut);
             else
                 % Do it during all the other runs
-                fprintf([pbar.textprogressStrCR strOut]);
+                fprintf([this.textprogressStrCR strOut]);
             end
             
             % Update carriage return
-            pbar.textprogressStrCR = repmat('\b',1,length(strOut)-1);
+            this.textprogressStrCR = repmat('\b',1,length(strOut)-1);
             
         end
     end
     
-    methods(Static)
+    methods (Static)
         function [rows, cols] = getTerminalSize()
             usingTerminal = ~usejava('desktop');
             

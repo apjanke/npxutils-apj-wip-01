@@ -4,7 +4,7 @@ classdef TensorUtils
     %
     % Daniel J. O'Shea, 2019
     
-    methods(Static) % Simple internalized utils
+    methods (Static) % Simple internalized utils
         function v = wrapCell(v)
             % v = wrapCell(v)
             % Wrap v as cell {v} if ~iscell(v)
@@ -64,7 +64,7 @@ classdef TensorUtils
     end
     
     
-    methods(Static) % Mapping, construction via callback
+    methods (Static) % Mapping, construction via callback
         function varargout = mapToSizeFromSubs(sz, varargin)
             % t = mapTensor(sz, contentsFn = @(varargin) NaN, asCell = false)
             % build a tensor with size sz by passing subscripts inds to
@@ -330,7 +330,7 @@ classdef TensorUtils
         end
     end
     
-    methods(Static) % Dimensions and sizes
+    methods (Static) % Dimensions and sizes
         function out = emptyWithSameType(in, szOut)
             % create out as size szOut with same type as in (either cell or
             % nans)
@@ -404,7 +404,7 @@ classdef TensorUtils
         end
     end
     
-    methods(Static) % Mask generation and mask utilities
+    methods (Static) % Mask generation and mask utilities
         function idx = vectorMaskToIndices(mask)
             if islogical(mask)
                 idx = npxutils.util.TensorUtils.makecol(find(mask));
@@ -502,7 +502,7 @@ classdef TensorUtils
         
     end
     
-    methods(Static) % Indices and subscripts
+    methods (Static) % Indices and subscripts
         
         function t = containingLinearInds(sz)
             % build a tensor with size sz where each element contains the linear
@@ -579,7 +579,7 @@ classdef TensorUtils
         end
     end
     
-    methods(Static) % Selection Mask generation
+    methods (Static) % Selection Mask generation
         function maskByDim = maskByDimCell(sz)
             sz = npxutils.util.TensorUtils.expandScalarSize(sz);
             
@@ -631,7 +631,7 @@ classdef TensorUtils
         end
     end
     
-    methods(Static) % Squeezing along particular dimensions
+    methods (Static) % Squeezing along particular dimensions
         function tsq = squeezeDims(t, dims)
             % like squeeze, except only collapses singleton dimensions in list dims
             siz = size(t);
@@ -660,7 +660,7 @@ classdef TensorUtils
         end
     end
     
-    methods(Static) % Regrouping, Nesting, Selecting, Reshaping
+    methods (Static) % Regrouping, Nesting, Selecting, Reshaping
         function tCell = regroupAlongDimension(t, dims)
             % tCell = regroupAlongDimension(t, dims)
             % returns a cell tensor of tensors, where the outer tensor is over
@@ -1328,7 +1328,7 @@ classdef TensorUtils
         
     end
     
-    methods(Static) % Slice orienting and repmat
+    methods (Static) % Slice orienting and repmat
         function vec = orientVectorAlongDim(vec, dim)
             vec = shiftdim(npxutils.util.TensorUtils.makecol(vec), -dim+1);
         end
@@ -1411,7 +1411,7 @@ classdef TensorUtils
         end
     end
     
-    methods(Static) % Size expansion / truncation
+    methods (Static) % Size expansion / truncation
         function out = scalarExpandToSize(in, szOut)
             if isscalar(in)
                 out = repmat(in, szOut);
@@ -1482,7 +1482,7 @@ classdef TensorUtils
         end
     end
     
-    methods(Static) % List resampling and shuffling along dimension
+    methods (Static) % List resampling and shuffling along dimension
         function seedRandStream(seed)
             if nargin == 0
                 seed = 'Shuffle';
@@ -1725,7 +1725,7 @@ classdef TensorUtils
         
     end
     
-    methods(Static) % Multi-dim extensions of any, all, find etc.
+    methods (Static) % Multi-dim extensions of any, all, find etc.
         function t = applyFunctionComposedOverSuccessiveDimensions(t, fn, dims)
             for iD = 1:numel(dims)
                 t = fn(t, dims(iD));
@@ -1807,7 +1807,7 @@ classdef TensorUtils
         end
     end
     
-    methods(Static) % Statistics
+    methods (Static) % Statistics
         function t = meanMultiDim(t, dims)
             % e.g. if t has size [s1, s2, s3, s4], then  mean(t, [2 3])
             % will compute the mean in slices along dims 2 and 3. the
@@ -1994,7 +1994,7 @@ classdef TensorUtils
         end
     end
     
-    methods(Static) % Data manipulation
+    methods (Static) % Data manipulation
         function t = centerSlicesOrthogonalToDimension(t, alongDims)
             % takes slices along dimensions specified, computes the mean
             % of the slice and subtracts it. this ensures

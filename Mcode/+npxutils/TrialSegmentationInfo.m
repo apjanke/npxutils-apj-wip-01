@@ -3,13 +3,13 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
     
     properties
         fs % sampling rate (Hz)
-        trialId(:, 1) uint32
-        conditionId(:, 1) uint32
-        idxStart(:, 1) uint64 % in samples
-        idxStop(:, 1) uint64 % in samples, may not be used
+        trialId (:,1) uint32
+        conditionId (:,1) uint32
+        idxStart (:,1) uint64 % in samples
+        idxStop (:,1) uint64 % in samples, may not be used
     end
     
-    properties(Dependent)
+    properties (Dependent)
         nTrials
         trialsAreAdjacent % true if each trial's stop == next trial's start
     end
@@ -29,80 +29,80 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             tsi.idxStop = zeros(nTrials, 1, 'uint64');
         end
         
-        function tsiNew = convertToDifferentSampleRate(tsi, fsNew)
-            tsiNew = copy(tsi);
+        function tsiNew = convertToDifferentSampleRate(this, fsNew)
+            tsiNew = copy(this);
             tsiNew.fs = fsNew;
             
-            convert = @(idx) uint64(floor(double(idx) / double(tsi.fs) * double(fsNew)));
-            tsiNew.idxStart = convert(tsi.idxStart);
-            tsiNew.idxStop = convert(tsi.idxStop);
+            convert = @(idx) uint64(floor(double(idx) / double(this.fs) * double(fsNew)));
+            tsiNew.idxStart = convert(this.idxStart);
+            tsiNew.idxStop = convert(this.idxStop);
         end
         
-        function nTrials = get.nTrials(tsi)
-            nTrials = numel(tsi.trialId);
+        function nTrials = get.nTrials(this)
+            nTrials = numel(this.trialId);
         end
         
-        function maskTrials(tsi, mask)
-            tsi.trialId = tsi.trialId(mask);
-            tsi.conditionId = tsi.conditionId(mask);
-            tsi.idxStart = tsi.idxStart(mask);
-            tsi.idxStop = tsi.idxStop(mask);
+        function maskTrials(this, mask)
+            this.trialId = this.trialId(mask);
+            this.conditionId = this.conditionId(mask);
+            this.idxStart = this.idxStart(mask);
+            this.idxStop = this.idxStop(mask);
         end
         
-        function maskTrialsByTrialId(tsi, trialIds)
-            mask = ismember(tsi.trialId, trialIds);
-            tsi.maskTrials(mask);
+        function maskTrialsByTrialId(this, trialIds)
+            mask = ismember(this.trialId, trialIds);
+            this.maskTrials(mask);
         end
         
-        function maskTrialsWithinTrialIdRange(tsi, trialIdLims)
+        function maskTrialsWithinTrialIdRange(this, trialIdLims)
             trialIdLims = uint32(trialIdLims);
             assert(numel(trialIdLims) == 2);
-            mask = tsi.trialId >= trialIdLims(1) & tsi.trialId <= trialIdLims(2);
-            tsi.maskTrials(mask);
+            mask = this.trialId >= trialIdLims(1) & this.trialId <= trialIdLims(2);
+            this.maskTrials(mask);
         end
         
-        function tf = get.trialsAreAdjacent(tsi)
+        function tf = get.trialsAreAdjacent(this)
             % true if each trial's stop == next trial's start (or within one sample
-            tf = all(int64(tsi.idxStart(2:end)) - int64(tsi.idxStop(1:end-1)) <= int64(1));
+            tf = all(int64(this.idxStart(2:end)) - int64(this.idxStop(1:end-1)) <= int64(1));
         end
         
-        function [trialInds, trialIds, mask_in_trial] = segmentTimes(tsi, times)
-            edges = [tsi.idxStart; tsi.idxStop(end) + uint64(1)];
+        function [trialInds, trialIds, mask_in_trial] = segmentTimes(this, times)
+            edges = [this.idxStart; this.idxStop(end) + uint64(1)];
             trialInds = discretize(times, edges);
             trialInds(trialInds == numel(edges)) = NaN; % ignore the last bin
-            if ~tsi.trialsAreAdjacent
+            if ~this.trialsAreAdjacent
                 % nan out trial assignments for times which lie past the corresponding trial stop
                 mask = ~isnan(trialInds);
                 correspondingStop = zeros(size(times), 'uint64');
-                correspondingStop(mask) = tsi.idxStop(trialInds(mask));
+                correspondingStop(mask) = this.idxStop(trialInds(mask));
                 trialInds(times > correspondingStop) = NaN;
             end
             
             trialIds = zeros(size(times), 'like', trialInds);
             mask_in_trial = ~isnan(trialInds);
-            trialIds(mask_in_trial) = tsi.trialId(trialInds(mask_in_trial));
+            trialIds(mask_in_trial) = this.trialId(trialInds(mask_in_trial));
         end
         
-        function truncateTrialsLongerThan(tsi, maxDurSec)
-            maxDurSamples = maxDurSec * tsi.fs;
-            durations = tsi.idxStop - tsi.idxStart;
+        function truncateTrialsLongerThan(this, maxDurSec)
+            maxDurSamples = maxDurSec * this.fs;
+            durations = this.idxStop - this.idxStart;
             longTrials = durations > maxDurSamples;
-            tsi.idxStop(longTrials) = tsi.idxStart(longTrials) + maxDurSamples;
+            this.idxStop(longTrials) = this.idxStart(longTrials) + maxDurSamples;
         end
         
-        function [idxStart, idxStop, trialStartStop] = computeActiveRegions(tsi, varargin)
+        function [idxStart, idxStop, trialStartStop] = computeActiveRegions(this, varargin)
             p = inputParser();
             p.addParameter('maxPauseSec', 20, @isscalar); % in samples
             p.parse(varargin{:});
             
-            if tsi.nTrials == 0
+            if this.nTrials == 0
                 [idxStart, idxStop, trialStartStop] = deal(zeros(0, 1, 'uint64'));
                 return;
             end
             
             % find regions where there are no pauses greater than maxPauseSec
-            maxPauseSamples = p.Results.maxPauseSec * tsi.fs;
-            pauses = int64(tsi.idxStart(2:end)) - int64(tsi.idxStop(1:end-1));
+            maxPauseSamples = p.Results.maxPauseSec * this.fs;
+            pauses = int64(this.idxStart(2:end)) - int64(this.idxStop(1:end-1));
             longPauses = find(pauses > maxPauseSamples); % longPause after trial idx
             
             R = numel(longPauses);
@@ -110,18 +110,18 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             trialStartStop = zeros(R+1, 2, 'uint32');
             last = 1;
             for iR = 1:R
-                idxStart(iR) = tsi.idxStart(last);
-                idxStop(iR) = tsi.idxStop(longPauses(iR));
-                trialStartStop(iR, :) = [tsi.trialId(last), tsi.trialId(longPauses(iR))];
+                idxStart(iR) = this.idxStart(last);
+                idxStop(iR) = this.idxStop(longPauses(iR));
+                trialStartStop(iR, :) = [this.trialId(last), this.trialId(longPauses(iR))];
                 last = longPauses(iR) + 1;
             end
             
-            idxStart(end) = tsi.idxStart(last)-uint64(1);
-            idxStop(end) = tsi.idxStop(end);
-            trialStartStop(end, :) = [tsi.trialId(last), tsi.trialId(end)];
+            idxStart(end) = this.idxStart(last)-uint64(1);
+            idxStop(end) = this.idxStop(end);
+            trialStartStop(end, :) = [this.trialId(last), this.trialId(end)];
         end
         
-        function markTrialStartStops(tsi, varargin) % assumes x is in seconds
+        function markTrialStartStops(this, varargin) % assumes x is in seconds
             p = inputParser();
             p.addParameter('Color', [0 0 1], @isvector);
             p.addParameter('LineSpecStart', '-', @ischar);
@@ -131,13 +131,13 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             xOffset = p.Results.xOffset;
             
             hold on;
-            for iT = 1:numel(tsi.idxStart)
-                xline(tsi.idxStart(iT) / tsi.fs + xOffset, p.Results.LineSpecStart, num2str(tsi.trialId(iT)), 'Color', p.Results.Color, 'LineWidth', 0.5);
-                xline(tsi.idxStart(iT) / tsi.fs + xOffset, p.Results.LineSpecStop, 'Color', p.Results.Color, 'LineWidth', 0.5);
+            for iT = 1:numel(this.idxStart)
+                xline(this.idxStart(iT) / this.fs + xOffset, p.Results.LineSpecStart, num2str(this.trialId(iT)), 'Color', p.Results.Color, 'LineWidth', 0.5);
+                xline(this.idxStart(iT) / this.fs + xOffset, p.Results.LineSpecStop, 'Color', p.Results.Color, 'LineWidth', 0.5);
             end
         end
         
-        function h = plotTrialsActiveRegions(tsi, varargin)
+        function h = plotTrialsActiveRegions(this, varargin)
             p = inputParser();
             p.addParameter('maxPauseSec', 20, @isscalar);
             p.addParameter('LineSpecStart', '-', @ischar);
@@ -147,14 +147,14 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             
             cla;
             ylim([0 1]);
-            tsi.markActiveRegions(p.Results, p.Unmatched);
-            tsi.markTrialTicks(p.Unmatched);
+            this.markActiveRegions(p.Results, p.Unmatched);
+            this.markTrialTicks(p.Unmatched);
             
         end
         
-        function h = markTrialTicks(tsi, varargin)
+        function h = markTrialTicks(this, varargin)
             p = inputParser();
-            p.addParameter('maskTrials', true(tsi.nTrials, 1), @isvector);
+            p.addParameter('maskTrials', true(this.nTrials, 1), @isvector);
             p.addParameter('sample_window', [], @(x) isempty(x) || isvector(x)); % masks which trials to include, note that it applies before the time shifts
             p.addParameter('time_shifts', [], @(x) isempty(x) || isa(x, 'npxutils.TimeShiftSpec'));
             p.addParameter('side', 'bottom', @ischar);
@@ -166,7 +166,7 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             xOffset = p.Results.xOffset;
             
             timeShifts = p.Results.time_shifts;
-            ticks =  tsi.idxStart;
+            ticks =  this.idxStart;
             
             if ~isempty(timeShifts)
                 ticks = timeShifts.shiftTimes(ticks);
@@ -181,20 +181,20 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             ticks = ticks(mask);
             
             if p.Results.timeInSeconds
-                ticks = double(ticks) / tsi.fs;
+                ticks = double(ticks) / this.fs;
             end
             
             templateRows = [ ...
-                dataTipTextRow('idx start', tsi.idxStart(mask), '%d'); ...
-                dataTipTextRow('trial id', tsi.trialId(mask), '%d'); ...
-                dataTipTextRow('idx start', tsi.conditionId(mask), '%d') ];
+                dataTipTextRow('idx start', this.idxStart(mask), '%d'); ...
+                dataTipTextRow('trial id', this.trialId(mask), '%d'); ...
+                dataTipTextRow('idx start', this.conditionId(mask), '%d') ];
             
             h = npxutils.util.rugplot(ticks + xOffset, 'side', p.Results.side, 'Color', p.Results.Color, 'expand_limits', p.Results.expand_limits, ...
                 'dataTipTemplateRows', templateRows);
             set(h, 'XLimInclude', 'off');
         end
         
-        function markActiveRegions(tsi, varargin)
+        function markActiveRegions(this, varargin)
             % marks regions that are densely covered with trials (ignoring gaps between trials
             p = inputParser();
             p.addParameter('maxPauseSec', 20, @isscalar);
@@ -208,7 +208,7 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             p.parse(varargin{:});
             xOffset = p.Results.xOffset;
             
-            [idxStart, idxStop, trialStartStop] = tsi.computeActiveRegions('maxPauseSec', p.Results.maxPauseSec); %#ok<*PROPLC>
+            [idxStart, idxStop, trialStartStop] = this.computeActiveRegions('maxPauseSec', p.Results.maxPauseSec); %#ok<*PROPLC>
             timeShiftSpec = p.Results.time_shifts;
             if ~isempty(timeShiftSpec)
                 idxStart = timeShiftSpec.shiftTimes(idxStart);
@@ -216,8 +216,8 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             end
             
             if p.Results.timeInSeconds
-                idxStart = double(idxStart) / tsi.fs;
-                idxStop = double(idxStop) / tsi.fs;
+                idxStart = double(idxStart) / this.fs;
+                idxStop = double(idxStop) / this.fs;
             end
             hold on;
             for iT = 1:numel(idxStart)
@@ -228,7 +228,7 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             end
         end
         
-        function markSpecificTrials(tsi, trialIds, varargin)
+        function markSpecificTrials(this, trialIds, varargin)
             % marks regions that are densely covered with trials (ignoring gaps between trials
             p = inputParser();
             p.addParameter('labels', [], @(x) isempty(x) || isstringlike(x));
@@ -243,7 +243,7 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             p.parse(varargin{:});
             xOffset = p.Results.xOffset;
             
-            [tf, trialInds] = ismember(trialIds, tsi.trialId);
+            [tf, trialInds] = ismember(trialIds, this.trialId);
             assert(all(tf), "Some trialIds not found in TrialSegmentationInfo");
             
             labels = p.Results.labels;
@@ -253,7 +253,7 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
                 labels = string(labels);
             end
             
-            idxStart = tsi.idxStart(trialInds);
+            idxStart = this.idxStart(trialInds);
             
             sample_window = p.Results.sample_window;
             if ~isempty(sample_window)
@@ -269,7 +269,7 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             end
             
             if p.Results.timeInSeconds
-                idxStart = double(idxStart) / tsi.fs;
+                idxStart = double(idxStart) / this.fs;
             end
             hold on;
             
@@ -285,10 +285,10 @@ classdef TrialSegmentationInfo < handle & matlab.mixin.Copyable
             end
         end
         
-        function spec = computeShiftsExciseRegionsOutsideTrials(tsi, varargin)
+        function spec = computeShiftsExciseRegionsOutsideTrials(this, varargin)
             % shifts is an nRegions x 3 matrix of uint64 sample idxs
             % start of original window, stop of original window, updated start for this window
-            [idxStart, idxStop, ~] = tsi.computeActiveRegions(varargin{:}); %#ok<*PROP>
+            [idxStart, idxStop, ~] = this.computeActiveRegions(varargin{:}); %#ok<*PROP>
             spec = npxutils.TimeShiftSpec.buildToExciseGaps(idxStart, idxStop);
         end
     end

@@ -4,12 +4,12 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
     % This is used primarily for skipping over bad regions in a raw data file we don't want to sort
     
     properties
-        idxStart(:, 1) uint64 % original start index for interval
-        idxStop(:, 1) uint64 % last index within interval
-        idxShiftStart(:, 1) uint64 % new, shifted start index for interval
+        idxStart (:,1) uint64 % original start index for interval
+        idxStop (:,1) uint64 % last index within interval
+        idxShiftStart (:,1) uint64 % new, shifted start index for interval
     end
     
-    properties(Dependent)
+    properties (Dependent)
         nIntervals
         intervalDurations
         nShiftedTimes % number of output samples that the source will be compressed into
@@ -33,23 +33,23 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
             end
         end
         
-        function specNew = convertToDifferentSampleRate(spec, fsThis, fsNew, maxSamples)
+        function specNew = convertToDifferentSampleRate(this, fsThis, fsNew, maxSamples)
             if nargin < 4
                 maxSamples = Inf;
             end
             clamp = @(idx) min(max(idx, 1), maxSamples);
             convert = @(idx) uint64(clamp(floor(double(idx) / double(fsThis) * double(fsNew))));
-            specNew = npxutils.TimeShiftSpec(convert(spec.idxStart), convert(spec.idxStop), convert(spec.idxShiftStart));
+            specNew = npxutils.TimeShiftSpec(convert(this.idxStart), convert(this.idxStop), convert(this.idxShiftStart));
         end
         
-        function mat = as_matrix(spec)
+        function mat = as_matrix(this)
             % see from_matrixd
-            mat = cat(2, spec.idxStart, spec.idxStop, spec.idxShiftStart);
+            mat = cat(2, this.idxStart, this.idxStop, this.idxShiftStart);
         end
         
-        function str = as_string(spec)
+        function str = as_string(this)
             % see from_string
-            mat = spec.as_matrix();
+            mat = this.as_matrix();
             if isempty(mat)
                 str = "[]";
             else
@@ -57,82 +57,82 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
             end
         end
         
-        function dur = get.intervalDurations(spec)
-            dur = uint64(int64(spec.idxStop) - int64(spec.idxStart)) + uint64(1);
-            dur(spec.idxStart == uint64(0) | spec.idxStop == uint64(0)) = 0;
+        function dur = get.intervalDurations(this)
+            dur = uint64(int64(this.idxStop) - int64(this.idxStart)) + uint64(1);
+            dur(this.idxStart == uint64(0) | this.idxStop == uint64(0)) = 0;
         end
         
-        function n = get.nIntervals(spec)
-            n = numel(spec.idxStart);
+        function n = get.nIntervals(this)
+            n = numel(this.idxStart);
         end
         
-        function n = get.nShiftedTimes(spec)
-            lastOutSample = uint64(int64(spec.idxShiftStart) + int64(spec.intervalDurations) - int64(1));
+        function n = get.nShiftedTimes(this)
+            lastOutSample = uint64(int64(this.idxShiftStart) + int64(this.intervalDurations) - int64(1));
             n = max(lastOutSample);
         end
         
-        function [times_out, mask] = shiftTimes(spec, times)
+        function [times_out, mask] = shiftTimes(this, times)
             % reassign the times provided by shifting them according the delta between idxStart and idxShiftStart
             % if a time doesn't fit within any of the specified windows, it will be marked as NaN.
             mask = false(numel(times), 1);
             times_out = times;
-            for iR = 1:spec.nIntervals
-                match_this = times >= spec.idxStart(iR) & times <= spec.idxStop(iR);
+            for iR = 1:this.nIntervals
+                match_this = times >= this.idxStart(iR) & times <= this.idxStop(iR);
                 mask(match_this) = true;
-                times_out(match_this) = uint64(int64(times(match_this)) - int64(spec.idxStart(iR)) + int64(spec.idxShiftStart(iR)));
+                times_out(match_this) = uint64(int64(times(match_this)) - int64(this.idxStart(iR)) + int64(this.idxShiftStart(iR)));
             end
             
             times_out(~mask) = NaN;
         end
         
-        function time_src = unshiftTimes(spec, times)
+        function time_src = unshiftTimes(this, times)
             % recover the original time that was mapped to times by shiftTimes
-            dur = spec.intervalDurations;
+            dur = this.intervalDurations;
             
             time_src = zeros(size(times), 'like', times);
-            for iR = 1:spec.nIntervals
-                mask = times >= spec.idxShiftStart(iR) & times <= spec.idxShiftStart(iR) + dur(iR); % times in this interval
+            for iR = 1:this.nIntervals
+                mask = times >= this.idxShiftStart(iR) & times <= this.idxShiftStart(iR) + dur(iR); % times in this interval
                 % no offset by 1 here, time == idxShiftStart should map to idxStart exactly
-                time_src(mask) = uint64(int64(times(mask)) - int64(spec.idxShiftStart(iR)) +  int64(spec.idxStart(iR)));
+                time_src(mask) = uint64(int64(times(mask)) - int64(this.idxShiftStart(iR)) +  int64(this.idxStart(iR)));
             end
             %             srcIdx = spec.computeSourceIndices();
             %             [~, time_src] = ismember(times, srcIdx);
         end
         
-        function constrainToNumSamples(spec, nSamplesSource)
-            maskKeep = spec.idxStart <= uint64(nSamplesSource);
-            spec.idxStart = spec.idxStart(maskKeep);
-            spec.idxStop = min(spec.idxStop(maskKeep), uint64(nSamplesSource));
-            spec.idxShiftStart = spec.idxShiftStart(maskKeep);
+        function constrainToNumSamples(this, nSamplesSource)
+            maskKeep = this.idxStart <= uint64(nSamplesSource);
+            this.idxStart = this.idxStart(maskKeep);
+            this.idxStop = min(this.idxStop(maskKeep), uint64(nSamplesSource));
+            this.idxShiftStart = this.idxShiftStart(maskKeep);
         end
         
-        function constrainToSampleWindow(spec, window)
-            maskKeep = spec.idxStop >= uint64(window(1)) & spec.idxStart <= uint64(window(2));
-            spec.idxStart = max(uint64(window(1)), spec.idxStart(maskKeep));
-            spec.idxStop = min(spec.idxStop(maskKeep), uint64(window(2)));
-            spec.idxShiftStart = spec.idxShiftStart(maskKeep);
+        function constrainToSampleWindow(this, window)
+            maskKeep = this.idxStop >= uint64(window(1)) & this.idxStart <= uint64(window(2));
+            this.idxStart = max(uint64(window(1)), this.idxStart(maskKeep));
+            this.idxStop = min(this.idxStop(maskKeep), uint64(window(2)));
+            this.idxShiftStart = this.idxShiftStart(maskKeep);
         end
         
-        function shiftIndices = computeSourceIndices(spec, nSamplesSource)
+        function shiftIndices = computeSourceIndices(this, nSamplesSource)
             % compute a nShiftedTimes x 1 vector of indices into the source file imec
             % that would occupy times 1:nShiftedTimes in the shifted output file
             % if a given slot isn't filled, it will be set to 0
             
             if nargin > 1
-                spec.constrainToNumSamples(nSamplesSource);
+                this.constrainToNumSamples(nSamplesSource);
             end
             
-            shiftIndices = zeros(spec.nShiftedTimes, 1, 'uint64');
-            dur = spec.intervalDurations;
-            for i = 1:spec.nIntervals
+            shiftIndices = zeros(this.nShiftedTimes, 1, 'uint64');
+            dur = this.intervalDurations;
+            for i = 1:this.nIntervals
                 offsets = int64(0):(int64(dur(i)) - int64(1));
-                to = int64(spec.idxShiftStart(i)) + offsets;
-                from = int64(spec.idxStart(i)) + offsets;
+                to = int64(this.idxShiftStart(i)) + offsets;
+                from = int64(this.idxStart(i)) + offsets;
                 shiftIndices(to) = from;
             end
         end
         
-        function h = markExcisionBoundaries(spec, varargin)
+        function h = markExcisionBoundaries(this, varargin)
             p = inputParser();
             p.addParameter('sample_window', [], @(x) isempty(x) || isvector(x)); % set this to the x window being shown to avoid plotting hidden boundaries
             p.addParameter('Color', [0.9 0.3 0.9], @isvector);
@@ -144,7 +144,7 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
             p.parse(varargin{:});
             xOffset = p.Results.xOffset;
             
-            boundaries = double(spec.idxShiftStart(2:end));
+            boundaries = double(this.idxShiftStart(2:end));
             time_shifts_plot = p.Results.time_shifts;
             if ~isempty(time_shifts_plot)
                 boundaries = time_shifts_plot.shiftTimes(boundaries);
@@ -169,7 +169,7 @@ classdef TimeShiftSpec < handle & matlab.mixin.Copyable
         end
     end
     
-    methods(Static)
+    methods (Static)
         function spec = non_shift(nSamples)
             % returns a TimeShiftSpec that takes all samples without any shifting
             spec = npxutils.TimeShiftSpec(1, nSamples, 1);

@@ -5,7 +5,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
     % data here should be thought of as a set of data for many snippets
     %
     
-    properties(Transient)
+    properties (Transient)
         ks  % optional, handle to KilosortDataset for plotting waveforms and templates
     end
     
@@ -13,27 +13,27 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
         data % (:, :, :, :) int16 % channels x time x snippets x layers - we deactivate the size checking here
         
         % optional, set if each snippet corresponds to a specific cluster
-        cluster_ids (:, 1) uint32 % nSnippets x 1, array indicating which cluster is extracted in each snippet, if this makes sense. otherwise will just be 1s
+        cluster_ids (:,1) uint32 % nSnippets x 1, array indicating which cluster is extracted in each snippet, if this makes sense. otherwise will just be 1s
         
-        group_ids (:, 1)  % nSnippets x 1 metadata indicating which group a cluster belonged to
+        group_ids (:,1)  % nSnippets x 1 metadata indicating which group a cluster belonged to
         
-        channel_ids_by_snippet (:, :, :) uint32 % channels x snippets
+        channel_ids_by_snippet (:,:,:) uint32 % channels x snippets
         
-        overlay_cluster_ids (:, 1) uint32 % set of clusters whose waveforms or templates will be drawn on top of a given snippet, will be cluster_ids(i), or ks.cluster_ids
+        overlay_cluster_ids (:,1) uint32 % set of clusters whose waveforms or templates will be drawn on top of a given snippet, will be cluster_ids(i), or ks.cluster_ids
         
         % for manually specifying overlay matrices (can also be generated automatically with e.g. overlay_waveforms)
-        overlay_labels(:, :, :, :) uint32 % channels x time x snippets x layers (label matrix corresponding to elements of data for the purpose of generating colored overlays)
-        overlay_datatip_label (1, 1) string
-        overlay_datatip_values(:, 1) % nLabels x 1
+        overlay_labels (:,:,:,:) uint32 % channels x time x snippets x layers (label matrix corresponding to elements of data for the purpose of generating colored overlays)
+        overlay_datatip_label (1,1) string
+        overlay_datatip_values (:,1) % nLabels x 1
         
-        sample_idx (:, 1) uint64
-        trial_idx (:, 1) uint32
-        window (:, 2) int64 % in samples
+        sample_idx (:,1) uint64
+        trial_idx (:,1) uint32
+        window (:,2) int64 % in samples
         
-        valid (:, 1) logical
+        valid (:,1) logical
         
         channelMap % ChannelMap for coordinates
-        scaleToUv (:, 1) single % one value for each snippet (will auto inflate to nSnippets if set to be scalar
+        scaleToUv (:,1) single % one value for each snippet (will auto inflate to nSnippets if set to be scalar
         fs
     end
     
@@ -45,8 +45,8 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
         nLayers
         
         data_valid
-        time_samples(:, 1) int64
-        time_ms (:, 1) double
+        time_samples (:,1) int64
+        time_ms (:,1) double
         
         unique_cluster_ids
     end
@@ -86,77 +86,77 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             end
         end
         
-        function n = get.nChannels(ss)
-            n = size(ss.data, 1);
+        function n = get.nChannels(this)
+            n = size(this.data, 1);
         end
         
-        function n = get.nTimepoints(ss)
-            n = size(ss.data, 2);
+        function n = get.nTimepoints(this)
+            n = size(this.data, 2);
         end
         
-        function n = get.nSnippets(ss)
-            n = size(ss.data, 3);
+        function n = get.nSnippets(this)
+            n = size(this.data, 3);
         end
         
-        function n = get.nLayers(ss)
-            n = size(ss.data, 4);
+        function n = get.nLayers(this)
+            n = size(this.data, 4);
         end
         
-        function n = get.nClusters(ss)
-            n = numel(ss.unique_cluster_ids);
+        function n = get.nClusters(this)
+            n = numel(this.unique_cluster_ids);
         end
         
-        function v = get.valid(ss)
-            if isempty(ss.valid)
-                v = true(size(ss.data, 3), 1);
+        function v = get.valid(this)
+            if isempty(this.valid)
+                v = true(size(this.data, 3), 1);
             else
-                v = ss.valid;
+                v = this.valid;
             end
         end
         
-        function v = get.data_valid(ss)
-            v = ss.data(:, :, ss.valid);
+        function v = get.data_valid(this)
+            v = this.data(:, :, this.valid);
         end
         
-        function v = get.time_ms(ss)
-            v = double(ss.window(1) : ss.window(2)) / ss.fs * 1000;
+        function v = get.time_ms(this)
+            v = double(this.window(1) : this.window(2)) / this.fs * 1000;
         end
         
-        function v = get.time_samples(ss)
-            v = ss.window(1) : ss.window(2);
+        function v = get.time_samples(this)
+            v = this.window(1) : this.window(2);
         end
         
-        function v = get.unique_cluster_ids(ss)
-            v = unique(ss.cluster_ids);
+        function v = get.unique_cluster_ids(this)
+            v = unique(this.cluster_ids);
         end
         
-        function v = get.overlay_cluster_ids(ss)
-            if isempty(ss.overlay_cluster_ids)
-                if isempty(ss.unique_cluster_ids)
-                    if isempty(ss.ks)
+        function v = get.overlay_cluster_ids(this)
+            if isempty(this.overlay_cluster_ids)
+                if isempty(this.unique_cluster_ids)
+                    if isempty(this.ks)
                         v = [];
                     else
-                        v = ss.ks.cluster_ids;
+                        v = this.ks.cluster_ids;
                     end
                 else
-                    v = ss.unique_cluster_ids;
+                    v = this.unique_cluster_ids;
                 end
             else
-                v = ss.overlay_cluster_ids;
+                v = this.overlay_cluster_ids;
             end
         end
         
-        function v = get.scaleToUv(ss)
-            v = ss.scaleToUv;
+        function v = get.scaleToUv(this)
+            v = this.scaleToUv;
             if isempty(v)
                 v = NaN;
             end
             if numel(v) == 1
-                v = repmat(v, ss.nSnippets, 1);
+                v = repmat(v, this.nSnippets, 1);
             end
         end
         
-        function colormap = generateOverlayColormap(~, overlay_labels, backgroundColor)
+        function colormap = generateOverlayColormap(this, overlay_labels, backgroundColor) %#ok<INUSL>
             if nargin < 3
                 backgroundColor = [0 0 0; 1 1 1];
             end
@@ -167,43 +167,43 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             colormap(label_found, :) = npxutils.util.distinguishable_colors(nnz(label_found), backgroundColor);
         end
         
-        function ss = selectClusters(ss, cluster_ids)
-            mask = ismember(ss.cluster_ids, cluster_ids);
-            ss = ss.selectData('maskSnippets', mask);
+        function this = selectClusters(this, cluster_ids)
+            mask = ismember(this.cluster_ids, cluster_ids);
+            this = this.selectData('maskSnippets', mask);
         end
         
-        function ss = selectData(ss, varargin)
+        function this = selectData(this, varargin)
             p = inputParser();
-            p.addParameter('maskSnippets', ss.valid, @isvector);
-            p.addParameter('maskTime', true(ss.nTimepoints, 1), @isvector);
-            p.addParameter('maskChannels', true(ss.nChannels, 1), @isvector);
+            p.addParameter('maskSnippets', this.valid, @isvector);
+            p.addParameter('maskTime', true(this.nTimepoints, 1), @isvector);
+            p.addParameter('maskChannels', true(this.nChannels, 1), @isvector);
             p.parse(varargin{:});
             
             maskSnippets = p.Results.maskSnippets;
             
-            ss = copy(ss);
-            ss.valid = ss.valid(maskSnippets); % first time auto generates based on data, so has to come first
-            ss.data = ss.data(p.Results.maskChannels, p.Results.maskTime, maskSnippets);
+            this = copy(this);
+            this.valid = this.valid(maskSnippets); % first time auto generates based on data, so has to come first
+            this.data = this.data(p.Results.maskChannels, p.Results.maskTime, maskSnippets);
             
-            if ~isempty(ss.overlay_labels)
-                ss.overlay_labels = ss.overlay_labels(p.Results.maskChannels, p.Results.maskTime, maskSnippets);
+            if ~isempty(this.overlay_labels)
+                this.overlay_labels = this.overlay_labels(p.Results.maskChannels, p.Results.maskTime, maskSnippets);
             end
             
-            ss.cluster_ids = ss.cluster_ids(maskSnippets);
+            this.cluster_ids = this.cluster_ids(maskSnippets);
             
-            ss.sample_idx = ss.sample_idx(maskSnippets);
-            if ~isempty(ss.trial_idx)
-                ss.trial_idx = ss.trial_idx(maskSnippets);
+            this.sample_idx = this.sample_idx(maskSnippets);
+            if ~isempty(this.trial_idx)
+                this.trial_idx = this.trial_idx(maskSnippets);
             end
             
-            ss.scaleToUv = ss.scaleToUv(maskSnippets);
+            this.scaleToUv = this.scaleToUv(maskSnippets);
         end
         
-        function [cluster_inds, cluster_ids] = lookup_clusterIds(ss, cluster_ids)
+        function [cluster_inds, cluster_ids] = lookup_clusterIds(this, cluster_ids)
             if islogical(cluster_ids)
-                cluster_ids = ss.unique_cluster_ids(cluster_ids);
+                cluster_ids = this.unique_cluster_ids(cluster_ids);
             end
-            [tf, cluster_inds] = ismember(cluster_ids, ss.unique_cluster_ids);
+            [tf, cluster_inds] = ismember(cluster_ids, this.unique_cluster_ids);
             assert(all(tf), 'Some cluster_ids not found in ss.unique_cluster_ids');
         end
         
@@ -215,15 +215,15 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
     end
     
     methods % plotting
-        function [hdata, settings] = plotAtProbeLocations(ss, varargin)
+        function [hdata, settings] = plotAtProbeLocations(this, varargin)
             p = inputParser();
             % specify one of these
             p.addParameter('cluster_ids', [], @(x) isempty(x) || isvector(x));
-            p.addParameter('maskSnippets', ss.valid, @isvector);
+            p.addParameter('maskSnippets', this.valid, @isvector);
             
             % and optionally these
-            p.addParameter('maskTime', true(ss.nTimepoints, 1), @isvector);
-            p.addParameter('maskChannels', true(ss.nChannels, 1), @isvector);
+            p.addParameter('maskTime', true(this.nTimepoints, 1), @isvector);
+            p.addParameter('maskChannels', true(this.nChannels, 1), @isvector);
             p.addParameter('maxChannelsPerCluster', NaN, @isscalar);
             
             p.addParameter('maxPerCluster', Inf, @isscalar);
@@ -264,8 +264,8 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             p.KeepUnmatched = false;
             p.parse(varargin{:});
             
-            yspacing = ss.channelMap.yspacing;
-            xspacing = ss.channelMap.xspacing;
+            yspacing = this.channelMap.yspacing;
+            xspacing = this.channelMap.xspacing;
             xmag = p.Results.xmag;
             ymag = p.Results.ymag;
             xoffset = p.Results.xoffset;
@@ -282,11 +282,11 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             if isempty(axh), axh = gca; end
             
             % plot relative time vector
-            tvec = linspace(0, xspacing * xmag, numel(ss.window(1) : ss.window(2)));
+            tvec = linspace(0, xspacing * xmag, numel(this.window(1) : this.window(2)));
             dt = tvec(2) - tvec(1);
             
             if ~isempty(specified_cluster_ids)
-                maskSnippets = ismember(ss.cluster_ids, specified_cluster_ids) & ss.valid;
+                maskSnippets = ismember(this.cluster_ids, specified_cluster_ids) & this.valid;
             else
                 maskSnippets = p.Results.maskSnippets;
             end
@@ -303,14 +303,14 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                 return;
             end
             
-            if isinteger(ss.data)
-                data = single(ss.data(p.Results.maskChannels, p.Results.maskTime, maskSnippets));
+            if isinteger(this.data)
+                data = single(this.data(p.Results.maskChannels, p.Results.maskTime, maskSnippets));
             else
-                data = ss.data(p.Results.maskChannels, p.Results.maskTime, maskSnippets);
+                data = this.data(p.Results.maskChannels, p.Results.maskTime, maskSnippets);
             end
             
             if p.Results.applyScaling
-                data = single(data) .* single(ss.scaleToUv(maskSnippets));
+                data = single(data) .* single(this.scaleToUv(maskSnippets));
             end
             
             if p.Results.center
@@ -328,7 +328,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                 % keep the list the same because colormap may be passed in
                 unique_cluster_ids = specified_cluster_ids;
             else
-                unique_cluster_ids = unique(ss.cluster_ids(maskSnippets));
+                unique_cluster_ids = unique(this.cluster_ids(maskSnippets));
             end
             nUniqueClusters = numel(unique_cluster_ids);
             
@@ -342,7 +342,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             handlesIndiv = cell(nChannelsMaxPerCluster, nUniqueClusters);
             handlesMean = gobjects(nChannelsMaxPerCluster, nUniqueClusters);
             handlesMedian = gobjects(nChannelsMaxPerCluster, nUniqueClusters);
-            channels_plotted = false(ss.channelMap.nChannels, 1);
+            channels_plotted = false(this.channelMap.nChannels, 1);
             
             cmap = p.Results.colormap;
             if isa(cmap, 'function_handle')
@@ -358,7 +358,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                 end
                 
                 % data is already sliced using maskSnippets, so we have a subset (size of nnz(maskSnippets)) and full mask (size of nSnippets)
-                this_snippet_mask_subset = ss.cluster_ids(maskSnippets) == this_cluster_id;
+                this_snippet_mask_subset = this.cluster_ids(maskSnippets) == this_cluster_id;
                 if isfinite(p.Results.maxPerCluster)
                     idxKeep = find(this_snippet_mask_subset, p.Results.maxPerCluster, 'first');
                     if ~isempty(idxKeep)
@@ -372,14 +372,14 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                 if ~any(this_snippet_mask_full)
                     continue;
                 end
-                this_channel_ids = ss.channel_ids_by_snippet(:, this_snippet_mask_full);
+                this_channel_ids = this.channel_ids_by_snippet(:, this_snippet_mask_full);
                 this_channel_ids = this_channel_ids(:, 1);
                 this_channel_ids = this_channel_ids(p.Results.maskChannels);
                 this_channel_ids = this_channel_ids(1:nChannelsMaxPerCluster);
                 
-                this_channel_inds = ss.channelMap.lookup_channelIds(this_channel_ids); % in channel map
-                xc = ss.channelMap.xcoords(this_channel_inds);
-                yc = ss.channelMap.ycoords(this_channel_inds);
+                this_channel_inds = this.channelMap.lookup_channelIds(this_channel_ids); % in channel map
+                xc = this.channelMap.xcoords(this_channel_inds);
+                yc = this.channelMap.ycoords(this_channel_inds);
                 
                 channels_plotted(this_channel_inds) = true;
                 
@@ -460,12 +460,12 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             end
             
             if p.Results.showChannelLabels
-                xc = ss.channelMap.xcoords + xoffset;
-                yc = ss.channelMap.ycoords + yoffset;
+                xc = this.channelMap.xcoords + xoffset;
+                yc = this.channelMap.ycoords + yoffset;
                 
-                for iC = 1:ss.channelMap.nChannels
+                for iC = 1:this.channelMap.nChannels
                     if channels_plotted(iC)
-                        text(xc(iC), yc(iC), sprintf('ch %d', ss.channelMap.channelIds(iC)), ...
+                        text(xc(iC), yc(iC), sprintf('ch %d', this.channelMap.channelIds(iC)), ...
                             'Parent', axh, 'HorizontalAlignment', 'right', 'VerticalAlignment', 'middle', ...
                             p.Results.labelArgs{:});
                     end
@@ -507,7 +507,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             settings.cluster_lags = cluster_lags;
         end
         
-        function [bg, traceColor] = setupFigureAxes(~, dark)
+        function [bg, traceColor] = setupFigureAxes(this, dark) %#ok<INUSL>
             if dark
                 bg = [16 16 16]/255;
                 traceColor = 1 - bg;
@@ -521,16 +521,17 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             end
         end
         
-        function [overlay_labels, overlay_datatip_label, overlay_datatip_values] = buildWaveformOverlays(ss, varargin)
+        function [overlay_labels, overlay_datatip_label, overlay_datatip_values] ...
+                = buildWaveformOverlays(this, varargin)
             p = inputParser();
-            p.addParameter('maskSnippets', ss.valid, @isvector);
-            p.addParameter('cluster_ids', ss.overlay_cluster_ids, @isvector);
+            p.addParameter('maskSnippets', this.valid, @isvector);
+            p.addParameter('cluster_ids', this.overlay_cluster_ids, @isvector);
             p.addParameter('sortChannelsVertically', false, @islogical);
             p.addParameter('best_n_channels', 24, @isscalar);
             p.parse(varargin{:});
             
-            assert(~isempty(ss.ks), 'KilosortDataset must be provided in .ks for waveform building');
-            ks = ss.ks;
+            assert(~isempty(this.ks), 'KilosortDataset must be provided in .ks for waveform building');
+            ks = this.ks;
             
             best_n_channels = p.Results.best_n_channels;
             
@@ -546,15 +547,15 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             end
             snippet_inds = find(p.Results.maskSnippets);
             nSnippets = numel(snippet_inds);
-            times = ss.sample_idx;
-            labels = zeros(ss.nChannels, ss.nTimepoints, nSnippets, 1, 'uint32');
+            times = this.sample_idx;
+            labels = zeros(this.nChannels, this.nTimepoints, nSnippets, 1, 'uint32');
             
             for iiSn = 1:nSnippets
                 iSn = snippet_inds(iiSn);
-                channel_ids_this = ss.channel_ids_by_snippet(:, iSn);
+                channel_ids_this = this.channel_ids_by_snippet(:, iSn);
                 
                 % find all spike times in this window
-                this_window = int64(times(iSn)) + ss.window;
+                this_window = int64(times(iSn)) + this.window;
                 mask_spikes = ks.spike_times >= this_window(1) & ks.spike_times <= this_window(2);
                 
                 % that belong to a cluster in cluster_ids
@@ -566,9 +567,9 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                 
                 % mark each spike in the labels matrix
                 for iSp = 1:numel(ind_spikes)
-                    time_inds = ks.templateTimeRelative + int64(ks.spike_times(ind_spikes(iSp)))  - int64(times(iSn)) - int64(ss.window(1)) + int64(1);
+                    time_inds = ks.templateTimeRelative + int64(ks.spike_times(ind_spikes(iSp)))  - int64(times(iSn)) - int64(this.window(1)) + int64(1);
                     % chop off time inds before and after window
-                    mask = time_inds >= 1 & time_inds <= ss.nTimepoints;
+                    mask = time_inds >= 1 & time_inds <= this.nTimepoints;
                     time_inds = time_inds(mask);
                     
                     [ch_included, ch_inds] = ismember(cluster_best_channel_ids(selected_cluster_inds(iSp), :), channel_ids_this);
@@ -582,13 +583,14 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             overlay_datatip_values = cluster_ids;
         end
         
-        function [templates, template_start_ind, spike_inds, cluster_ids] = buildTemplateOverlays(ss, varargin)
+        function [templates, template_start_ind, spike_inds, cluster_ids] ...
+                = buildTemplateOverlays(this, varargin)
             % temlates is ch x time x nTemplates reconstructed templates. the templates will be optionally nan'ed out at time
             % points that lie
             
             p = inputParser();
-            p.addParameter('maskSnippets', ss.valid, @isvector);
-            p.addParameter('cluster_ids', ss.overlay_cluster_ids, @isvector);
+            p.addParameter('maskSnippets', this.valid, @isvector);
+            p.addParameter('cluster_ids', this.overlay_cluster_ids, @isvector);
             p.addParameter('best_n_channels', 24, @isscalar);
             p.addParameter('sortChannelsVertically', false, @isscalar);
             p.addParameter('nanOutsideSnippet', true, @islogical);
@@ -596,8 +598,8 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             
             p.parse(varargin{:});
             
-            assert(~isempty(ss.ks), 'KilosortDataset must be provided in .ks for waveform building');
-            ks = ss.ks;
+            assert(~isempty(this.ks), 'KilosortDataset must be provided in .ks for waveform building');
+            ks = this.ks;
             
             nanOutsideSnippet = p.Results.nanOutsideSnippet;
             nanOutsideBestChannels = p.Results.nanOutsideBestChannels;
@@ -618,9 +620,9 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             [templates, template_start_ind, spike_inds, cluster_ids_by_spike] = deal(cell(numel(snippet_inds), 1));
             for iiSn = 1:numel(snippet_inds)
                 iSn = snippet_inds(iiSn);
-                this_window = int64(ss.sample_idx(iSn)) + ss.window;
+                this_window = int64(this.sample_idx(iSn)) + this.window;
                 %                 cluster_ind_this = ss.lookup_clusterIds(ss.cluster_ids(iSn));
-                ch_ids_this = ss.channel_ids_by_snippet(:, iSn);
+                ch_ids_this = this.channel_ids_by_snippet(:, iSn);
                 
                 [spike_inds_this, template_start_inds_this, templates_this] = ...
                     ks.findSpikesOverlappingWithWindow(this_window, 'channel_ids', ch_ids_this, 'cluster_ids', cluster_ids);
@@ -641,7 +643,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                     
                     if nanOutsideSnippet
                         template_tvec_this = template_start_inds_this(iSp)+int64(1:ks.nTemplateTimepoints);
-                        t_mask_this = template_tvec_this >= 1 & template_tvec_this <= ss.nTimepoints;
+                        t_mask_this = template_tvec_this >= 1 & template_tvec_this <= this.nTimepoints;
                         templates_this(:, ~t_mask_this, iSp) = NaN;
                     end
                 end
@@ -659,10 +661,10 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             cluster_ids = cat(1, cluster_ids_by_spike{:});
         end
         
-        function [recon, cluster_ids] = buildTemplateReconstructions(ss, varargin)
-            [templates, template_start_ind, spike_inds, cluster_ids] = ss.buildTemplateOverlays(varargin{:});
+        function [recon, cluster_ids] = buildTemplateReconstructions(this, varargin)
+            [templates, template_start_ind, spike_inds, cluster_ids] = this.buildTemplateOverlays(varargin{:});
             
-            recon = zeros(ss.nChannels, ss.nTimepoints, size(templates, 3), 'like', ss.data);
+            recon = zeros(this.nChannels, this.nTimepoints, size(templates, 3), 'like', this.data);
             nTemplateTime = size(templates, 2);
             for iSp = 1:numel(spike_inds)
                 insert_idx = int64(template_start_ind(iSp)) + int64(0:nTemplateTime-1);
@@ -673,10 +675,10 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             end
         end
         
-        function plotStackedTraces(ss, varargin)
+        function plotStackedTraces(this, varargin)
             p = inputParser();
-            p.addParameter('maskSnippets', ss.valid, @isvector);
-            p.addParameter('maskChannels', true(ss.nChannels, 1), @isvector);
+            p.addParameter('maskSnippets', this.valid, @isvector);
+            p.addParameter('maskChannels', true(this.nChannels, 1), @isvector);
             p.addParameter('showLabels', true, @islogical);
             p.addParameter('gain', 1.95, @isscalar);
             %             p.addParameter('car', false, @islogical);
@@ -688,18 +690,18 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             p.parse(varargin{:});
             
             dark = p.Results.dark;
-            [~, traceColor] = ss.setupFigureAxes(dark);
+            [~, traceColor] = this.setupFigureAxes(dark);
             
             if p.Results.timeInMilliseconds
-                time = ss.time_ms;
+                time = this.time_ms;
             else
-                time = ss.time_samples;
+                time = this.time_samples;
             end
             mask_snippets = p.Results.maskSnippets;
             
             mask_channels = p.Results.maskChannels;
-            data = ss.data(mask_channels, :, mask_snippets, :);
-            channel_ids = ss.channel_ids_by_snippet(mask_channels, mask_snippets);
+            data = this.data(mask_channels, :, mask_snippets, :);
+            channel_ids = this.channel_ids_by_snippet(mask_channels, mask_snippets);
             
             % data is ch x time x snippets x layers
             % plot stacked traces wants time x ch x layers
@@ -707,17 +709,17 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             
             npxutils.util.plotStackedTraces(time, data_txcxl, 'colors', traceColor, ...
                 'lineWidth', 0.5, 'lineOpacity', p.Results.lineOpacity, ...
-                'gain', p.Results.gain, 'invertChannels', ss.channelMap.invertChannelsY, 'normalizeEach', false, ...
+                'gain', p.Results.gain, 'invertChannels', this.channelMap.invertChannelsY, 'normalizeEach', false, ...
                 'channel_ids', channel_ids, 'showChannelDataTips', p.Results.showChannelDataTips);
             
             axis off;
             hold off;
         end
         
-        function plotStackedTracesWithOverlays(ss, varargin)
+        function plotStackedTracesWithOverlays(this, varargin)
             p = inputParser();
-            p.addParameter('maskSnippets', ss.valid, @isvector);
-            p.addParameter('maskChannels', true(ss.nChannels, 1), @isvector);
+            p.addParameter('maskSnippets', this.valid, @isvector);
+            p.addParameter('maskChannels', true(this.nChannels, 1), @isvector);
             p.addParameter('showLabels', true, @islogical);
             p.addParameter('gain', 1.95, @isscalar);
             %             p.addParameter('car', false, @islogical);
@@ -731,42 +733,42 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             
             p.addParameter('overlay_waveforms', false, @islogical);
             p.addParameter('overlay_templates', false, @islogical);
-            p.addParameter('overlay_cluster_ids', ss.overlay_cluster_ids, @isvector);
+            p.addParameter('overlay_cluster_ids', this.overlay_cluster_ids, @isvector);
             p.addParameter('overlay_best_channels', 24, @isscalar);
             
             p.parse(varargin{:});
             
             dark = p.Results.dark;
-            [bg, traceColor] = ss.setupFigureAxes(dark);
+            [bg, traceColor] = this.setupFigureAxes(dark);
             
             if p.Results.timeInMilliseconds
-                time = ss.time_ms;
+                time = this.time_ms;
             else
-                time = ss.time_samples;
+                time = this.time_samples;
             end
             mask_snippets = p.Results.maskSnippets;
             
-            data = ss.data(:, :, mask_snippets, :);
+            data = this.data(:, :, mask_snippets, :);
             
             overlay_cluster_ids = p.Results.overlay_cluster_ids;
-            if isempty(overlay_cluster_ids) && ~isempty(ss.ks)
+            if isempty(overlay_cluster_ids) && ~isempty(this.ks)
                 % overlay all clusters if none specified
-                overlay_cluster_ids = ss.ks.cluster_ids;
+                overlay_cluster_ids = this.ks.cluster_ids;
             end
             overlay_best_channels = p.Results.overlay_best_channels;
-            overlay_cluster_colormap = ss.generateOverlayColormap(1:numel(overlay_cluster_ids), [bg; traceColor]);
+            overlay_cluster_colormap = this.generateOverlayColormap(1:numel(overlay_cluster_ids), [bg; traceColor]);
             if p.Results.overlay_waveforms
-                [overlay_labels, overlay_datatip_label, overlay_datatip_values] = ss.buildWaveformOverlays('maskSnippets', mask_snippets, ...
+                [overlay_labels, overlay_datatip_label, overlay_datatip_values] = this.buildWaveformOverlays('maskSnippets', mask_snippets, ...
                     'cluster_ids', overlay_cluster_ids, ...
                     'best_n_channels', overlay_best_channels, 'sortChannelsVertically', true);
                 overlay_colormap = overlay_cluster_colormap;
                 
-            elseif ~isempty(ss.overlay_labels)
-                overlay_labels = ss.overlay_labels(:, :, mask_snippets, :);
-                overlay_datatip_label = ss.overlay_datatip_label;
-                overlay_datatip_values = ss.overlay_datatip_values;
+            elseif ~isempty(this.overlay_labels)
+                overlay_labels = this.overlay_labels(:, :, mask_snippets, :);
+                overlay_datatip_label = this.overlay_datatip_label;
+                overlay_datatip_values = this.overlay_datatip_values;
                 
-                overlay_colormap = ss.generateOverlayColormap(overlay_labels, [bg; traceColor]);
+                overlay_colormap = this.generateOverlayColormap(overlay_labels, [bg; traceColor]);
             else
                 [overlay_labels, overlay_datatip_label, overlay_datatip_values] = deal([]);
                 overlay_colormap = [];
@@ -780,7 +782,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             %             end
             
             % nCh x nSnippets
-            channel_ids_ch_by_snippet = ss.channel_ids_by_snippet(:, mask_snippets);
+            channel_ids_ch_by_snippet = this.channel_ids_by_snippet(:, mask_snippets);
             
             % not supported by waveform or template overlays yet
             %             if p.Results.car
@@ -794,7 +796,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             
             [~, transform] = npxutils.util.plotStackedTraces(time, data_txcxl, 'colors', traceColor, ...
                 'lineWidth', 0.5, 'lineOpacity', p.Results.lineOpacity, ...
-                'gain', p.Results.gain, 'invertChannels', ss.channelMap.invertChannelsY, 'normalizeEach', false, ...
+                'gain', p.Results.gain, 'invertChannels', this.channelMap.invertChannelsY, 'normalizeEach', false, ...
                 'colorOverlayLabels', overlay_labels_txcxl, 'colorOverlayMap', overlay_colormap, ...
                 'channel_ids', channel_ids_ch_by_snippet, 'showChannelDataTips', p.Results.showChannelDataTips, ...
                 'showOverlayDataTips', p.Results.showOverlayDataTips, ...
@@ -802,7 +804,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             
             % plot templates if requested
             if p.Results.overlay_templates
-                [templates, template_start_ind, spike_inds, cluster_ids] = ss.buildTemplateOverlays('maskSnippets', mask_snippets, ...
+                [templates, template_start_ind, spike_inds, cluster_ids] = this.buildTemplateOverlays('maskSnippets', mask_snippets, ...
                     'cluster_ids', overlay_cluster_ids, 'sortChannelsVertically', true, ...
                     'best_n_channels', p.Results.overlay_best_channels);
                 
@@ -811,9 +813,9 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                 % generate expanded time vector we can insert templates into accounting for timepoints outside the snippet
                 % where a template could start
                 nTemplateTime = size(templates, 2);
-                time_exp =  int64(ss.window(1) + 1) - int64(nTemplateTime) : int64(ss.window(2) - 1) + int64(nTemplateTime);
+                time_exp =  int64(this.window(1) + 1) - int64(nTemplateTime) : int64(this.window(2) - 1) + int64(nTemplateTime);
                 if p.Results.timeInMilliseconds
-                    time_exp = single(time_exp) / ss.fs * 1000;
+                    time_exp = single(time_exp) / this.fs * 1000;
                 end
                 
                 for iSp = 1:numel(spike_inds)
@@ -839,9 +841,9 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             hold off;
         end
         
-        function plotStackedTracesColorClusters(ss, varargin)
+        function plotStackedTracesColorClusters(this, varargin)
             p = inputParser();
-            p.addParameter('maskSnippets', ss.valid, @isvector);
+            p.addParameter('maskSnippets', this.valid, @isvector);
             p.addParameter('maxPerCluster', 50, @isscalar);
             p.addParameter('showLabels', true, @islogical);
             p.addParameter('gain', 1.95, @isscalar);
@@ -851,12 +853,12 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             p.parse(varargin{:});
             
             mask_snippets = p.Results.maskSnippets;
-            unique_cluster_ids = ss.unique_cluster_ids;
+            unique_cluster_ids = this.unique_cluster_ids;
             
             maxPerCluster = p.Results.maxPerCluster;
             if isfinite(maxPerCluster)
                 mask_inds = find(mask_snippets);
-                cluster_ids = ss.cluster_ids(mask_snippets);
+                cluster_ids = this.cluster_ids(mask_snippets);
                 [~, cluster_inds] = ismember(cluster_ids, unique_cluster_ids);
                 for iC = 1:numel(unique_cluster_ids)
                     this_cluster = find(cluster_inds == iC);
@@ -869,34 +871,34 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             end
             
             dark = p.Results.dark;
-            [bg, ~] = ss.setupFigureAxes(dark);
-            cluster_colormap = ss.generateOverlayColormap(1:numel(unique_cluster_ids), bg);
+            [bg, ~] = this.setupFigureAxes(dark);
+            cluster_colormap = this.generateOverlayColormap(1:numel(unique_cluster_ids), bg);
             
             % nCh x nSnippets
-            channel_ids_ch_by_snippet = ss.channel_ids_by_snippet(:, mask_snippets);
-            data = ss.data(:, :, mask_snippets, :);
+            channel_ids_ch_by_snippet = this.channel_ids_by_snippet(:, mask_snippets);
+            data = this.data(:, :, mask_snippets, :);
             data_txcxl = permute(data(:, :, :), [2 1 3]);
             
-            cluster_ids = ss.cluster_ids(mask_snippets);
+            cluster_ids = this.cluster_ids(mask_snippets);
             [~, cluster_inds] = ismember(cluster_ids, unique_cluster_ids);
             traceColors = cluster_colormap(cluster_inds, :);
             
             if p.Results.timeInMilliseconds
-                time = ss.time_ms;
+                time = this.time_ms;
             else
-                time = ss.time_samples;
+                time = this.time_samples;
             end
             
             npxutils.util.plotStackedTraces(time, data_txcxl, 'layerColors', traceColors, ...
                 'lineWidth', 0.5, 'lineOpacity', p.Results.lineOpacity, ...
-                'gain', p.Results.gain, 'invertChannels', ss.channelMap.invertChannelsY, 'normalizeEach', false, ...
+                'gain', p.Results.gain, 'invertChannels', this.channelMap.invertChannelsY, 'normalizeEach', false, ...
                 'channel_ids', channel_ids_ch_by_snippet, 'showChannelDataTips', false);
             
             axis off;
             hold off;
         end
         
-        function plotHeatmap(ss, snippet_ind, varargin)
+        function plotHeatmap(this, snippet_ind, varargin)
             % plots one snippet as a heatmap with each of the clusters that occur during that period
             
             p = inputParser();
@@ -904,37 +906,37 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             p.parse(varargin{:});
             
             if p.Results.timeInMilliseconds
-                time = ss.time_ms;
+                time = this.time_ms;
             else
-                time = ss.time_samples;
+                time = this.time_samples;
             end
-            data = ss.data(:, :, snippet_ind, 1);
+            data = this.data(:, :, snippet_ind, 1);
             
             npxutils.util.pmatbal(data, 'x', time);
             yline(0.5, '-', sprintf('snippet %d', snippet_ind), 'LabelVerticalAlignment', 'bottom');
         end
         
-        function plotHeatmapWithTemplates(ss, snippet_ind, varargin)
+        function plotHeatmapWithTemplates(this, snippet_ind, varargin)
             % plots one snippet as a heatmap with each of the clusters that occur during that period
             
             p = inputParser();
             p.addParameter('timeInMilliseconds', false, @islogical);
-            p.addParameter('reconstruct_cluster_ids', ss.overlay_cluster_ids, @isvector);
+            p.addParameter('reconstruct_cluster_ids', this.overlay_cluster_ids, @isvector);
             p.addParameter('reconstruct_best_channels', 24, @isscalar);
             p.addParameter('successive_residuals', false, @islogical);
             p.parse(varargin{:});
             
             if p.Results.timeInMilliseconds
-                time = ss.time_ms;
+                time = this.time_ms;
             else
-                time = ss.time_samples;
+                time = this.time_samples;
             end
-            data = ss.data(:, :, snippet_ind, 1);
+            data = this.data(:, :, snippet_ind, 1);
             
             reconstruct_cluster_ids = p.Results.reconstruct_cluster_ids;
-            if isempty(reconstruct_cluster_ids) && ~isempty(ss.ks)
+            if isempty(reconstruct_cluster_ids) && ~isempty(this.ks)
                 % overlay all clusters if none specified
-                reconstruct_cluster_ids = ss.ks.cluster_ids;
+                reconstruct_cluster_ids = this.ks.cluster_ids;
             end
             reconstruct_best_channels = p.Results.reconstruct_best_channels;
             
@@ -942,7 +944,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             %             cluster_inds_by_snippet = ss.lookup_clusterIds(ss.cluster_ids(snippet_ind));
             %             channel_ids_ch_by_snippet = ss.channel_ids_by_cluster(:, cluster_inds_by_snippet);
             
-            [templates, cluster_ids] = ss.buildTemplateReconstructions('maskSnippets', snippet_ind, ...
+            [templates, cluster_ids] = this.buildTemplateReconstructions('maskSnippets', snippet_ind, ...
                 'cluster_ids', reconstruct_cluster_ids, ...
                 'best_n_channels', reconstruct_best_channels, 'sortChannelsVertically', true);
             
@@ -962,51 +964,51 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             
             yline(0.5, '-', sprintf('snippet %d', snippet_ind), 'LabelVerticalAlignment', 'bottom');
             for iC = 1:size(templates, 3)
-                yline(ss.nChannels * iC + 0.5, 'k-', sprintf('cluster %u', cluster_ids(iC)), 'LabelVerticalAlignment', 'bottom');
+                yline(this.nChannels * iC + 0.5, 'k-', sprintf('cluster %u', cluster_ids(iC)), 'LabelVerticalAlignment', 'bottom');
             end
             
             
         end
         
-        function plotHeatmapWithReconstruction(ss, snippet_ind, varargin)
+        function plotHeatmapWithReconstruction(this, snippet_ind, varargin)
             % plots one snippet as a heatmap with all of the overlapping clusters' reconstructed templates below
             
-            default_cluster_reconstruct = ss.ks.cluster_ids;
-            hasClusterId = ~isempty(ss.cluster_ids);
+            default_cluster_reconstruct = this.ks.cluster_ids;
+            hasClusterId = ~isempty(this.cluster_ids);
             if hasClusterId
-                this_cluster_id = ss.cluster_ids(snippet_ind);
+                this_cluster_id = this.cluster_ids(snippet_ind);
                 default_cluster_reconstruct = setdiff(default_cluster_reconstruct, this_cluster_id);
             end
             
             p = inputParser();
             p.addParameter('timeInMilliseconds', false, @islogical);
             p.addParameter('reconstruct_cluster_ids', default_cluster_reconstruct, @isvector);
-            p.addParameter('reconstruct_best_channels', ss.ks.nChannelsSorted, @isscalar);
+            p.addParameter('reconstruct_best_channels', this.ks.nChannelsSorted, @isscalar);
             p.parse(varargin{:});
             
             if p.Results.timeInMilliseconds
-                time = ss.time_ms;
+                time = this.time_ms;
             else
-                time = ss.time_samples;
+                time = this.time_samples;
             end
-            data = ss.data(:, :, snippet_ind, 1);
+            data = this.data(:, :, snippet_ind, 1);
             
             reconstruct_cluster_ids = p.Results.reconstruct_cluster_ids;
-            if isempty(reconstruct_cluster_ids) && ~isempty(ss.ks)
+            if isempty(reconstruct_cluster_ids) && ~isempty(this.ks)
                 % overlay all clusters if none specified
-                reconstruct_cluster_ids = ss.ks.cluster_ids;
+                reconstruct_cluster_ids = this.ks.cluster_ids;
             end
             reconstruct_best_channels = p.Results.reconstruct_best_channels;
             
             if hasClusterId
                 % build this cluster's tempalte
-                this_template = ss.buildTemplateReconstructions('maskSnippets', snippet_ind, ...
+                this_template = this.buildTemplateReconstructions('maskSnippets', snippet_ind, ...
                     'cluster_ids', this_cluster_id, 'sortChannelsVertically', true, ...
                     'best_n_channels', reconstruct_best_channels);
             end
             
             % build other clusters' templates
-            [templates, cluster_ids_recon] = ss.buildTemplateReconstructions('maskSnippets', snippet_ind, ...
+            [templates, cluster_ids_recon] = this.buildTemplateReconstructions('maskSnippets', snippet_ind, ...
                 'cluster_ids', reconstruct_cluster_ids, 'sortChannelsVertically', true, ...
                 'best_n_channels', reconstruct_best_channels);
             reconstruction = sum(templates, 3);
@@ -1021,7 +1023,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             if ~hasClusterId
                 labelMain = sprintf('snippet %d', snippet_ind);
             else
-                labelMain = sprintf('snippet %d (cluster %d)', snippet_ind, ss.cluster_ids(snippet_ind));
+                labelMain = sprintf('snippet %d (cluster %d)', snippet_ind, this.cluster_ids(snippet_ind));
             end
             yline(0.5, '-', labelMain, 'LabelVerticalAlignment', 'bottom');
             
@@ -1032,10 +1034,10 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                 other_clusters_str = strjoin(string(unique(cluster_ids_recon)), ',');
             end
             if hasClusterId
-                yline(ss.nChannels + 0.5, 'k-', sprintf('reconstruction cluster %d', this_cluster_id), 'LabelVerticalAlignment', 'bottom');
-                yline(ss.nChannels*2 + 0.5, 'k-', sprintf('reconstruction other clusters (%s)', other_clusters_str), 'LabelVerticalAlignment', 'bottom');
+                yline(this.nChannels + 0.5, 'k-', sprintf('reconstruction cluster %d', this_cluster_id), 'LabelVerticalAlignment', 'bottom');
+                yline(this.nChannels*2 + 0.5, 'k-', sprintf('reconstruction other clusters (%s)', other_clusters_str), 'LabelVerticalAlignment', 'bottom');
             else
-                yline(ss.nChannels + 0.5, 'k-', sprintf('reconstruction all clusters (%s)', other_clusters_str), 'LabelVerticalAlignment', 'bottom');
+                yline(this.nChannels + 0.5, 'k-', sprintf('reconstruction all clusters (%s)', other_clusters_str), 'LabelVerticalAlignment', 'bottom');
             end
         end
     end
