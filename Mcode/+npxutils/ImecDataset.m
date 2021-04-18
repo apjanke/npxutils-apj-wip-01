@@ -1,5 +1,11 @@
 classdef ImecDataset < handle
-% Author: Daniel J. O'Shea (2019)
+    % An IMEC dataset
+    %
+    % This is a handle object, so it is pass-by-reference.
+    
+    properties (Constant)
+        bytesPerSample = 2;
+    end
 
     properties(SetAccess = protected)
         pathRoot char = '';
@@ -8,8 +14,8 @@ classdef ImecDataset < handle
         creationTime = NaN;
         nChannels = NaN;
 
-        fileTypeAP = 'ap'; % typically ap or ap_CAR
-        fileTypeLF = 'lf'; % typically lf or lf_CAR
+        fileTypeAP = 'ap'; % Typically ap or ap_CAR
+        fileTypeLF = 'lf'; % Typically lf or lf_CAR
         
         nSamplesAP = 0;
         nSamplesLF = 0;
@@ -25,9 +31,9 @@ classdef ImecDataset < handle
         adcBits = 10;
 
         snsShankMap (1,1) string;
-        channelMap = []; % can be stored using set channelMap
+        channelMap = []; % Can be stored using set channelMap
 
-        % see markBadChannels
+        % See markBadChannels
         badChannels (:, 1) uint32
 
         syncBitNames string;
@@ -35,19 +41,16 @@ classdef ImecDataset < handle
         concatenationInfoAP
         concatenationInfoLF
         
-        sourceDatasets % optional list of concatenated ImecDatasets that sourced the data for this file (via concatenationInfoAP)
+        % Optional list of concatenated ImecDatasets that sourced the data for this file (via concatenationInfoAP)
+        sourceDatasets 
     end
 
     properties
-        % will be cached after loading, can also be cleared by user
+        % Will be cached after loading, can also be cleared by user
         syncRaw uint16 = [];
     end
 
-    properties(Constant)
-        bytesPerSample = 2;
-    end
-
-    properties(Dependent)
+    properties (Dependent)
         hasAP
         hasLF
         hasSync
@@ -60,57 +63,86 @@ classdef ImecDataset < handle
         channelMapFile
         mappedChannels
         mappedChannelInds
-        nChannelsMapped % number of channels in the channel map (excludes sync)
+        % Number of channels in the channel map (excludes sync)
+        nChannelsMapped
 
         connectedChannels
         connectedChannelInds
-        nChannelsConnected % excludes reference and sync channels
+        nChannelsConnected % Excludes reference and sync channels
 
-        goodChannels % connected channels sans badChannels
+        goodChannels % Connected channels sans badChannels
         goodChannelInds
         nGoodChannels
         
-        channelIds % list of ids from ChannelMap
-        channelNames % full list of channel names
+        channelIds % List of ids from ChannelMap
+        channelNames % Full list of channel names
         channelNamesPadded
 
         nSyncBits
         syncBitsNamed
 
-        fileAP % .imec.ap.bin file without folder
-        pathAP % .imec.ap.bin file with folder
-        fileAPMeta
-        pathAPMeta
+        fileAP % The .imec.ap.bin file, without folder
+        pathAP % The .imec.ap.bin file, with folder
+        fileAPMeta % The AP metadata file, without folder
+        pathAPMeta % The AP Metadata file, with foler
 
-        fileLF % without folder
-        pathLF % .imec.lf.bin file with folder
-        fileLFMeta
-        pathLFMeta
+        fileLF % The .imec.lf.bin file, without folder
+        pathLF % The .imec.lf.bin file, with folder
+        fileLFMeta % The .imec.lf.meta file, without folder
+        pathLFMeta % The .imec.lf.meta file, with folder
 
-        % if sync is stored in a separate file than AP
+        % The sync file, which may be a separate .imec.sync.bin file, without folder
         fileSync
-        pathSync % .imec.sync.bin file
+        % The sync file, which may be a separate .imec.sync.bin file, with folder
+        pathSync
 
-        % after sync is cached to sync.mat file for faster reload
+        % After sync is cached to sync.mat file for faster reload, without folder
         fileSyncCached
-        pathSyncCached % .sync.mat file (with cached sync)
+        % After sync is cached to sync.mat file for faster reload, with folder
+        pathSyncCached
 
+        % Creation time, as a human-readable date string
         creationTimeStr
 
-        apScaleToUv % multiply raw int16 by this to get uV
+        % Multiply raw int16 by this to get uV
+        apScaleToUv 
         lfScaleToUv
 
-        % from channel map (although syncChannelIndex will be 1 if sync not in AP or LF file)
+        % From channel map (although syncChannelIndex will be 1 if sync not in AP or LF file)
         syncChannelId
-        syncChannelIndex % if sync in AP file, at one index
+        % If sync in AP file, at one index
+        syncChannelIndex
         
-        % sync will come from either AP, LF, or separate file depending on these flags
-        syncInAPFile % is the sync info in the ap file?
-        syncInLFFile % is the sync info in the lf file?
+        % Sync will come from either AP, LF, or separate file depending on these flags
+        
+        % Whether sync is in the ap file
+        syncInAPFile
+        % Whether sync is in the lf file
+        syncInLFFile
     end
 
     methods
         function imec = ImecDataset(fileOrFileStem, varargin)
+            % Construct a new ImecDataset from a set of files
+            %
+            % obj = npxutils.ImecDataset(fileOrFileStem, [Options ...])
+            %
+            % FileOrFileStem is a scalar string specifying a file or file stem
+            % that identifies the IMEC data set to load. It may be:
+            %   - The .imec.ap.bin file
+            %   - The base name of the .imec.* files (that is, the file name
+            %     with no extension)
+            %   - A common prefix of the base name of the file, as long as there
+            %     is is no ambiguity with other files in that directory.
+            %   - The parent directory of the data set, as long as there is only
+            %     one .ap.bin file inside that directory.
+            %
+            % Options is a list of name/value options. Valid options:
+            %
+            %   channelMap - ???
+            %   syncBitNames - (empty or string) ???
+            %   sourceDatasets - ???
+            
             p = inputParser();
             p.addParameter('channelMap', [], @(x) true);
             p.addParameter('syncBitNames', [], @(x) isempty(x) || isstring(x) || iscellstr(x));

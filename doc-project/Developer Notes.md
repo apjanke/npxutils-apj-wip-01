@@ -87,8 +87,9 @@ This will produce the distribution Matlab Toolbox .mltbx file.
 * 4-space indents
 * Auto-format everything using the Matlab Editor
 * Naming
-  * `camelCase` variable and function names
+  * `camelCase` variable, function, and method names
   * `TitleCase` class names
+  * `lowercase` package names
 * Markdown
   * MkDocs-flavored Markdown
     * (Andrew isn't exactly sure what this is, actually!)
