@@ -486,11 +486,11 @@
 <p>which returns a <code>Neuropixel.KilosortMetrics</code> instance. This is a catch-all class for storing all the statistics we want to compute about the results of a Kilosort run. At the moment, most of these properties are related to localizing spikes / templates / clusters in spatial coordinates on the probe. The details of these computations borrow heavily from code written by Nick Steinmetz described on the <a href="https://github.com/cortex-lab/neuropixels/wiki/Other_analysis_methods">Neuropixels wiki</a>.</p>
 <p>Many properties are computed for each cluster, for each template (as multiple templates may comprise each cluster), and for each individual spike.</p>
 <ul>
-<li>Spatial location properties end in <code>_centerOfMass</code>, and have x,y (and someday z) along the second dimension</li>
-<li><code>depth</code> properties are shorthands for the <code>y</code> spatial dimension of <code>centerOfMass</code></li>
-<li><code>waveform</code> properties store the template-derived waveform taken from the largest channel</li>
-<li><code>best_channels</code> properties indicate which channels best capture the electrical image of a given template or cluster. * <code>amplitude</code> properties are already in uV</li>
-<li><code>is_localized</code> properties indicate whether the electrical image is sufficiently well localized in space</li>
+<li>Spatial location properties end in <code>_centerOfMass</code>, and have x,y (and someday z) along the second dimension.</li>
+<li><code>depth</code> properties are shorthands for the <code>y</code> spatial dimension of <code>centerOfMass</code>.</li>
+<li><code>waveform</code> properties store the template-derived waveform taken from the largest channel.</li>
+<li><code>best_channels</code> properties indicate which channels best capture the electrical image of a given template or cluster. * <code>amplitude</code> properties are already in uV.</li>
+<li><code>is_localized</code> properties indicate whether the electrical image is sufficiently well localized in space.</li>
 </ul>
 <p>KilosortMetrics with properties:</p>
 <div class="highlight"><pre><span></span><code>                           ks: [1×1 Neuropixel.KilosortDataset]

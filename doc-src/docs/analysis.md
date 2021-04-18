@@ -41,11 +41,11 @@ which returns a `Neuropixel.KilosortMetrics` instance. This is a catch-all class
 
 Many properties are computed for each cluster, for each template (as multiple templates may comprise each cluster), and for each individual spike.
 
-* Spatial location properties end in `_centerOfMass`, and have x,y (and someday z) along the second dimension
-* `depth` properties are shorthands for the `y` spatial dimension of `centerOfMass`
-* `waveform` properties store the template-derived waveform taken from the largest channel
-* `best_channels` properties indicate which channels best capture the electrical image of a given template or cluster. * `amplitude` properties are already in uV
-* `is_localized` properties indicate whether the electrical image is sufficiently well localized in space
+* Spatial location properties end in `_centerOfMass`, and have x,y (and someday z) along the second dimension.
+* `depth` properties are shorthands for the `y` spatial dimension of `centerOfMass`.
+* `waveform` properties store the template-derived waveform taken from the largest channel.
+* `best_channels` properties indicate which channels best capture the electrical image of a given template or cluster. * `amplitude` properties are already in uV.
+* `is_localized` properties indicate whether the electrical image is sufficiently well localized in space.
 
   KilosortMetrics with properties:
 

@@ -236,11 +236,11 @@ imec.inspectAP_timeWindow(timeWindow, ...)
 
 There are additional optional parameters you can specify:
 
-* `channels`: channel indices to plot, defaults to `imec.mappedChannels`
-* `syncBits` : which sync bits to plot individually, defaults to `imec.syncBitsNamed`
-* `gain`: global scaling factor, values larger then 1 will magnify the individual channels, defaults to 0.95
-* `car`: perform common average referencing before plotting, defaults to false
-* `downsample` : take every nth sample to speed up plotting, defaults to 1
+* `channels`: channel indices to plot, defaults to `imec.mappedChannels`.
+* `syncBits` : which sync bits to plot individually, defaults to `imec.syncBitsNamed`.
+* `gain`: global scaling factor, values larger then 1 will magnify the individual channels, defaults to 0.95.
+* `car`: perform common average referencing before plotting, defaults to false.
+* `downsample` : take every nth sample to speed up plotting, defaults to 1.
 
 Good channels are plotted in black, non-connected channels in blue, and bad channels in red. Sync bits are also shown in red and are not affected by the normalization gain.
 
@@ -309,17 +309,17 @@ Here, `outPath` should include the folder where the new datasets should be writt
 
 You can provide one or more function handles (e.g. ```@Neuropixel.DataProcessFn.commonAverageReference```) that will be applied sequentially. Other optional parameters include:
 
-* `dryRun`: if true, no actual data will be modified on disk, facilitating testing or step by step debugging of the transform functions before writing data. (default false)
-* `gpuArray`: if true, the data chunks will be copied to the GPU and the transformation functions will receive and return GPU arrays
-* `applyScaling`: if true, the data will be converted to floating point values with the correct analog scale. if false (default) the data will remain in the original, unscaled `int16` quantization.
-* `writeAP`: if true, the AP file will be transformed and copied
-* `writeLF`: if true, the LF file will be transformed and copied (default false but will be set true automatically if any transformLF is non-empty)
-* `goodChannelsOnly`: send only the channels marked good to the transform function
-* `connectedChannelsOnly`: send only the connected channels to the transform function
-* `mappedChannelsOnly`: send only the mapped channels to the transform function
-* `chunkSize`: specify the number of time samples sent to transform functions at once
-* `extraMeta`: a struct with extra meta fields to include or overwrite with the output file
-* `timeShifts`: a `Neuropixel.TimeShiftSpec` instance used to excise time windows, see [excising time windows](#excising-time-windows)
+* `dryRun`: If true, no actual data will be modified on disk, facilitating testing or step by step debugging of the transform functions before writing data. (default false).
+* `gpuArray`: If true, the data chunks will be copied to the GPU and the transformation functions will receive and return GPU arrays.
+* `applyScaling`: If true, the data will be converted to floating point values with the correct analog scale. if false (default) the data will remain in the original, unscaled `int16` quantization.
+* `writeAP`: If true, the AP file will be transformed and copied.
+* `writeLF`: If true, the LF file will be transformed and copied (default false but will be set true automatically if any transformLF is non-empty).
+* `goodChannelsOnly`: Send only the channels marked good to the transform function.
+* `connectedChannelsOnly`: Send only the connected channels to the transform function.
+* `mappedChannelsOnly`: Send only the mapped channels to the transform function.
+* `chunkSize`: Specify the number of time samples sent to transform functions at once.
+* `extraMeta`: A struct with extra meta fields to include or overwrite with the output file.
+* `timeShifts`: A `Neuropixel.TimeShiftSpec` instance used to excise time windows, see [excising time windows](#excising-time-windows).
 
 !!! warning "Save transformed data to a new folder!"
     Ensure that `outPath` refers to separate directory so that you make a copy of the dataset rather than writing over the same location. An error will be thrown if any existing files would be overwritten by this call.

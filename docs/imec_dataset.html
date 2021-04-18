@@ -834,11 +834,11 @@
 </code></pre></div>
 <p>There are additional optional parameters you can specify:</p>
 <ul>
-<li><code>channels</code>: channel indices to plot, defaults to <code>imec.mappedChannels</code></li>
-<li><code>syncBits</code> : which sync bits to plot individually, defaults to <code>imec.syncBitsNamed</code></li>
-<li><code>gain</code>: global scaling factor, values larger then 1 will magnify the individual channels, defaults to 0.95</li>
-<li><code>car</code>: perform common average referencing before plotting, defaults to false</li>
-<li><code>downsample</code> : take every nth sample to speed up plotting, defaults to 1</li>
+<li><code>channels</code>: channel indices to plot, defaults to <code>imec.mappedChannels</code>.</li>
+<li><code>syncBits</code> : which sync bits to plot individually, defaults to <code>imec.syncBitsNamed</code>.</li>
+<li><code>gain</code>: global scaling factor, values larger then 1 will magnify the individual channels, defaults to 0.95.</li>
+<li><code>car</code>: perform common average referencing before plotting, defaults to false.</li>
+<li><code>downsample</code> : take every nth sample to speed up plotting, defaults to 1.</li>
 </ul>
 <p>Good channels are plotted in black, non-connected channels in blue, and bad channels in red. Sync bits are also shown in red and are not affected by the normalization gain.</p>
 <p><img alt="imec_inspect" src="images/imec_inspect.png" title="Raw Imec traces" /></p>
@@ -883,17 +883,17 @@
 </code></pre></div>
 <p>You can provide one or more function handles (e.g. <code>@Neuropixel.DataProcessFn.commonAverageReference</code>) that will be applied sequentially. Other optional parameters include:</p>
 <ul>
-<li><code>dryRun</code>: if true, no actual data will be modified on disk, facilitating testing or step by step debugging of the transform functions before writing data. (default false)</li>
-<li><code>gpuArray</code>: if true, the data chunks will be copied to the GPU and the transformation functions will receive and return GPU arrays</li>
-<li><code>applyScaling</code>: if true, the data will be converted to floating point values with the correct analog scale. if false (default) the data will remain in the original, unscaled <code>int16</code> quantization.</li>
-<li><code>writeAP</code>: if true, the AP file will be transformed and copied</li>
-<li><code>writeLF</code>: if true, the LF file will be transformed and copied (default false but will be set true automatically if any transformLF is non-empty)</li>
-<li><code>goodChannelsOnly</code>: send only the channels marked good to the transform function</li>
-<li><code>connectedChannelsOnly</code>: send only the connected channels to the transform function</li>
-<li><code>mappedChannelsOnly</code>: send only the mapped channels to the transform function</li>
-<li><code>chunkSize</code>: specify the number of time samples sent to transform functions at once</li>
-<li><code>extraMeta</code>: a struct with extra meta fields to include or overwrite with the output file</li>
-<li><code>timeShifts</code>: a <code>Neuropixel.TimeShiftSpec</code> instance used to excise time windows, see <a href="#excising-time-windows">excising time windows</a></li>
+<li><code>dryRun</code>: If true, no actual data will be modified on disk, facilitating testing or step by step debugging of the transform functions before writing data. (default false).</li>
+<li><code>gpuArray</code>: If true, the data chunks will be copied to the GPU and the transformation functions will receive and return GPU arrays.</li>
+<li><code>applyScaling</code>: If true, the data will be converted to floating point values with the correct analog scale. if false (default) the data will remain in the original, unscaled <code>int16</code> quantization.</li>
+<li><code>writeAP</code>: If true, the AP file will be transformed and copied.</li>
+<li><code>writeLF</code>: If true, the LF file will be transformed and copied (default false but will be set true automatically if any transformLF is non-empty).</li>
+<li><code>goodChannelsOnly</code>: Send only the channels marked good to the transform function.</li>
+<li><code>connectedChannelsOnly</code>: Send only the connected channels to the transform function.</li>
+<li><code>mappedChannelsOnly</code>: Send only the mapped channels to the transform function.</li>
+<li><code>chunkSize</code>: Specify the number of time samples sent to transform functions at once.</li>
+<li><code>extraMeta</code>: A struct with extra meta fields to include or overwrite with the output file.</li>
+<li><code>timeShifts</code>: A <code>Neuropixel.TimeShiftSpec</code> instance used to excise time windows, see <a href="#excising-time-windows">excising time windows</a>.</li>
 </ul>
 <div class="admonition warning">
 <p class="admonition-title">Save transformed data to a new folder!</p>

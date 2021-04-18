@@ -30,6 +30,10 @@ I'd also like to acknowledge several authors whose Matlab File Exchange contribu
 
 * Chad A. Greene:  [cmocean](https://www.mathworks.com/matlabcentral/fileexchange/57773-cmocean-perceptually-uniform-colormaps), based on Kristen M. Thyng, Chad A. Greene, Robert D. Hetland, Heather M. Zimmerle, and Steven F. DiMarco. True colors of oceanography: Guidelines for effective and accurate colormap selection. _Oceanography_, September 2016. 
 
+## Matlab coding
+
+Neuropixel Utils' repo organization and packaging system is based on [Janklab's](https://janklab.net) [MatlabProjectTemplate](https://matlabprojecttemplate.janklab.net/) structure, adapted with financial support from MathWorks.
+
 ## Support
 
 If you have any issues using this code with your data, please look for any similar [existing GitHub issues](https://github.com/djoshea/neuropixel-utils/issues) or file a new issue there. Please don't email me straight away unless there's some need for confidentiality, as I'll most likely ask you to file a GitHub issue anyway. Across multiple repositiories, this policy helps me keep track of what needs to be fixed, and also helps other users who may have been encountering similar issues.

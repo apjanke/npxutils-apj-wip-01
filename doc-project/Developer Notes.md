@@ -5,10 +5,14 @@
 * `Mcode/` – Matlab source code for the Neuropixel Utils library itself
 * `doc-project/` – developer-oriented doco for people working on the library itself
 * `doc-src/` – Source for user-facing doco
-* `docs/` – Built user-facing doco and GitHub Pages site
-  * This is generated from `doc-src/`. Don't edit it directly here!
+* `docs/` – Generated user-facing doco and GitHub Pages site
+  * This is generated from `doc-src/`. Don't edit anything here directly!
 * `dev-kit/` – Developer tools for working on the library
 * `examples/` – Example code to go with the library, and for building into the `docs/` stuff
+* `map_files/` – ??? Are these example data sets or part of the library itself?
+* Ephemeral directories (not checked in to Git)
+  * `build/` – Where intermediate munged source code goes as part of the build
+  * `dist/` – Final distribution artifacts appear here
 
 ## Working with the repo
 
@@ -76,6 +80,7 @@ This will produce the distribution Matlab Toolbox .mltbx file.
 * "Matlab", not "MATLAB"
   * Yes, we know "MATLAB" is the official styling; we just don't like it.
 * Oxford commas
+* Full stops (periods) at the end of list items that are sentences or similar
 
 ### Code Style
 
@@ -84,3 +89,7 @@ This will produce the distribution Matlab Toolbox .mltbx file.
 * Naming
   * `camelCase` variable and function names
   * `TitleCase` class names
+* Markdown
+  * MkDocs-flavored Markdown
+    * (Andrew isn't exactly sure what this is, actually!)
+  * Try to be Markdownlint-clean
