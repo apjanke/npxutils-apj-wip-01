@@ -438,45 +438,45 @@ classdef ImecDataset < handle
     end
     
     %     methods  % these functions read a contiguous block of samples over a contiguous band of channels
-    %         function data_ch_by_time = readAPChannelBand(imec, chFirst, chLast, sampleFirst, sampleLast, msg)
+    %         function data_ch_by_time = readAPChannelBand(this, chFirst, chLast, sampleFirst, sampleLast, msg)
     %             if nargin < 4 || isempty(sampleFirst)
     %                 sampleFirst = 1;
     %             end
     %             if nargin < 5 || isempty(sampleLast)
-    %                 sampleLast = imec.nSamplesAP;
+    %                 sampleLast = this.nSamplesAP;
     %             end
     %             if nargin < 6 || isempty(msg)
     %                 msg = 'Reading channels from neuropixel AP file';
     %             end
     %
-    %             data_ch_by_time = imec.readChannelBand('ap', chFirst, chLast, sampleFirst, sampleLast, msg);
+    %             data_ch_by_time = this.readChannelBand('ap', chFirst, chLast, sampleFirst, sampleLast, msg);
     %         end
     %
-    %         function data_ch_by_time = readLFChannelBand(imec, chFirst, chLast, sampleFirst, sampleLast, msg)
+    %         function data_ch_by_time = readLFChannelBand(this, chFirst, chLast, sampleFirst, sampleLast, msg)
     %             if nargin < 4 || isempty(sampleFirst)
     %                 sampleFirst = 1;
     %             end
     %             if nargin < 5 || isempty(sampleLast)
-    %                 sampleLast = imec.nSamplesLF;
+    %                 sampleLast = this.nSamplesLF;
     %             end
     %             if nargin < 6 || isempty(msg)
     %                 msg = 'Reading channels from neuropixel LF file';
     %             end
     %
-    %             data_ch_by_time = imec.readChannelBand('lf', chFirst, chLast, sampleFirst, sampleLast, msg);
+    %             data_ch_by_time = this.readChannelBand('lf', chFirst, chLast, sampleFirst, sampleLast, msg);
     %         end
     %
-    %         function data_by_time = readAPSingleChannel(imec, ch, varargin)
-    %             data_by_time = imec.readAPChannelBand(ch, ch, varargin{:})';
+    %         function data_by_time = readAPSingleChannel(this, ch, varargin)
+    %             data_by_time = this.readAPChannelBand(ch, ch, varargin{:})';
     %         end
     %
     %         function data_by_time = readLFSingleChannel(imec, ch, varargin)
-    %             data_by_time = imec.readLFChannelBand(ch, ch, varargin{:})';
+    %             data_by_time = this.readLFChannelBand(ch, ch, varargin{:})';
     %         end
     %     end
     
     methods % Sync channel read / cache
-        function [syncRaw, fsSync] = readSync(imec, varargin)
+        function [syncRaw, fsSync] = readSync(this, varargin)
             p = inputParser();
             p.addOptional('reload', false, @islogical); % if true, ignore cache in memory imec.syncRaw
             p.addParameter('preferredBand', '', @npxutils.internal.isstringlike); % prefer a band (ap or lf), though will only be obeyed if not already loaded / cached
@@ -484,17 +484,17 @@ classdef ImecDataset < handle
             p.parse(varargin{:});
             preferredBand = string(p.Results.preferredBand);
             
-            if isempty(imec.syncRaw) || p.Results.reload
-                if exist(imec.pathSyncCached, 'file') && ~p.Results.ignoreCached
-                    [~, f, e] = fileparts(imec.pathSyncCached);
+            if isempty(this.syncRaw) || p.Results.reload
+                if exist(this.pathSyncCached, 'file') && ~p.Results.ignoreCached
+                    [~, f, e] = fileparts(this.pathSyncCached);
                     fprintf('Loading sync from cached %s%s\n', f, e);
-                    ld = load(imec.pathSyncCached);
-                    imec.syncRaw = typecast(ld.sync, 'uint16');
+                    ld = load(this.pathSyncCached);
+                    this.syncRaw = typecast(ld.sync, 'uint16');
                     if isfield(ld, 'fsSync')
-                        imec.fsSync = ld.fsSync;
+                        this.fsSync = ld.fsSync;
                     else
                         % assume from AP if not specified since I added sync from LF later
-                        imec.fsSync = imec.fsAP;
+                        this.fsSync = this.fsAP;
                     end
                 else
                     % this will automatically redirect to a separate sync file
@@ -502,62 +502,62 @@ classdef ImecDataset < handle
                     switch preferredBand
                         case {"", "auto"}
                             fprintf('Loading sync channel auto (this will take some time)...\n');
-                            [mm, imec.fsSync] = imec.memmapSync_full();
-                            imec.syncRaw = typecast(mm.Data.x(imec.syncChannelIndex, :)', 'uint16');
-                            imec.saveSyncCached();
+                            [mm, this.fsSync] = this.memmapSync_full();
+                            this.syncRaw = typecast(mm.Data.x(this.syncChannelIndex, :)', 'uint16');
+                            this.saveSyncCached();
                         case 'ap'
                             fprintf('Loading sync channel from AP band (this will take some time)...\n');
-                            mm = imec.memmapAP_full();
-                            imec.syncRaw = typecast(mm.Data.x(imec.syncChannelIndex, :)', 'uint16');
-                            imec.fsSync = imec.fsAP;
-                            imec.saveSyncCached();
+                            mm = this.memmapAP_full();
+                            this.syncRaw = typecast(mm.Data.x(this.syncChannelIndex, :)', 'uint16');
+                            this.fsSync = this.fsAP;
+                            this.saveSyncCached();
                         case 'lf'
                             fprintf('Loading sync channel from LF band (this will take some time)...\n');
-                            mm = imec.memmapLF_full();
-                            imec.syncRaw = typecast(mm.Data.x(imec.syncChannelIndex, :)', 'uint16');
-                            imec.fsSync = imec.fsLF;
-                            imec.saveSyncCached();
+                            mm = this.memmapLF_full();
+                            this.syncRaw = typecast(mm.Data.x(this.syncChannelIndex, :)', 'uint16');
+                            this.fsSync = this.fsLF;
+                            this.saveSyncCached();
                         otherwise
                             error('Unknown preferredBand %s', preferredBand);
                     end
                 end
             end
-            syncRaw = imec.syncRaw;
-            fsSync = imec.fsSync;
+            syncRaw = this.syncRaw;
+            fsSync = this.fsSync;
         end
         
-        function saveSyncCached(imec)
-            sync = imec.readSync();
-            fsSync = imec.fsSync; %#ok<PROP>
-            save(imec.pathSyncCached, 'sync', 'fsSync');
+        function saveSyncCached(this)
+            sync = this.readSync();
+            fsSync = this.fsSync; %#ok<PROP>
+            save(this.pathSyncCached, 'sync', 'fsSync');
         end
         
-        function clearSyncCached(imec)
-            if exist(imec.pathSyncCached, 'file') > 0
-                fprintf('Deleting cached sync file %s\n', imec.pathSyncCached);
-                delete(imec.pathSyncCached);
+        function clearSyncCached(this)
+            if exist(this.pathSyncCached, 'file') > 0
+                fprintf('Deleting cached sync file %s\n', this.pathSyncCached);
+                delete(this.pathSyncCached);
             end
-            imec.syncRaw = [];
-            imec.fsSync = NaN;
+            this.syncRaw = [];
+            this.fsSync = NaN;
         end
         
-        function updateSyncCached(imec, varargin)
-            imec.syncRaw = [];
-            imec.fsSync = [];
-            if exist(imec.pathSyncCached, 'file')
-                [sync, fsSync] = imec.readSync('reload', true, 'ignoreCached', true);
-                save(imec.pathSyncCached, 'sync', 'fsSync');
-                imec.syncRaw = sync;
-                imec.fsSync = fsSync;
+        function updateSyncCached(this, varargin)
+            this.syncRaw = [];
+            this.fsSync = [];
+            if exist(this.pathSyncCached, 'file')
+                [sync, fsSync] = this.readSync('reload', true, 'ignoreCached', true);
+                save(this.pathSyncCached, 'sync', 'fsSync');
+                this.syncRaw = sync;
+                this.fsSync = fsSync;
             end
         end
         
-        function tf = readSyncBit(imec, bit)
-            bit = imec.lookupSyncBitByName(bit);
-            tf = logical(bitget(imec.readSync(), bit));
+        function tf = readSyncBit(this, bit)
+            bit = this.lookupSyncBitByName(bit);
+            tf = logical(bitget(this.readSync(), bit));
         end
         
-        function vec = readSync_idx(imec, idx, varargin)
+        function vec = readSync_idx(this, idx, varargin)
             p = inputParser();
             p.addParameter('band', '', @npxutils.internal.isstringlike);
             p.addParameter('fromSourceDatasets', false, @islogical);
@@ -570,9 +570,9 @@ classdef ImecDataset < handle
                 case "auto"
                     fsRequested = NaN;
                 case "lf"
-                    fsRequested = imec.fsLF;
+                    fsRequested = this.fsLF;
                 case "ap"
-                    fsRequested = imec.fsAP;
+                    fsRequested = this.fsAP;
                 otherwise
                     error('Unknown band %s', band);
             end
@@ -580,38 +580,38 @@ classdef ImecDataset < handle
             fromSource = p.Results.fromSourceDatasets;
             if ~fromSource
                 % grab cached data if the sampling rate matches, otherwise use the memmap
-                if ~isempty(imec.syncRaw) && imec.fsSync == fsRequested
-                    vec = imec.syncRaw(idx);
+                if ~isempty(this.syncRaw) && this.fsSync == fsRequested
+                    vec = this.syncRaw(idx);
                 elseif ismember(band, ["", "auto"])
-                    mm = imec.memmapSync_full();
-                    vec = mm.Data.x(imec.syncChannelIndex, idx)';
+                    mm = this.memmapSync_full();
+                    vec = mm.Data.x(this.syncChannelIndex, idx)';
                 elseif band == "ap"
-                    mm = imec.memmapAP_full();
-                    vec = mm.Data.x(imec.syncChannelIndex, idx)';
+                    mm = this.memmapAP_full();
+                    vec = mm.Data.x(this.syncChannelIndex, idx)';
                 elseif band == "lf"
-                    mm = imec.memmapLF_full();
-                    vec = mm.Data.x(imec.syncChannelIndex, idx)';
+                    mm = this.memmapLF_full();
+                    vec = mm.Data.x(this.syncChannelIndex, idx)';
                 end
                 
-            elseif imec.syncInAPFile
-                mmSet = imec.memmap_sourceAP_full();
-                [sourceFileInds, sourceSampleInds] = imec.concatenationInfoAP.lookup_sampleIndexInSourceFiles(idx);
-                vec = npxutils.ImecDataset.multi_mmap_extract_sample_idx(mmSet, sourceFileInds, sourceSampleInds, imec.syncChannelIndex);
-            elseif imec.syncInLFFile
-                mmSet = imec.memmap_sourceLF_full();
-                [sourceFileInds, sourceSampleInds] = imec.concatenationInfoLF.lookup_sampleIndexInSourceFiles(idx);
-                vec = npxutils.ImecDataset.multi_mmap_extract_sample_idx(mmSet, sourceFileInds, sourceSampleInds, imec.syncChannelIndex);
+            elseif this.syncInAPFile
+                mmSet = this.memmap_sourceAP_full();
+                [sourceFileInds, sourceSampleInds] = this.concatenationInfoAP.lookup_sampleIndexInSourceFiles(idx);
+                vec = npxutils.ImecDataset.multi_mmap_extract_sample_idx(mmSet, sourceFileInds, sourceSampleInds, this.syncChannelIndex);
+            elseif this.syncInLFFile
+                mmSet = this.memmap_sourceLF_full();
+                [sourceFileInds, sourceSampleInds] = this.concatenationInfoLF.lookup_sampleIndexInSourceFiles(idx);
+                vec = npxutils.ImecDataset.multi_mmap_extract_sample_idx(mmSet, sourceFileInds, sourceSampleInds, this.syncChannelIndex);
             else
                 error('Cannot read source sync unless sync derives from AP or LF');
             end
         end
         
-        function mat = readSyncBits_idx(imec, bits, idx, varargin)
+        function mat = readSyncBits_idx(this, bits, idx, varargin)
             % mat is nBits x nTime to match readAP_idx which is nChannels x nTime
             if isstring(bits) || ischar(bits)
-                bits = imec.lookupSyncBitByName(bits);
+                bits = this.lookupSyncBitByName(bits);
             end
-            vec = imec.readSync_idx(idx, varargin{:});
+            vec = this.readSync_idx(idx, varargin{:});
             mat = false(numel(bits), numel(vec));
             for iB = 1:numel(bits)
                 mat(iB, :) = logical(bitget(vec, bits(iB)));
@@ -620,39 +620,39 @@ classdef ImecDataset < handle
     end
     
     methods
-        function sampleIdx = closestSampleAPForTime(imec, timeSeconds)
-            sampleIdx = round(timeSeconds * imec.fsAP);
+        function sampleIdx = closestSampleAPForTime(this, timeSeconds)
+            sampleIdx = round(timeSeconds * this.fsAP);
             sampleIdx(sampleIdx == 0) = 1;
-            if any(sampleIdx < 0 | sampleIdx > imec.nSamplesAP)
+            if any(sampleIdx < 0 | sampleIdx > this.nSamplesAP)
                 error('Time seconds out of range');
             end
         end
         
-        function sampleIdx = closestSampleLFForTime(imec, timeSeconds)
-            sampleIdx = round(timeSeconds * imec.fsLF);
+        function sampleIdx = closestSampleLFForTime(this, timeSeconds)
+            sampleIdx = round(timeSeconds * this.fsLF);
             sampleIdx(sampleIdx == 0) = 1;
-            if any(sampleIdx < 0 | sampleIdx > imec.nSamplesLF)
+            if any(sampleIdx < 0 | sampleIdx > this.nSamplesLF)
                 error('Time seconds out of range');
             end
         end
         
-        function idxLF = closestSampleLFForAP(imec, idxAP)
-            idxLF = floor(double(idxAP-1) * double(imec.fsLF) / double(imec.fsAP)) + 1;
+        function idxLF = closestSampleLFForAP(this, idxAP)
+            idxLF = floor(double(idxAP-1) * double(this.fsLF) / double(this.fsAP)) + 1;
         end
         
-        function idxAP = closestSampleAPForLF(imec, idxLF)
-            idxAP = floor(double(idxLF-1) * double(imec.fsAP) / double(imec.fsLF)) + 1;
+        function idxAP = closestSampleAPForLF(this, idxLF)
+            idxAP = floor(double(idxLF-1) * double(this.fsAP) / double(this.fsLF)) + 1;
         end
         
-        function data = readAP_idx(imec, sampleIdx, varargin)
-            data = imec.internal_read_idx(sampleIdx, 'band', 'ap', varargin{:});
+        function data = readAP_idx(this, sampleIdx, varargin)
+            data = this.internal_read_idx(sampleIdx, 'band', 'ap', varargin{:});
         end
         
-        function data = readLF_idx(imec, sampleIdx, varargin)
-            data = imec.internal_read_idx(sampleIdx, 'band', 'lf', varargin{:});
+        function data = readLF_idx(this, sampleIdx, varargin)
+            data = this.internal_read_idx(sampleIdx, 'band', 'lf', varargin{:});
         end
         
-        function data = internal_read_idx(imec, sampleIdx, varargin)
+        function data = internal_read_idx(this, sampleIdx, varargin)
             p = inputParser();
             p.addParameter('band', 'ap', @npxutils.internal.isstringlike);
             p.addParameter('applyScaling', true, @islogical); % convert to uV before processing
@@ -666,29 +666,29 @@ classdef ImecDataset < handle
             switch band
                 case 'ap'
                     if ~fromSource
-                        assert(imec.hasAP, 'ImecDataset does not have AP band');
+                        assert(this.hasAP, 'ImecDataset does not have AP band');
                     else
-                        assert(imec.hasSourceAP, 'ImecDataset does not have source datasets with AP band');
+                        assert(this.hasSourceAP, 'ImecDataset does not have source datasets with AP band');
                     end
                 case 'lf'
                     if ~fromSource
-                        assert(imec.hasLF, 'ImecDataset does not have LF band');
+                        assert(this.hasLF, 'ImecDataset does not have LF band');
                     else
-                        assert(imec.hasSourceLF, 'ImecDataset does not have source datasets with LF band');
+                        assert(this.hasSourceLF, 'ImecDataset does not have source datasets with LF band');
                     end
                 otherwise
                     error('Unknown band %s', band);
             end
             
-            ch_conn_mask = imec.lookup_channelIds(imec.connectedChannels);
+            ch_conn_mask = this.lookup_channelIds(this.connectedChannels);
             
             if ~fromSource
                 if band == "ap"
-                    mm = imec.memmapAP_full();
-                    scaleToUv = imec.apScaleToUv;
+                    mm = this.memmapAP_full();
+                    scaleToUv = this.apScaleToUv;
                 else
-                    mm = imec.memmapLF_full();
-                    scaleToUv = imec.lfScaleToUv;
+                    mm = this.memmapLF_full();
+                    scaleToUv = this.lfScaleToUv;
                 end
                 
                 if any(isnan(sampleIdx))
@@ -705,15 +705,15 @@ classdef ImecDataset < handle
                 end
             else
                 if band == "ap"
-                    mmSet = imec.memmap_sourceAP_full();
-                    [sourceFileInds, sourceSampleInds] = imec.concatenationInfoAP.lookup_sampleIndexInSourceFiles(sampleIdx);
-                    scalingByFile = imec.concatenationInfoAP.scaleToUvs;
-                    scaleToUvThis = imec.apScaleToUv;
+                    mmSet = this.memmap_sourceAP_full();
+                    [sourceFileInds, sourceSampleInds] = this.concatenationInfoAP.lookup_sampleIndexInSourceFiles(sampleIdx);
+                    scalingByFile = this.concatenationInfoAP.scaleToUvs;
+                    scaleToUvThis = this.apScaleToUv;
                 else
-                    mmSet = imec.memmap_sourceLF_full();
-                    [sourceFileInds, sourceSampleInds] = imec.concatenationInfoLF.lookup_sampleIndexInSourceFiles(sampleIdx);
-                    scalingByFile = imec.concatenationInfoLF.scaleToUvs;
-                    scaleToUvThis = imec.lfScaleToUv;
+                    mmSet = this.memmap_sourceLF_full();
+                    [sourceFileInds, sourceSampleInds] = this.concatenationInfoLF.lookup_sampleIndexInSourceFiles(sampleIdx);
+                    scalingByFile = this.concatenationInfoLF.scaleToUvs;
+                    scaleToUvThis = this.lfScaleToUv;
                 end
                 
                 % if applyScaling, use the per-file scalings to produce uv, scaling only the connected channels
@@ -727,77 +727,77 @@ classdef ImecDataset < handle
                         scalingByFile = [];
                     end
                 end
-                data = npxutils.ImecDataset.multi_mmap_extract_sample_idx(mmSet, sourceFileInds, sourceSampleInds, imec.channelIds, scalingByFile, ch_conn_mask);
+                data = npxutils.ImecDataset.multi_mmap_extract_sample_idx(mmSet, sourceFileInds, sourceSampleInds, this.channelIds, scalingByFile, ch_conn_mask);
             end
         end
         
-        function [mat, sampleIdx] = readAP_timeWindow(imec, timeWindowSec, varargin)
-            idxWindow = imec.closestSampleAPForTime(timeWindowSec);
+        function [mat, sampleIdx] = readAP_timeWindow(this, timeWindowSec, varargin)
+            idxWindow = this.closestSampleAPForTime(timeWindowSec);
             sampleIdx = idxWindow(1):idxWindow(2);
-            mat = imec.readAP_idx(sampleIdx, varargin{:});
+            mat = this.readAP_idx(sampleIdx, varargin{:});
         end
         
-        function [mat, sampleIdx] = readLF_timeWindow(imec, timeWindowSec, varargin)
-            idxWindow = imec.closestSampleLFForTime(timeWindowSec);
+        function [mat, sampleIdx] = readLF_timeWindow(this, timeWindowSec, varargin)
+            idxWindow = this.closestSampleLFForTime(timeWindowSec);
             sampleIdx = idxWindow(1):idxWindow(2);
-            mat = imec.readLF_idx(sampleIdx, varargin{:});
+            mat = this.readLF_idx(sampleIdx, varargin{:});
         end
         
-        function [mat, sampleIdx] = readSyncBits_timeWindow(imec, bits, timeWindowSec)
-            idxWindow = imec.closestSampleAPForTime(timeWindowSec);
+        function [mat, sampleIdx] = readSyncBits_timeWindow(this, bits, timeWindowSec)
+            idxWindow = this.closestSampleAPForTime(timeWindowSec);
             sampleIdx = idxWindow(1):idxWindow(2);
             mat = readSyncBits_idx(bits, sampleIdx);
         end
         
-        function [mat, sampleIdx] = readSyncLFBits_timeWindow(imec, bits, timeWindowSec)
-            idxWindow = imec.closestSampleLFForTime(timeWindowSec);
+        function [mat, sampleIdx] = readSyncLFBits_timeWindow(this, bits, timeWindowSec)
+            idxWindow = this.closestSampleLFForTime(timeWindowSec);
             sampleIdx = idxWindow(1):idxWindow(2);
             mat = readSyncLFBits_idx(bits, sampleIdx);
         end
         
-        function [mat, sourceInds] = readAP_viaTimeShiftSpec(imec, timeShifts, varargin)
+        function [mat, sourceInds] = readAP_viaTimeShiftSpec(this, timeShifts, varargin)
             % read a matrix of AP data as requested by npxutils.TimeShiftSpec instance timeShifts
-            sourceInds = timeShifts.computeSourceIndices(imec.nSamplesAP);
-            mat = imec.readAP_idx(sourceInds, varargin{:});
+            sourceInds = timeShifts.computeSourceIndices(this.nSamplesAP);
+            mat = this.readAP_idx(sourceInds, varargin{:});
         end
     end
     
     methods % Quick inspection
-        function [channelInds, channelIds] = lookup_channelIds(imec, channelIds)
+        function [channelInds, channelIds] = lookup_channelIds(this, channelIds)
             if islogical(channelIds)
-                channelIds = imec.channelIdx(channelIds);
+                channelIds = this.channelIdx(channelIds);
             end
-            [tf, channelInds] = ismember(channelIds, imec.channelIds);
+            [tf, channelInds] = ismember(channelIds, this.channelIds);
             assert(all(tf, 'all'), 'Some channel ids not found');
         end
         
-        function inspectAP_timeWindow(imec, timeWindowSec, varargin)
-            idxWindow = imec.closestSampleAPForTime(timeWindowSec);
-            imec.inspectAP_idxWindow(idxWindow, 'timeInSeconds', true, varargin{:});
+        function inspectAP_timeWindow(this, timeWindowSec, varargin)
+            idxWindow = this.closestSampleAPForTime(timeWindowSec);
+            this.inspectAP_idxWindow(idxWindow, 'timeInSeconds', true, varargin{:});
         end
         
-        function inspectAP_idxWindow(imec, idxWindow, varargin)
-            imec.internal_inspect_idxWindow(idxWindow, 'band', 'ap', varargin{:});
+        function inspectAP_idxWindow(this, idxWindow, varargin)
+            this.internal_inspect_idxWindow(idxWindow, 'band', 'ap', varargin{:});
         end
         
-        function inspectLF_idxWindow(imec, idxWindow, varargin)
-            imec.internal_inspect_idxWindow(idxWindow, 'band', 'lf', varargin{:});
+        function inspectLF_idxWindow(this, idxWindow, varargin)
+            this.internal_inspect_idxWindow(idxWindow, 'band', 'lf', varargin{:});
         end
         
-        function inspectLF_timeWindow(imec, timeWindowSec, varargin)
-            idxWindow = imec.closestSampleLFForTime(timeWindowSec);
-            imec.inspectLF_idxWindow(idxWindow, 'timeInSeconds', true, varargin{:});
+        function inspectLF_timeWindow(this, timeWindowSec, varargin)
+            idxWindow = this.closestSampleLFForTime(timeWindowSec);
+            this.inspectLF_idxWindow(idxWindow, 'timeInSeconds', true, varargin{:});
         end
         
-        function internal_inspect_idxWindow(imec, idxWindow, varargin)
+        function internal_inspect_idxWindow(this, idxWindow, varargin)
             p = inputParser();
             p.addParameter('band', 'ap', @ischar);
-            p.addParameter('channels', imec.mappedChannels, @(x) isempty(x) || isvector(x));
-            p.addParameter('invertChannels', imec.channelMap.invertChannelsY, @islogical);
+            p.addParameter('channels', this.mappedChannels, @(x) isempty(x) || isvector(x));
+            p.addParameter('invertChannels', this.channelMap.invertChannelsY, @islogical);
             p.addParameter('goodChannelsOnly', false, @islogical);
             p.addParameter('connectedChannelsOnly', false, @islogical);
             p.addParameter('showSync', true, @isvector);
-            p.addParameter('syncBits', imec.syncBitsNamed, @isvector);
+            p.addParameter('syncBits', this.syncBitsNamed, @isvector);
             p.addParameter('showLabels', true, @islogical);
             p.addParameter('gain', 0.95, @isscalar);
             p.addParameter('car', false, @islogical); % subtract median of all channels at each time
@@ -828,9 +828,9 @@ classdef ImecDataset < handle
             band = string(p.Results.band);
             switch band
                 case 'ap'
-                    fsBand = imec.fsAP;
+                    fsBand = this.fsAP;
                 case 'lf'
-                    fsBand = imec.fsLF;
+                    fsBand = this.fsLF;
                 otherwise
                     error('Unknown band %s', band);
             end
@@ -842,25 +842,25 @@ classdef ImecDataset < handle
             
             sampleIdx = floor(sampleIdx);
             
-            mat = imec.internal_read_idx(sampleIdx, 'band', band, 'fromSourceDatasets', fromSource, 'applyScaling', true); % C x T
-            labels = imec.channelNamesPadded;
+            mat = this.internal_read_idx(sampleIdx, 'band', band, 'fromSourceDatasets', fromSource, 'applyScaling', true); % C x T
+            labels = this.channelNamesPadded;
             
-            [channelInds, channelIds] = imec.lookup_channelIds(p.Results.channels); %#ok<*PROPLC>
+            [channelInds, channelIds] = this.lookup_channelIds(p.Results.channels); %#ok<*PROPLC>
             if p.Results.goodChannelsOnly
-                mask = ismember(channelIds, imec.goodChannels);
+                mask = ismember(channelIds, this.goodChannels);
                 channelInds = channelInds(mask);
                 channelIds = channelIds(mask);
             end
             if p.Results.connectedChannelsOnly
-                mask = ismember(channelIds, imec.connectedChannels);
+                mask = ismember(channelIds, this.connectedChannels);
                 channelInds = channelInds(mask);
                 channelIds = channelIds(mask);
             end
             
             mat = mat(channelInds, :);
             labels = labels(channelInds);
-            connected = ismember(channelIds, imec.connectedChannels);
-            bad = ismember(channelIds, imec.badChannels);
+            connected = ismember(channelIds, this.connectedChannels);
+            bad = ismember(channelIds, this.badChannels);
             
             if p.Results.downsample > 1
                 mat = mat(:, 1:p.Results.downsample:end);
@@ -889,18 +889,18 @@ classdef ImecDataset < handle
             
             % append sync bit info to plot in purple
             showSync = p.Results.showSync;
-            if (syncFromSource && ~imec.hasSourceSync) || (~syncFromSource && ~imec.hasSync)
+            if (syncFromSource && ~this.hasSourceSync) || (~syncFromSource && ~this.hasSync)
                 warning('Cannot show sync data since no sync data present');
                 showSync = false;
             end
             syncBits = p.Results.syncBits;
             if ~isempty(syncBits) && showSync
                 % make sure we grab sync from the matching band
-                syncBitMat = imec.readSyncBits_idx(syncBits, sampleIdx, 'fromSourceDatasets', syncFromSource, 'band', band);
+                syncBitMat = this.readSyncBits_idx(syncBits, sampleIdx, 'fromSourceDatasets', syncFromSource, 'band', band);
                 mat = cat(1, mat, syncBitMat);
                 syncColor = [0.75 0 0.9];
                 colors = cat(1, colors, repmat(syncColor, size(syncBitMat, 1), 1));
-                labels = cat(1, labels, imec.syncBitNames(syncBits));
+                labels = cat(1, labels, this.syncBitNames(syncBits));
                 normalizeMask = cat(1, normalizeMask, false(size(syncBitMat, 1), 1));
             end
             
@@ -967,103 +967,103 @@ classdef ImecDataset < handle
             hold off;
         end
         
-        function inspectSync_idxWindow(imec, idxWindow, varargin)
-            imec.inspectAP_idxWindow(idxWindow, 'channels', [], 'showSync', true, varargin{:});
+        function inspectSync_idxWindow(this, idxWindow, varargin)
+            this.inspectAP_idxWindow(idxWindow, 'channels', [], 'showSync', true, varargin{:});
         end
     end
     
     methods % Memory mapped read/write access to data
-        function mm = memmapAP_by_sample(imec)
-            mm = memmapfile(imec.pathAP, 'Format', {'int16', [imec.nChannels 1], 'x'}, ...
-                'Repeat', imec.nSamplesAP);
+        function mm = memmapAP_by_sample(this)
+            mm = memmapfile(this.pathAP, 'Format', {'int16', [this.nChannels 1], 'x'}, ...
+                'Repeat', this.nSamplesAP);
         end
         
-        function mm = memmapLF_by_sample(imec)
-            mm = memmapfile(imec.pathLF, 'Format', {'int16', [imec.nChannels 1], 'x'}, ...
-                'Repeat', imec.nSamplesLF);
+        function mm = memmapLF_by_sample(this)
+            mm = memmapfile(this.pathLF, 'Format', {'int16', [this.nChannels 1], 'x'}, ...
+                'Repeat', this.nSamplesLF);
         end
         
-        function mm = memmapAP_by_chunk(imec, nSamplesPerChunk)
-            mm = memmapfile(imec.pathAP, 'Format', {'int16', [imec.nChannels nSamplesPerChunk], 'x'}, ...
-                'Repeat', floor(imec.nSamplesAP/nSamplesPerChunk));
+        function mm = memmapAP_by_chunk(this, nSamplesPerChunk)
+            mm = memmapfile(this.pathAP, 'Format', {'int16', [this.nChannels nSamplesPerChunk], 'x'}, ...
+                'Repeat', floor(this.nSamplesAP/nSamplesPerChunk));
         end
         
-        function mm = memmapLF_by_chunk(imec, nSamplesPerChunk)
-            mm = memmapfile(imec.pathLF, 'Format', {'int16', [imec.nChannels nSamplesPerChunk], 'x'}, ...
-                'Repeat', floor(imec.nSamplesLF/nSamplesPerChunk));
+        function mm = memmapLF_by_chunk(this, nSamplesPerChunk)
+            mm = memmapfile(this.pathLF, 'Format', {'int16', [this.nChannels nSamplesPerChunk], 'x'}, ...
+                'Repeat', floor(this.nSamplesLF/nSamplesPerChunk));
         end
         
-        function mm = memmapAP_full(imec, varargin)
+        function mm = memmapAP_full(this, varargin)
             p = inputParser();
             p.addParameter('Writable', false, @islogical);
             p.parse(varargin{:});
             
-            mm = memmapfile(imec.pathAP, 'Format', {'int16', [imec.nChannels imec.nSamplesAP], 'x'}, 'Writable', p.Results.Writable);
+            mm = memmapfile(this.pathAP, 'Format', {'int16', [this.nChannels this.nSamplesAP], 'x'}, 'Writable', p.Results.Writable);
         end
         
-        function mm = memmapLF_full(imec, varargin)
+        function mm = memmapLF_full(this, varargin)
             p = inputParser();
             p.addParameter('Writable', false, @islogical);
             p.parse(varargin{:});
             
-            mm = memmapfile(imec.pathLF, 'Format', {'int16', [imec.nChannels imec.nSamplesLF], 'x'}, 'Writable', p.Results.Writable);
+            mm = memmapfile(this.pathLF, 'Format', {'int16', [this.nChannels this.nSamplesLF], 'x'}, 'Writable', p.Results.Writable);
         end
         
-        function [mm, fsSync] = memmapSync_full(imec)
-            if imec.syncInAPFile
+        function [mm, fsSync] = memmapSync_full(this)
+            if this.syncInAPFile
                 % still has nChannels
-                mm = memmapfile(imec.pathSync, 'Format', {'int16', [imec.nChannels imec.nSamplesAP], 'x'});
-                fsSync = imec.fsAP;
-            elseif imec.syncInLFFile
+                mm = memmapfile(this.pathSync, 'Format', {'int16', [this.nChannels this.nSamplesAP], 'x'});
+                fsSync = this.fsAP;
+            elseif this.syncInLFFile
                 % still has nChannels
-                mm = memmapfile(imec.pathSync, 'Format', {'int16', [imec.nChannels imec.nSamplesLF], 'x'});
-                fsSync = imec.fsLF;
+                mm = memmapfile(this.pathSync, 'Format', {'int16', [this.nChannels this.nSamplesLF], 'x'});
+                fsSync = this.fsLF;
             else
                 % only sync channel
-                mm = memmapfile(imec.pathSync, 'Format', {'int16', [1 imec.nSamplesAP], 'x'});
-                fsSync = imec.fsAP;
+                mm = memmapfile(this.pathSync, 'Format', {'int16', [1 this.nSamplesAP], 'x'});
+                fsSync = this.fsAP;
             end
         end
         
         % refer back to the source datasets
-        function mmSet = memmap_sourceAP_full(imec, varargin)
-            assert(~isempty(imec.sourceDatasets));
-            nSources = numel(imec.sourceDatasets);
+        function mmSet = memmap_sourceAP_full(this, varargin)
+            assert(~isempty(this.sourceDatasets));
+            nSources = numel(this.sourceDatasets);
             mmSet = cell(nSources, 1);
             for iF = 1:nSources
-                mmSet{iF} = imec.sourceDatasets(iF).memmapAP_full(varargin{:});
+                mmSet{iF} = this.sourceDatasets(iF).memmapAP_full(varargin{:});
             end
         end
         
         % refer back to the source datasets
-        function mmSet = memmap_sourceLF_full(imec, varargin)
-            assert(~isempty(imec.sourceDatasets));
-            nSources = numel(imec.sourceDatasets);
+        function mmSet = memmap_sourceLF_full(this, varargin)
+            assert(~isempty(this.sourceDatasets));
+            nSources = numel(this.sourceDatasets);
             mmSet = cell(nSources, 1);
             for iF = 1:nSources
-                mmSet{iF} = imec.sourceDatasets(iF).memmapLF_full(varargin{:});
+                mmSet{iF} = this.sourceDatasets(iF).memmapLF_full(varargin{:});
             end
         end
         
-        function [mmSet, fsSync] = memmap_sourceSync_full(imec, varargin)
-            assert(~isempty(imec.sourceDatasets));
-            nSources = numel(imec.sourceDatasets);
+        function [mmSet, fsSync] = memmap_sourceSync_full(this, varargin)
+            assert(~isempty(this.sourceDatasets));
+            nSources = numel(this.sourceDatasets);
             mmSet = cell(nSources, 1);
             fsSync = nan(nSources, 1);
             for iF = 1:nSources
-                imecSrc = imec.sourceDatasets(iF);
+                imecSrc = this.sourceDatasets(iF);
                 if imecSrc.syncInAPFile
                     % still has nChannels
-                    mmSet{iF} = memmapfile(imecSrc.pathSync, 'Format', {'int16', [imec.nChannels imec.nSamplesAP], 'x'});
-                    fsSync(iF) = imec.fsAP;
+                    mmSet{iF} = memmapfile(imecSrc.pathSync, 'Format', {'int16', [this.nChannels this.nSamplesAP], 'x'});
+                    fsSync(iF) = this.fsAP;
                 elseif imecSrc.syncInLFFile
                     % still has nChannels
-                    mmSet{iF} = memmapfile(imec.pathSync, 'Format', {'int16', [imec.nChannels imec.nSamplesLF], 'x'});
-                    fsSync(iF) = imec.fsLF;
+                    mmSet{iF} = memmapfile(this.pathSync, 'Format', {'int16', [this.nChannels this.nSamplesLF], 'x'});
+                    fsSync(iF) = this.fsLF;
                 else
                     % only sync channel
-                    mmSet{iF} = memmapfile(imec.pathSync, 'Format', {'int16', [1 imec.nSamplesAP], 'x'});
-                    fsSync(iF) = imec.fsAP;
+                    mmSet{iF} = memmapfile(this.pathSync, 'Format', {'int16', [1 this.nSamplesAP], 'x'});
+                    fsSync(iF) = this.fsAP;
                 end
             end
             
@@ -1072,7 +1072,7 @@ classdef ImecDataset < handle
         end
     end
     
-    methods(Static)
+    methods (Static)
         function out = multi_mmap_extract_sample_idx(mmSet, fileInds, origSampleInds, chInds, scalingByFile, scalingChMask)
             % given [fileInds, origSampleInds] as returned by ConcatenationInfo/lookup_sampleIndexInSourceFiles
             % extract those samples from the set of memory mapped files in mmSet (returned by memmap**_all)
@@ -1127,8 +1127,9 @@ classdef ImecDataset < handle
         end
     end
     
-    methods(Hidden) % Read data at specified times
-        function [data_ch_by_time_by_snippet, cluster_ids, channel_ids_by_snippet, scaleToUv_by_snippet, group_ids] = readSnippetsRaw(imec, times, window, varargin)
+    methods (Hidden) % Read data at specified times
+        function [data_ch_by_time_by_snippet, cluster_ids, channel_ids_by_snippet, scaleToUv_by_snippet, group_ids] ...
+                = readSnippetsRaw(this, times, window, varargin)
             % for each sample index in times, read the window times + window(1):window(2)
             % of samples around this time from some channels
             
@@ -1203,8 +1204,8 @@ classdef ImecDataset < handle
                 error('Specify either channel_ids or channel_ids_by_cluster');
             end
             
-            channel_inds_by_snippet = imec.lookup_channelIds(channel_ids_by_snippet);
-            syncChannelIndex = imec.syncChannelIndex;
+            channel_inds_by_snippet = this.lookup_channelIds(channel_ids_by_snippet);
+            syncChannelIndex = this.syncChannelIndex;
             syncInChannelInds = any(ismember(channel_inds_by_snippet, syncChannelIndex), 'all');
             
             band = string(p.Results.band);
@@ -1217,47 +1218,47 @@ classdef ImecDataset < handle
             
             switch band
                 case 'ap'
-                    nSamples = imec.nSamplesAP;
+                    nSamples = this.nSamplesAP;
                     if ~fromSourceDatasets
-                        mm = imec.memmapAP_full();
-                        scaleToUv = imec.apScaleToUv;
+                        mm = this.memmapAP_full();
+                        scaleToUv = this.apScaleToUv;
                     else
-                        mmSet = imec.memmap_sourceAP_full();
-                        concatInfo = imec.concatenationInfoAP;
-                        scaleToUv_this = imec.apScaleToUv;
-                        scaleToUv_by_source = cat(1, imec.sourceDatasets.apScaleToUv);
+                        mmSet = this.memmap_sourceAP_full();
+                        concatInfo = this.concatenationInfoAP;
+                        scaleToUv_this = this.apScaleToUv;
+                        scaleToUv_by_source = cat(1, this.sourceDatasets.apScaleToUv);
                     end
                     
                     % do we need to specially handle the sync channel?
                     if syncFromSource ~= fromSourceDatasets && syncInChannelInds
                         handleSyncSeparately = true;
                         if ~syncFromSource
-                            mmSync = imec.memmapAP_full();
+                            mmSync = this.memmapAP_full();
                         else
-                            mmSetSync = imec.memmap_sourceAP_full();
+                            mmSetSync = this.memmap_sourceAP_full();
                         end
                     else
                         handleSyncSeparately = false;
                     end
                 case 'lf'
-                    nSamples = imec.nSamplesLF;
+                    nSamples = this.nSamplesLF;
                     if ~fromSourceDatasets
-                        mm = imec.memmapLF_full();
-                        scaleToUv = imec.lfScaleToUv;
+                        mm = this.memmapLF_full();
+                        scaleToUv = this.lfScaleToUv;
                     else
-                        mmSet = imec.memmap_sourceLF_full();
-                        concatInfo = imec.concatenationInfoLF;
-                        scaleToUv_this = imec.lfScaleToUv;
-                        scaleToUv_by_source = cat(1, imec.sourceDatasets.lfScaleToUv);
+                        mmSet = this.memmap_sourceLF_full();
+                        concatInfo = this.concatenationInfoLF;
+                        scaleToUv_this = this.lfScaleToUv;
+                        scaleToUv_by_source = cat(1, this.sourceDatasets.lfScaleToUv);
                     end
                     
                     % do we need to specially handle the sync channel?
                     if syncFromSource ~= fromSourceDatasets  && syncInChannelInds
                         handleSyncSeparately = true;
                         if ~syncFromSource
-                            mmSync = imec.memmapLF_full();
+                            mmSync = this.memmapLF_full();
                         else
-                            mmSetSync = imec.memmap_sourceLF_full();
+                            mmSetSync = this.memmap_sourceLF_full();
                         end
                     else
                         handleSyncSeparately = true;
@@ -1280,7 +1281,7 @@ classdef ImecDataset < handle
             
             times = npxutils.internal.makecol(uint64(times));
             nC = size(channel_ids_by_snippet, 1);
-            nC_all = imec.nChannels;
+            nC_all = this.nChannels;
             nS = numel(times); % actual number of input snippets extracted
             
             % nS out is the accumulated number of output snippets (equals nS or number of clusters if we're averaging)
@@ -1348,7 +1349,7 @@ classdef ImecDataset < handle
                 prog = [];
             end
             
-            good_ch_inds = imec.goodChannelInds;
+            good_ch_inds = this.goodChannelInds;
             idx_request = int64(times') + int64(window(1):window(2))'; % nWindow x nTimes indices
             mask_idx_okay = idx_request >= int64(1) & idx_request <= nSamples;
             idx_request(~mask_idx_okay) = 1; % we'll clear out later
@@ -1447,10 +1448,10 @@ classdef ImecDataset < handle
     end
     
     methods  % Read data at specified times
-        function snippet_set = readSnippetSet(imec, band, times, window, varargin)
+        function snippet_set = readSnippetSet(this, band, times, window, varargin)
             [data_ch_by_time_by_snippet, cluster_ids, channel_ids_by_snippet, scaleToUv_by_snippet, group_ids] = ...
-                imec.readSnippetsRaw(times, window, 'band', band, varargin{:});
-            snippet_set = npxutils.SnippetSet(imec, band);
+                this.readSnippetsRaw(times, window, 'band', band, varargin{:});
+            snippet_set = npxutils.SnippetSet(this, band);
             snippet_set.data = data_ch_by_time_by_snippet;
             snippet_set.scaleToUv = scaleToUv_by_snippet;
             snippet_set.sample_idx = times;
@@ -1460,15 +1461,15 @@ classdef ImecDataset < handle
             snippet_set.window = window;
         end
         
-        function snippet_set = readAPSnippetSet(imec, times, window, varargin)
-            snippet_set = imec.readSnippetSet('ap', times, window, varargin{:});
+        function snippet_set = readAPSnippetSet(this, times, window, varargin)
+            snippet_set = this.readSnippetSet('ap', times, window, varargin{:});
         end
         
-        function snippet_set = readLFSnippetSet(imec, times, window, varargin)
-            snippet_set = imec.readSnippetSet('lf', times, window, varargin{:});
+        function snippet_set = readLFSnippetSet(this, times, window, varargin)
+            snippet_set = this.readSnippetSet('lf', times, window, varargin{:});
         end
         
-        function rms = computeRMSByChannel(imec, varargin)
+        function rms = computeRMSByChannel(this, varargin)
             % output will be nMappedChannels x 1 vector of rms
             p = inputParser();
             p.addParameter('sampleMaskFn', [], @(x) isempty(x) || isa(x, 'function_handle')); % sampleMaskFn(data_ch_x_time, sample_idx_time) --> logical_time mask of time samples valid for use, useful if you have artifacts at known times
@@ -1480,15 +1481,15 @@ classdef ImecDataset < handle
             sampleMaskFn = p.Results.sampleMaskFn;
             
             % aim for the middle of the file
-            chunkSize = min(imec.fsAP, p.Results.chunkSize);
-            mm = imec.memmapAP_by_chunk(chunkSize);
+            chunkSize = min(this.fsAP, p.Results.chunkSize);
+            mm = this.memmapAP_by_chunk(chunkSize);
             nChunks = numel(mm.Data);
             useChunks = min(nChunks, p.Results.useChunks);
             skipChunks = floor((nChunks-useChunks)/2);
             
-            ch_mask = imec.lookup_channelIds(imec.mappedChannels); % for common average referencing
+            ch_mask = this.lookup_channelIds(this.mappedChannels); % for common average referencing
             
-            sumByChunk = nan(imec.nChannels, useChunks);
+            sumByChunk = nan(this.nChannels, useChunks);
             %             prog = npxutils.internal.ProgressBar(useChunks, 'Computing RMS per channel');
             for iC =  1:useChunks
                 %                 prog.increment();
@@ -1510,41 +1511,41 @@ classdef ImecDataset < handle
             rms = sqrt(sum(sumByChunk, 2) ./ (useChunks * chunkSize));
             
             rms = rms(ch_mask); % only return mapped channels
-            rms = rms * imec.apScaleToUv;
+            rms = rms * this.apScaleToUv;
         end
     end
     
     methods (Hidden)
-        function fid = openAPFile(imec)
-            if ~exist(imec.pathAP, 'file')
-                error('RawDataFile: %s not found', imec.pathAP);
+        function fid = openAPFile(this)
+            if ~exist(this.pathAP, 'file')
+                error('RawDataFile: %s not found', this.pathAP);
             end
-            fid = fopen(imec.pathAP, 'r');
+            fid = fopen(this.pathAP, 'r');
             
             if fid == -1
-                error('RawDataFile: Could not open %s', imec.pathAP);
+                error('RawDataFile: Could not open %s', this.pathAP);
             end
         end
         
-        function fid = openLFFile(imec)
-            if ~exist(imec.pathLF, 'file')
-                error('RawDataFile: %s not found', imec.pathAP);
+        function fid = openLFFile(this)
+            if ~exist(this.pathLF, 'file')
+                error('RawDataFile: %s not found', this.pathAP);
             end
-            fid = fopen(imec.pathLF, 'r');
+            fid = fopen(this.pathLF, 'r');
             
             if fid == -1
-                error('RawDataFile: Could not open %s', imec.pathAP);
+                error('RawDataFile: Could not open %s', this.pathAP);
             end
         end
         
-        function fid = openSyncFile(imec)
-            if ~exist(imec.pathSync, 'file')
-                error('RawDataFile: %s not found', imec.pathSync);
+        function fid = openSyncFile(this)
+            if ~exist(this.pathSync, 'file')
+                error('RawDataFile: %s not found', this.pathSync);
             end
-            fid = fopen(imec.pathSync, 'r');
+            fid = fopen(this.pathSync, 'r');
             
             if fid == -1
-                error('RawDataFile: Could not open %s', imec.pathSync);
+                error('RawDataFile: Could not open %s', this.pathSync);
             end
         end
     
@@ -1552,273 +1553,273 @@ classdef ImecDataset < handle
     
         %% Dependent properties
     methods    
-        function tf = get.syncInAPFile(imec)
-            tf = imec.channelMap.syncInAPFile && imec.hasAP;
+        function tf = get.syncInAPFile(this)
+            tf = this.channelMap.syncInAPFile && this.hasAP;
         end
         
-        function tf = get.syncInLFFile(imec)
-            tf = imec.channelMap.syncInLFFile && imec.hasLF;
+        function tf = get.syncInLFFile(this)
+            tf = this.channelMap.syncInLFFile && this.hasLF;
         end
         
-        function id = get.syncChannelId(imec)
-            if imec.syncInAPFile || imec.syncInLFFile
-                id = imec.channelMap.syncChannelId;
+        function id = get.syncChannelId(this)
+            if this.syncInAPFile || this.syncInLFFile
+                id = this.channelMap.syncChannelId;
             else
                 % if sync is in its own file, assume it's the first and only channel
                 id = NaN;
             end
         end
         
-        function ind = get.syncChannelIndex(imec)
-            if imec.syncInAPFile || imec.syncInLFFile
-                ind = imec.channelMap.syncChannelIndex;
+        function ind = get.syncChannelIndex(this)
+            if this.syncInAPFile || this.syncInLFFile
+                ind = this.channelMap.syncChannelIndex;
             else
                 % if sync is in its own file, assume it's the first and only channel
                 ind = uint32(1);
             end
         end
         
-        function pathAP = get.pathAP(imec)
-            pathAP = fullfile(imec.pathRoot, imec.fileAP);
+        function pathAP = get.pathAP(this)
+            pathAP = fullfile(this.pathRoot, this.fileAP);
         end
         
-        function fileAP = get.fileAP(imec)
-            if isnan(imec.fileImecNumber)
-                fileAP = [imec.fileStem '.imec.' imec.fileTypeAP '.bin'];
+        function fileAP = get.fileAP(this)
+            if isnan(this.fileImecNumber)
+                fileAP = [this.fileStem '.imec.' this.fileTypeAP '.bin'];
             else
-                fileAP = [imec.fileStem, sprintf('.imec%d.', imec.fileImecNumber), imec.fileTypeAP, '.bin'];
+                fileAP = [this.fileStem, sprintf('.imec%d.', this.fileImecNumber), this.fileTypeAP, '.bin'];
             end
         end
         
-        function tf = get.hasAP(imec)
-            tf = exist(imec.pathAP, 'file') == 2;
+        function tf = get.hasAP(this)
+            tf = exist(this.pathAP, 'file') == 2;
         end
         
-        function fileAPMeta = get.fileAPMeta(imec)
-            if isnan(imec.fileImecNumber)
-                fileAPMeta = [imec.fileStem '.imec.ap.meta'];
+        function fileAPMeta = get.fileAPMeta(this)
+            if isnan(this.fileImecNumber)
+                fileAPMeta = [char(this.fileStem) '.imec.ap.meta'];
             else
-                fileAPMeta = [imec.fileStem, sprintf('.imec%d.ap.meta', imec.fileImecNumber)];
+                fileAPMeta = sprintf('%s.imec%d.ap.meta', this.fileStem, this.fileImecNumber);
             end
         end
         
-        function pathAPMeta = get.pathAPMeta(imec)
-            pathAPMeta = fullfile(imec.pathRoot, imec.fileAPMeta);
+        function pathAPMeta = get.pathAPMeta(this)
+            pathAPMeta = fullfile(this.pathRoot, this.fileAPMeta);
         end
         
-        function pathLF = get.pathLF(imec)
-            pathLF = fullfile(imec.pathRoot, imec.fileLF);
+        function pathLF = get.pathLF(this)
+            pathLF = fullfile(this.pathRoot, this.fileLF);
         end
         
-        function fileLF = get.fileLF(imec)
-            if isnan(imec.fileImecNumber)
-                fileLF = [imec.fileStem '.imec.lf.bin'];
+        function fileLF = get.fileLF(this)
+            if isnan(this.fileImecNumber)
+                fileLF = [this.fileStem '.imec.lf.bin'];
             else
-                fileLF = [imec.fileStem, sprintf('.imec%d.', imec.fileImecNumber), 'lf.bin'];
+                fileLF = [this.fileStem, sprintf('.imec%d.', this.fileImecNumber), 'lf.bin'];
             end
         end
         
-        function fileLFMeta = get.fileLFMeta(imec)
-            if isnan(imec.fileImecNumber)
-                fileLFMeta = [imec.fileStem '.imec.lf.meta'];
+        function fileLFMeta = get.fileLFMeta(this)
+            if isnan(this.fileImecNumber)
+                fileLFMeta = [this.fileStem '.imec.lf.meta'];
             else
-                fileLFMeta = [imec.fileStem, sprintf('.imec%d.lf.meta', imec.fileImecNumber)];
+                fileLFMeta = [this.fileStem, sprintf('.imec%d.lf.meta', this.fileImecNumber)];
             end
         end
         
-        function pathLFMeta = get.pathLFMeta(imec)
-            pathLFMeta = fullfile(imec.pathRoot, imec.fileLFMeta);
+        function pathLFMeta = get.pathLFMeta(this)
+            pathLFMeta = fullfile(this.pathRoot, this.fileLFMeta);
         end
         
-        function tf = get.hasLF(imec)
-            tf = exist(imec.pathLF, 'file') == 2;
+        function tf = get.hasLF(this)
+            tf = exist(this.pathLF, 'file') == 2;
         end
         
-        function fileSync = get.fileSync(imec)
-            if imec.syncInAPFile
-                fileSync = imec.fileAP;
-            elseif imec.syncInLFFile
-                fileSync = imec.fileLF;
+        function fileSync = get.fileSync(this)
+            if this.syncInAPFile
+                fileSync = this.fileAP;
+            elseif this.syncInLFFile
+                fileSync = this.fileLF;
             else
-                fileSync = [imec.fileStem, '.imec.sync.bin'];
+                fileSync = [this.fileStem, '.imec.sync.bin'];
             end
         end
         
-        function pathSync = get.pathSync(imec)
-            pathSync = fullfile(imec.pathRoot, imec.fileSync);
+        function pathSync = get.pathSync(this)
+            pathSync = fullfile(this.pathRoot, this.fileSync);
         end
         
-        function tf = get.hasSync(imec)
-            tf = exist(imec.pathSync, 'file') == 2;
+        function tf = get.hasSync(this)
+            out = isfile(this.pathSync);
         end
         
-        function fs = get.fsSync(imec)
+        function fs = get.fsSync(this)
             % defer to fsAP or fsLF, or to stored value if neither sources the sync signal
-            if ~isempty(imec.fsSync)
-                fs = imec.fsSync;
-            elseif imec.syncInAPFile
-                fs = imec.fsAP;
-            elseif imec.syncInLFFile
-                fs = imec.fsLF;
+            if ~isempty(this.fsSync)
+                fs = this.fsSync;
+            elseif this.syncInAPFile
+                fs = this.fsAP;
+            elseif this.syncInLFFile
+                fs = this.fsLF;
             else
                 fs = NaN;
             end
         end
         
-        function tf = get.hasSourceSync(imec)
-            tf = imec.hasSourceDatasets && all([imec.sourceDatasets.hasSync]);
+        function tf = get.hasSourceSync(this)
+            tf = this.hasSourceDatasets && all([this.sourceDatasets.hasSync]);
         end
         
-        function fileSyncCached = get.fileSyncCached(imec)
-            fileSyncCached = [imec.fileStem '.sync.mat'];
+        function out = get.fileSyncCached(this)
+            out = [char(this.fileStem) '.sync.mat'];
         end
         
-        function pathSyncCached = get.pathSyncCached(imec)
-            pathSyncCached = fullfile(imec.pathRoot, imec.fileSyncCached);
+        function pathSyncCached = get.pathSyncCached(this)
+            pathSyncCached = fullfile(this.pathRoot, this.fileSyncCached);
         end
         
-        function scale = get.apScaleToUv(imec)
-            if isempty(imec.apRange)
+        function scale = get.apScaleToUv(this)
+            if isempty(this.apRange)
                 scale = NaN;
             else
-                scale = (imec.apRange(2) - imec.apRange(1)) / (2^imec.adcBits) / imec.apGain * 1e6;
+                scale = (this.apRange(2) - this.apRange(1)) / (2^this.adcBits) / this.apGain * 1e6;
             end
         end
         
-        function scale = get.lfScaleToUv(imec)
-            if isempty(imec.lfRange)
+        function scale = get.lfScaleToUv(this)
+            if isempty(this.lfRange)
                 scale = NaN;
             else
-                scale = (imec.lfRange(2) - imec.lfRange(1)) / (2^imec.adcBits) / imec.lfGain * 1e6;
+                scale = (this.lfRange(2) - this.lfRange(1)) / (2^this.adcBits) / this.lfGain * 1e6;
             end
         end
         
-        function file = get.channelMapFile(imec)
-            if isempty(imec.channelMap)
+        function file = get.channelMapFile(this)
+            if isempty(this.channelMap)
                 file = '';
             else
-                file = imec.channelMap.file;
+                file = this.channelMap.file;
             end
         end
         
-        function list = get.mappedChannels(imec)
-            if isempty(imec.channelMap)
+        function list = get.mappedChannels(this)
+            if isempty(this.channelMap)
                 list = [];
             else
-                list = imec.channelMap.channelIdsMapped;
+                list = this.channelMap.channelIdsMapped;
             end
         end
         
-        function list = get.mappedChannelInds(imec)
-            list = imec.lookup_channelIds(imec.mappedChannels);
+        function list = get.mappedChannelInds(this)
+            list = this.lookup_channelIds(this.mappedChannels);
         end
         
-        function list = get.connectedChannels(imec)
-            if isempty(imec.channelMap)
+        function list = get.connectedChannels(this)
+            if isempty(this.channelMap)
                 list = [];
             else
-                list = imec.channelMap.connectedChannels;
+                list = this.channelMap.connectedChannels;
             end
         end
         
-        function list = get.connectedChannelInds(imec)
-            list = imec.lookup_channelIds(imec.connectedChannels);
+        function list = get.connectedChannelInds(this)
+            list = this.lookup_channelIds(this.connectedChannels);
         end
         
-        function n = get.nChannelsMapped(imec)
-            if isempty(imec.channelMap)
+        function n = get.nChannelsMapped(this)
+            if isempty(this.channelMap)
                 n = NaN;
             else
-                n = imec.channelMap.nChannelsMapped;
+                n = this.channelMap.nChannelsMapped;
             end
         end
         
-        function n = get.nChannelsConnected(imec)
-            if isempty(imec.channelMap)
+        function n = get.nChannelsConnected(this)
+            if isempty(this.channelMap)
                 n = NaN;
             else
-                n = nnz(imec.channelMap.connected);
+                n = nnz(this.channelMap.connected);
             end
         end
         
-        function ch = get.goodChannels(imec)
-            ch = setdiff(imec.connectedChannels, imec.badChannels);
+        function ch = get.goodChannels(this)
+            ch = setdiff(this.connectedChannels, this.badChannels);
         end
         
-        function list = get.goodChannelInds(imec)
-            list = imec.lookup_channelIds(imec.goodChannels);
+        function list = get.goodChannelInds(this)
+            list = this.lookup_channelIds(this.goodChannels);
         end
         
-        function n = get.nGoodChannels(imec)
-            n = numel(imec.goodChannels);
+        function n = get.nGoodChannels(this)
+            n = numel(this.goodChannels);
         end
         
-        function idx = get.channelIds(imec)
-            idx = imec.channelMap.channelIds;
+        function idx = get.channelIds(this)
+            idx = this.channelMap.channelIds;
         end
         
-        function names = get.channelNames(imec)
-            names = strings(imec.nChannels, 1);
-            names(imec.channelMap.channelIds) = string(sprintfc("ch %d", imec.channelMap.channelIds));
-            if ~isnan(imec.syncChannelIndex)
-                names(imec.syncChannelIndex) = "sync";
+        function names = get.channelNames(this)
+            names = strings(this.nChannels, 1);
+            names(this.channelMap.channelIds) = string(sprintfc("ch %d", this.channelMap.channelIds));
+            if ~isnan(this.syncChannelIndex)
+                names(this.syncChannelIndex) = "sync";
             end
         end
         
-        function names = get.channelNamesPadded(imec)
-            names = strings(imec.nChannels, 1);
-            names(imec.channelMap.channelIds) = string(sprintfc("ch %03d", imec.channelMap.channelIds));
-            if ~isnan(imec.syncChannelIndex)
-                names(imec.syncChannelIndex) = "sync";
+        function names = get.channelNamesPadded(this)
+            names = strings(this.nChannels, 1);
+            names(this.channelMap.channelIds) = string(sprintfc("ch %03d", this.channelMap.channelIds));
+            if ~isnan(this.syncChannelIndex)
+                names(this.syncChannelIndex) = "sync";
             end
         end
         
-        function n = get.nSyncBits(imec)
-            n = 8*imec.bytesPerSample; % should be 16?
+        function n = get.nSyncBits(this)
+            n = 8*this.bytesPerSample; % should be 16?
         end
         
-        function bits = get.syncBitsNamed(imec)
-            names = imec.syncBitNames;
+        function bits = get.syncBitsNamed(this)
+            names = this.syncBitNames;
             bits = find(names ~= "");
         end
         
-        function names = get.syncBitNames(imec)
-            if isempty(imec.syncBitNames)
-                names = strings(imec.nSyncBits, 1);
+        function names = get.syncBitNames(this)
+            if isempty(this.syncBitNames)
+                names = strings(this.nSyncBits, 1);
             else
-                names = string(imec.syncBitNames);
+                names = string(this.syncBitNames);
             end
         end
         
-        function meta = readAPMeta(imec)
-            meta = npxutils.readINI(imec.pathAPMeta);
+        function meta = readAPMeta(this)
+            meta = npxutils.readINI(this.pathAPMeta);
         end
         
-        function meta = generateModifiedAPMeta(imec)
-            meta = imec.readAPMeta;
+        function meta = generateModifiedAPMeta(this)
+            meta = this.readAPMeta;
             
-            meta.syncBitNames = imec.syncBitNames;
-            meta.badChannels = imec.badChannels;
+            meta.syncBitNames = this.syncBitNames;
+            meta.badChannels = this.badChannels;
         end
         
-        function tf = get.hasSourceDatasets(imec)
-            tf = ~isempty(imec.sourceDatasets);
+        function tf = get.hasSourceDatasets(this)
+            tf = ~isempty(this.sourceDatasets);
         end
         
-        function tf = get.hasSourceAP(imec)
-            tf = imec.hasSourceDatasets && all([imec.sourceDatasets.hasAP]);
+        function tf = get.hasSourceAP(this)
+            tf = this.hasSourceDatasets && all([this.sourceDatasets.hasAP]);
         end
         
-        function tf = get.hasSourceLF(imec)
-            tf = imec.hasSourceDatasets && all([imec.sourceDatasets.hasLF]);
+        function tf = get.hasSourceLF(this)
+            tf = this.hasSourceDatasets && all([this.sourceDatasets.hasLF]);
         end
         
-        function writeModifiedAPMeta(imec, varargin)
+        function writeModifiedAPMeta(this, varargin)
             p = inputParser();
             p.addParameter('extraMeta', struct(), @isstruct);
             p.parse(varargin{:});
             
-            meta = imec.generateModifiedAPMeta();
+            meta = this.generateModifiedAPMeta();
             
             % set extra user provided fields
             extraMeta = p.Results.extraMeta;
@@ -1827,64 +1828,72 @@ classdef ImecDataset < handle
                 meta.(extraMetaFields{iFld}) = extraMeta.(extraMetaFields{iFld});
             end
             
-            npxutils.writeINI([imec.pathAPMeta], meta);
+            npxutils.writeINI([this.pathAPMeta], meta);
         end
         
-        function meta = readLFMeta(imec)
-            meta = npxutils.readINI(imec.pathLFMeta);
+        function meta = readLFMeta(this)
+            meta = npxutils.readINI(this.pathLFMeta);
         end
         
-        function str = get.creationTimeStr(imec)
-            str = datestr(imec.creationTime);
+        function str = get.creationTimeStr(this)
+            str = datestr(this.creationTime);
         end
         
-        function file = getAuxiliaryFileWithSuffix(imec, suffix)
+        function file = getAuxiliaryFileWithSuffix(this, suffix)
             suffix = char(suffix);
-            file = fullfile(imec.pathRoot, [imec.fileStem, '.', suffix]);
+            file = fullfile(this.pathRoot, [this.fileStem, '.', suffix]);
         end
     
         %% Marking Channels as bad
         
-        function [rmsBadChannels, rmsByChannel] = markBadChannelsByRMS(imec, varargin)
+        function [rmsBadChannels, rmsByChannel] = markBadChannelsByRMS(this, varargin)
             p = inputParser();
             p.addParameter('rmsRange', [3 100], @isvector);
             p.addParameter('sampleMaskFn', [], @(x) isempty(x) || isa(x, 'function_handle')); % sampleMaskFn(data_ch_x_time, sample_idx_time) --> logical_time mask of time samples valid for use, useful if you have artifacts at known times
             p.parse(varargin{:});
             
-            rmsByChannel = imec.computeRMSByChannel('sampleMaskFn', p.Results.sampleMaskFn);
+            rmsByChannel = this.computeRMSByChannel('sampleMaskFn', p.Results.sampleMaskFn);
             rmsMin = p.Results.rmsRange(1);
             rmsMax = p.Results.rmsRange(2);
             rmsBadMask = rmsByChannel < rmsMin | rmsByChannel > rmsMax;
             
-            badMappedChannels = imec.mappedChannels(rmsBadMask);
-            badConnectedChannels = badMappedChannels(ismember(badMappedChannels, imec.connectedChannels));
-            imec.markBadChannels(badConnectedChannels);
+            badMappedChannels = this.mappedChannels(rmsBadMask);
+            badConnectedChannels = badMappedChannels(ismember(badMappedChannels, this.connectedChannels));
+            this.markBadChannels(badConnectedChannels);
             
             rmsBadChannels = badMappedChannels;
         end
         
-        function markBadChannels(imec, list)
-            % this adds to the set of bad channels, so multiple calls will
-            % remove additional channels
+        function markBadChannels(this, list)
+            % Mark specified channels as bad.
+            %
+            % markBadChannels(this, list)
+            %
+            % List is a logical or numeric index vector identifying the channels
+            % to mark as bad. If you specify a non-connected or nonexistent
+            % channel, it is silently ignored.
+            %
+            % This adds to the set of bad channels, so multiple calls will
+            % remove additional channels.
             if islogical(list)
                 list = find(list);
             end
             % filter for connected channels only
-            badConnectedChannels = list(ismember(list, imec.connectedChannels));
-            imec.badChannels = union(imec.badChannels, badConnectedChannels);
+            badConnectedChannels = list(ismember(list, this.connectedChannels));
+            this.badChannels = union(this.badChannels, badConnectedChannels);
         end
     
         %% Modify bin data files in place
         
-        function modifyAPInPlace(imec, varargin)
-            imec.modifyInPlaceInternal('ap', varargin{:});
+        function modifyAPInPlace(this, varargin)
+            this.modifyInPlaceInternal('ap', varargin{:});
         end
         
-        function modifyLFInPlace(imec, varargin)
-            imec.modifyInPlaceInternal('lf', varargin{:});
+        function modifyLFInPlace(this, varargin)
+            this.modifyInPlaceInternal('lf', varargin{:});
         end
         
-        function imecSym = symLinkAPIntoDirectory(imec, newFolder, varargin)
+        function imecSym = symLinkAPIntoDirectory(this, newFolder, varargin)
             p = inputParser();
             p.addParameter('relative', false, @islogical);
             p.parse(varargin{:});
@@ -1893,26 +1902,26 @@ classdef ImecDataset < handle
             if ~exist(newFolder, 'dir')
                 npxutils.internal.mkdirRecursive(newFolder);
             end
-            newAPPath = fullfile(newFolder, imec.fileAP);
-            npxutils.internal.makeSymLink(imec.pathAP, newAPPath, p.Results.relative);
+            newAPPath = fullfile(newFolder, this.fileAP);
+            npxutils.internal.makeSymLink(this.pathAP, newAPPath, p.Results.relative);
             
-            newAPMetaPath = fullfile(newFolder, imec.fileAPMeta);
-            npxutils.internal.makeSymLink(imec.pathAPMeta, newAPMetaPath, p.Results.relative);
+            newAPMetaPath = fullfile(newFolder, this.fileAPMeta);
+            npxutils.internal.makeSymLink(this.pathAPMeta, newAPMetaPath, p.Results.relative);
             
-            if ~imec.syncInAPFile && exist(imec.pathSync, 'file')
-                newSyncPath = fullfile(newFolder, imec.fileSync);
-                npxutils.internal.makeSymLink(imec.pathSync, newSyncPath, p.Results.relative);
+            if ~this.syncInAPFile && exist(this.pathSync, 'file')
+                newSyncPath = fullfile(newFolder, this.fileSync);
+                npxutils.internal.makeSymLink(this.pathSync, newSyncPath, p.Results.relative);
             end
             
-            if exist(imec.pathSyncCached, 'file')
-                newSyncCachedPath = fullfile(newFolder, imec.fileSyncCached);
-                npxutils.internal.makeSymLink(imec.pathSyncCached, newSyncCachedPath, p.Results.relative);
+            if exist(this.pathSyncCached, 'file')
+                newSyncCachedPath = fullfile(newFolder, this.fileSyncCached);
+                npxutils.internal.makeSymLink(this.pathSyncCached, newSyncCachedPath, p.Results.relative);
             end
             
-            imecSym = npxutils.ImecDataset(newAPPath, 'channelMap', imec.channelMapFile);
+            imecSym = npxutils.ImecDataset(newAPPath, 'channelMap', this.channelMapFile);
         end
         
-        function imecOut = saveTransformedDataset(imec, outPath, varargin)
+        function imecOut = saveTransformedDataset(this, outPath, varargin)
             p = inputParser();
             p.addParameter('stem', "", @npxutils.internal.isstringlike);
             
@@ -1944,10 +1953,10 @@ classdef ImecDataset < handle
             p.parse(varargin{:});
             
             % this uses the same syntax as writeConcatenatedFileMatchGains
-            imecOut = npxutils.ImecDataset.writeConcatenatedFileMatchGains({imec}, outPath, p.Results);
+            imecOut = npxutils.ImecDataset.writeConcatenatedFileMatchGains({this}, outPath, p.Results);
         end
         
-        function writeFolderForPhy(imec, savePath, varargin)
+        function writeFolderForPhy(this, savePath, varargin)
             % writes the files needed for Phy template-gui to be able to inspect this file in Phy
             % essentially by generating a synthetic Kilosort output
             
@@ -1969,14 +1978,14 @@ classdef ImecDataset < handle
             end
             
             nTemplateTimepoints = 82;
-            nCh = imec.nGoodChannels;
+            nCh = this.nGoodChannels;
             % these can't be 1 because of squeeze() inside Phy's code
             nTemplates = 2;
             nTemplateFeatures = 2;
             nFeaturesPerChannel = 2;
             nPCFeatures = 2;
             
-            imec.symLinkAPIntoDirectory(savePath);
+            this.symLinkAPIntoDirectory(savePath);
             
             npxutils.writeNPY(spikeTimes, fullfile(savePath, 'spike_times.npy'));
             npxutils.writeNPY(zeros(nSpikes, 1, 'uint32'), fullfile(savePath, 'spike_templates.npy'));
@@ -1987,13 +1996,13 @@ classdef ImecDataset < handle
             templates = zeros(2, nTemplateTimepoints, nCh, 'single');
             npxutils.writeNPY(templates, fullfile(savePath, 'templates.npy'));
             
-            templatesInds = imec.goodChannels';
+            templatesInds = this.goodChannels';
             npxutils.writeNPY(templatesInds, fullfile(savePath, 'templates_ind.npy'));
             
-            sortedInds = imec.goodChannelInds;
-            chanMap0ind = int32(imec.channelMap.channelIdsMapped(sortedInds) - uint32(1));
-            xcoords = imec.channelMap.xcoords(sortedInds);
-            ycoords = imec.channelMap.ycoords(sortedInds);
+            sortedInds = this.goodChannelInds;
+            chanMap0ind = int32(this.channelMap.channelIdsMapped(sortedInds) - uint32(1));
+            xcoords = this.channelMap.xcoords(sortedInds);
+            ycoords = this.channelMap.ycoords(sortedInds);
             npxutils.writeNPY(chanMap0ind, fullfile(savePath, 'channel_map.npy'));
             npxutils.writeNPY([xcoords ycoords], fullfile(savePath, 'channel_positions.npy'));
             
@@ -2019,12 +2028,12 @@ classdef ImecDataset < handle
             
             % write params.py
             fid = fopen(fullfile(savePath,'params.py'), 'w');
-            [~, fname, ext] = fileparts(imec.fileAP);
+            [~, fname, ext] = fileparts(this.fileAP);
             fprintf(fid,['dat_path = ''',fname ext '''\n']);
-            fprintf(fid,'n_channels_dat = %i\n',imec.nChannels);
+            fprintf(fid,'n_channels_dat = %i\n',this.nChannels);
             fprintf(fid,'dtype = ''int16''\n');
             fprintf(fid,'offset = 0\n');
-            fprintf(fid,'sample_rate = %i\n', imec.fsAP);
+            fprintf(fid,'sample_rate = %i\n', this.fsAP);
             fprintf(fid,'hp_filtered = False');
             fclose(fid);
             
@@ -2049,7 +2058,7 @@ classdef ImecDataset < handle
     end
     
     methods (Hidden)
-        function [chInds, chIds] = build_channelSelectors_internal(imec, varargin)
+        function [chInds, chIds] = build_channelSelectors_internal(this, varargin)
             p = inputParser();
             p.addParameter('goodChannelsOnly', false, @islogical);
             p.addParameter('connectedChannelsOnly', false, @islogical);
@@ -2057,23 +2066,23 @@ classdef ImecDataset < handle
             p.parse(varargin{:});
             
             if p.Results.goodChannelsOnly
-                [chInds, chIds] = imec.lookup_channelIds(imec.goodChannels);
+                [chInds, chIds] = this.lookup_channelIds(this.goodChannels);
                 assert(~isempty(chInds), 'No channels marked good in dataset')
                 
             elseif p.Results.connectedChannelsOnly
-                [chInds, chIds] = imec.lookup_channelIds(imec.connectedChannels); % excludes sync channel
+                [chInds, chIds] = this.lookup_channelIds(this.connectedChannels); % excludes sync channel
                 assert(~isempty(chInds), 'No connected channels found in dataset');
                 
             elseif p.Results.mappedChannelsOnly
-                [chInds, chIds] = imec.lookup_channelIds(imec.mappedChannels); % excludes sync channel
+                [chInds, chIds] = this.lookup_channelIds(this.mappedChannels); % excludes sync channel
                 assert(~isempty(chInds), 'No mapped channels found in dataset');
             else
-                chInds = 1:imec.nChannels;
-                chIds = imec.channelIds(chInds);
+                chInds = 1:this.nChannels;
+                chIds = this.channelIds(chInds);
             end
         end
         
-        function transformExtraArg = modifyInPlaceInternal(imec, mode, procFnList, varargin)
+        function transformExtraArg = modifyInPlaceInternal(this, mode, procFnList, varargin)
             p = inputParser();
             p.addParameter('chunkSize', 2^20, @isscalar);
             
@@ -2111,15 +2120,15 @@ classdef ImecDataset < handle
             % open writable memmapfile
             switch mode
                 case 'ap'
-                    mm = imec.memmapAP_full('Writable', ~dryRun);
+                    mm = this.memmapAP_full('Writable', ~dryRun);
                 case 'lf'
-                    mm = imec.memmapLF_full('Writable', ~dryRun);
+                    mm = this.memmapLF_full('Writable', ~dryRun);
                 otherwise
                     error('Unknown mode %s', mode);
             end
             
             % figure out which channels to keep
-            [chInds, chIds] = imec.build_channelSelectors_internal('goodChannelsOnly', p.Results.goodChannelsOnly, ...
+            [chInds, chIds] = this.build_channelSelectors_internal('goodChannelsOnly', p.Results.goodChannelsOnly, ...
                 'connectedChannelsOnly', p.Results.connectedChannelsOnly, ...
                 'mappedChannelsOnly', p.Results.mappedChannelsOnly);
             
@@ -2140,7 +2149,7 @@ classdef ImecDataset < handle
                 % ch_connected_mask indicates which channels are
                 % connected, which are the ones where scaling makes
                 % sense. chIdx is all channels being modified by procFnList
-                ch_conn_mask = ismember(chIds, imec.connectedChannels);
+                ch_conn_mask = ismember(chIds, this.connectedChannels);
                 
                 % do additional processing here
                 if applyScaling
@@ -2148,10 +2157,10 @@ classdef ImecDataset < handle
                     switch mode
                         case 'ap'
                             data = single(data);
-                            data(ch_conn_mask, :) = data(ch_conn_mask, :) * single(imec.apScaleToUv);
+                            data(ch_conn_mask, :) = data(ch_conn_mask, :) * single(this.apScaleToUv);
                         case 'lf'
                             data = single(data);
-                            data(ch_conn_mask, :) = data(ch_conn_mask, :) * single(imec.lfScaleToUv);
+                            data(ch_conn_mask, :) = data(ch_conn_mask, :) * single(this.lfScaleToUv);
                     end
                 end
                 
@@ -2172,9 +2181,9 @@ classdef ImecDataset < handle
                     
                     noutputs = nargout(fn);
                     if noutputs > 1
-                        [data, transformExtraArg] = fn(imec, data, extraArgs{:});
+                        [data, transformExtraArg] = fn(this, data, extraArgs{:});
                     else
-                        data = fn(imec, data, extraArgs{:});
+                        data = fn(this, data, extraArgs{:});
                     end
                     
                 end
@@ -2184,7 +2193,7 @@ classdef ImecDataset < handle
                 end
                 
                 if applyScaling
-                    data(ch_conn_mask, :) = data(ch_conn_mask, :) ./ imec.scaleToUv;
+                    data(ch_conn_mask, :) = data(ch_conn_mask, :) ./ this.scaleToUv;
                 end
                 
                 data = int16(data);
@@ -2200,8 +2209,8 @@ classdef ImecDataset < handle
             prog.finish();
             
             if ~dryRun
-                imec.writeModifiedAPMeta('extraMeta', p.Results.extraMeta);
-                imec.clearSyncCached();
+                this.writeModifiedAPMeta('extraMeta', p.Results.extraMeta);
+                this.clearSyncCached();
             end
         end
     end
@@ -2515,14 +2524,16 @@ classdef ImecDataset < handle
             end
         end
         
-        function [imecOut, transformAPExtraArg, transformLFExtraArg] = writeConcatenatedFileMatchGains(imecList, outPath, varargin)
+        function [imecOut, transformAPExtraArg, transformLFExtraArg] ...
+                = writeConcatenatedFileMatchGains(imecList, outPath, varargin)
             p = inputParser();
             p.addParameter('stem', "", @npxutils.internal.isstringlike);
             p.addParameter('writeAP', true, @islogical);
             p.addParameter('goodChannelsOnly', false, @islogical);
             p.addParameter('mappedChannelsOnly', false, @islogical);
             p.addParameter('connectedChannelsOnly', false, @islogical);
-            p.addParameter('writeSyncSeparate', false, @islogical); % true means ap will get only mapped channels, false will preserve channels as is
+            % true means ap will get only mapped channels, false will preserve channels as is
+            p.addParameter('writeSyncSeparate', false, @islogical);
             p.addParameter('writeLF', false, @islogical);
             p.addParameter('chunkSize', 2^20, @isscalar);
             p.addParameter('chunkEdgeExtraSamplesAP', [0 0], @isvector);
@@ -2531,12 +2542,20 @@ classdef ImecDataset < handle
             p.addParameter('gpuArray', false, @islogical);
             p.addParameter('applyScaling', false, @islogical); % convert to uV before processing
             
-            p.addParameter('transformAP', {}, @(x) iscell(x) || isa(x, 'function_handle')); % list of transformation functions that accept (imec, dataChunk) and return dataChunk someplace
-            p.addParameter('transformLF', {}, @(x) iscell(x) || isa(x, 'function_handle')); % list of transformation functions that accept (imec, dataChunk) and return dataChunk someplace
+            % list of transformation functions that accept (imec, dataChunk) and return dataChunk someplace
+            p.addParameter('transformAP', {}, @(x) iscell(x) || isa(x, 'function_handle'));
+            % list of transformation functions that accept (imec, dataChunk) and return dataChunk someplace
+            p.addParameter('transformLF', {}, @(x) iscell(x) || isa(x, 'function_handle'));
             p.addParameter('transformAPExtraArg', struct(), @(x) true);
             p.addParameter('transformLFExtraArg', struct(), @(x) true);
-            p.addParameter('timeShiftsAP', {}, @(x) isempty(x) || isa(x, 'npxutils.TimeShiftSpec')); % cell array of time shifts for each file, a time shift is a n x 3 matrix of idxStart, idxStop, newIdxStart. These are used to excise specific time windows from the file
-            p.addParameter('timeShiftsLF', {}, @(x) isempty(x) || isa(x, 'npxutils.TimeShiftSpec')); % cell array of time shifts for each file, a time shift is a n x 3 matrix of idxStart, idxStop, newIdxStart. These are used to excise specific time windows from the file
+            % cell array of time shifts for each file, a time shift is a n x 3 matrix of
+            % idxStart, idxStop, newIdxStart. These are used to excise specific
+            % time windows from the file.
+            p.addParameter('timeShiftsAP', {}, @(x) isempty(x) || isa(x, 'npxutils.TimeShiftSpec'));
+            % cell array of time shifts for each file, a time shift is a n x 3 
+            % matrix of idxStart, idxStop, newIdxStart. These are used to excise
+            % specific time windows from the file
+            p.addParameter('timeShiftsLF', {}, @(x) isempty(x) || isa(x, 'npxutils.TimeShiftSpec'));
             
             p.addParameter('extraMeta', struct(), @isstruct);
             p.addParameter('dryRun', false, @islogical);
@@ -2811,9 +2830,11 @@ classdef ImecDataset < handle
                     end
                     
                     for iCh = 1:nChunks
-                        [idx, keepIdx] = npxutils.ImecDataset.determineChunkIdx(outSize, iCh, nChunks, chunkSize, chunkExtra);
+                        [idx, keepIdx] = npxutils.ImecDataset.determineChunkIdx(...
+                            outSize, iCh, nChunks, chunkSize, chunkExtra);
                         
-                        % some elements of source_idx may be 0 (meaning they are not filled with source data)
+                        % some elements of source_idx may be 0 (meaning they are
+                        % not filled with source data)
                         source_idx = sourceIdxList(idx);
                         mask_source_idx = source_idx > 0;
                         
@@ -2822,8 +2843,8 @@ classdef ImecDataset < handle
                         
                         % ch_connected_mask indicates which channels are
                         % connected, which are the ones where scaling makes
-                        % sense. chIdx is all channels being written to
-                        % output file
+                        % sense. chIdx is all channels being written to output
+                        % file.
                         ch_conn_mask = ismember(chIds, imecList{iF}.connectedChannels);
                         
                         if multipliers(iF) > 1
@@ -2837,10 +2858,12 @@ classdef ImecDataset < handle
                                 switch mode
                                     case 'ap'
                                         data = single(data);
-                                        data(ch_conn_mask, :) = data(ch_conn_mask, :) * single(imecList{iF}.apScaleToUv);
+                                        data(ch_conn_mask, :) = data(ch_conn_mask, :) ...
+                                            * single(imecList{iF}.apScaleToUv);
                                     case 'lf'
                                         data = single(data);
-                                        data(ch_conn_mask, :) = data(ch_conn_mask, :) * single(imecList{iF}.lfScaleToUv);
+                                        data(ch_conn_mask, :) = data(ch_conn_mask, :) ...
+                                            * single(imecList{iF}.lfScaleToUv);
                                 end
                             end
                             
