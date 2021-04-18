@@ -1,4 +1,4 @@
-function make_doc
+function make_doc(varargin)
 % Build these doc sources into the final doc/ directory
 %
 % make_doc
@@ -29,6 +29,7 @@ else
   if action == "install"
     rmdir2('../docs', 's');
     copyfile2('_site/*.*', '../docs');
+    delete('../docs/make_doc.m');
   end
 end
 
@@ -39,4 +40,19 @@ function out = withcd(dir)
 origDir = pwd;
 cd(dir);
 out = onCleanup(@() cd(origDir));
+end
+
+function out = system2(cmd)
+% A version of system that raises an error on failure
+
+if nargout == 0
+  status = system(cmd);
+else
+  [status,out] = system(cmd);
+end
+
+if status ~= 0
+  error('Command failed (exit status %d). Command: %s', status, cmd);
+end
+
 end

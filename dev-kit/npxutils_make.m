@@ -112,9 +112,8 @@ end
 
 function build_doc
 % Build the final doc files
-RAII.cd = withcd(fullfile(reporoot, 'docs'));
+RAII.cd = withcd(fullfile(reporoot, 'doc-src'));
 make_doc;
-delete('../doc/make_doc*');
 end
 
 function make_util_shim(pkg)
