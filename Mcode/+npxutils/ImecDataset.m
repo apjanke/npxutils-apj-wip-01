@@ -1,5 +1,10 @@
 classdef ImecDataset < handle
-    % An IMEC dataset
+    % An IMEC data set
+    %
+    % An IMEC data set is a set of data from a collection of related IMEC files.
+    % This includes the raw data files and metadata files.
+    %
+    % The files in an IMEC data set must all be in the same directory on disk.
     %
     % This is a handle object, so it is pass-by-reference.
     
@@ -8,19 +13,27 @@ classdef ImecDataset < handle
     end
 
     properties(SetAccess = protected)
+        % Full path to the parent directory of the files in this data set.
         pathRoot char = '';
+        % Common base name of the files in this data set.
         fileStem char = '';
         fileImecNumber = NaN;
+        % Data set creation time, as a datenum.
         creationTime = NaN;
+        % Number of channels.
         nChannels = NaN;
 
         fileTypeAP = 'ap'; % Typically ap or ap_CAR
         fileTypeLF = 'lf'; % Typically lf or lf_CAR
         
+        % Number of samples in the AP file
         nSamplesAP = 0;
+        % Number of samples in the LF file
         nSamplesLF = 0;
-        fsAP = NaN; % samples_per_second
-        fsLF = NaN; % samples_per_second
+        % ??? Maybe the frequency of samples in the AP file, in samples per second?
+        fsAP = NaN;
+        % ??? Maybe the frequency of samples in the LF file, in samples per second?
+        fsLF = NaN;
         fsSync = NaN;
         highPassFilterHz = NaN;
         apGain = NaN;
