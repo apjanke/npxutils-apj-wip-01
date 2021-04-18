@@ -83,7 +83,7 @@ end
 
 function make_dist
 program = "neuropixel-utils";
-distName = program + "-" + get_package_version;
+distName = program + "-" + npxutils_version;
 verDistDir = fullfile("dist", distName);
 distfiles = ["build/Mcode" "docs" "examples" "README.md" "LICENSE" "CHANGES.md"];
 rmrf([verDistDir, distName+".tar.gz", distName+".zip"])
@@ -99,13 +99,6 @@ system2(copyCmd);
 RAII.cd = withcd('dist');
 tar(distName+".tar.gz", distName)
 zip(distName+".zip", distName)
-end
-
-function out = get_package_version
-versionFile = fullfile(reporoot, 'VERSION');
-txt = readtext(versionFile);
-txt = regexprep(txt, '\r?\n.*', '');
-out = string(txt);
 end
 
 function make_clean

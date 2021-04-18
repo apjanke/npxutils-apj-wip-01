@@ -5,4 +5,5 @@ repoDir = npxutils_repo_root;
 mcodeDir = [repoDir '/Mcode'];
 addpath(mcodeDir);
 
-fprintf('Loaded Neuropixel Utils from %s (with dev-kit)\n', repoDir);
+fprintf('Loaded Neuropixel Utils %s from %s\n', ...
+    npxutils_version, repoDir);
