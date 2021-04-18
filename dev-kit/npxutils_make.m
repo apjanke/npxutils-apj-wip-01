@@ -1,18 +1,20 @@
 function npxutils_make(target, varargin)
-% Build tool for neuropixel-utils
+% Build tool for the neuropixel-utils library
 %
 % This is the main build tool for doing all the build and packaging operations
 % for the Neuropixel Utils library. It's intended to be called as a command in
-% most cases.
+% most cases. This is what you will use to build & package the distribution
+% files for a release of the library.
 %
 % Operations:
 %   npxutils_make build        - "build" the source code
-%   npxutils_make doc          - build the project doco (probably broken)
-%   npxutils_make doc-preview  - live-preview the project documentation (broken)
 %   npxutils_make test         - run the tests
 %   npxutils_make dist         - build the distribution files
+%   
 %   npxutils_make toolbox      - build the Matlab Toolbox .mltbx installer file
 %   npxutils_make clean        - delete all the derived artifacts
+%   npxutils_make doc          - build the project doco (probably broken)
+%   npxutils_make doc-preview  - live-preview the project doco (probably broken)
 %
 % The "doc" build targets are probably broken for you, because they require 
 % MkDocs with its "material" theme, and the only way (apparently) to get that
@@ -81,18 +83,29 @@ end
 
 function make_dist
 program = "neuropixel-utils";
-distName = program + "-" + npxutils.globals.version;
+distName = program + "-" + get_package_version;
 verDistDir = fullfile("dist", distName);
-distfiles = ["build/Mcode" "docs" "lib" "examples" "README.md" "LICENSE" "CHANGES.md"];
+distfiles = ["build/Mcode" "docs" "examples" "README.md" "LICENSE" "CHANGES.md"];
 rmrf([verDistDir, distName+".tar.gz", distName+".zip"])
 if ~isfolder('dist')
   mkdir2('dist')
 end
 mkdir2(verDistDir)
-copyfile2(distfiles, verDistDir)
+% Ugh, copyfile() doesn't work right with directories. Guess we'll just call
+% a system utility, and require devs to run this on Unix.
+quotedFiles = strcat("""", distfiles, """");
+copyCmd = sprintf("cp -R %s %s", strjoin(quotedFiles, ' '), verDistDir);
+system2(copyCmd);
 RAII.cd = withcd('dist');
 tar(distName+".tar.gz", distName)
 zip(distName+".zip", distName)
+end
+
+function out = get_package_version
+versionFile = fullfile(reporoot, 'VERSION');
+txt = readtext(versionFile);
+txt = regexprep(txt, '\r?\n.*', '');
+out = string(txt);
 end
 
 function make_clean
