@@ -1,7 +1,17 @@
 function data = fft_clean(imec, data, varargin)
-% from Will Allen
-% data is passed in as nChannels x nSamples, and is processed internally as
-% this transposed and then transposed on the way out
+% FFT Clean function.
+%
+% data = fft_clean(imec, data, ...)
+%
+% From Will Allen.
+%
+% Data is passed in as nChannels x nSamples, and is processed internally as
+% this transposed and then transposed on the way out.
+%
+% Options:
+%   thresh (numeric, 10*)
+%   nbins (numeric, 20*)
+%   showFigures (logical, false*)
 
 p = inputParser();
 p.addParameter('thresh', 10, @isscalar);
