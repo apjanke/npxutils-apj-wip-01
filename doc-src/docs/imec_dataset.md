@@ -32,7 +32,7 @@ These are all equivalent, in that the resulting `imec` instance will wrap both A
 
 ### Specifying a Channel Map
 
-When constructing the ImecDataset, you can specify a channel map. If you don't specify one, the default will be returned by `npxutils.Utils.getDefaultChannelMapFile()`, which in turn will look for the file pointed to by the environment variables `'NEUROPIXEL_MAP_FILE'` or `'NPIX_MAP_FILE'`. You can set these using Matlab's `setenv` function.
+When constructing the ImecDataset, you can specify a channel map. If you don't specify one, the default will be returned by `npxutils.util.getDefaultChannelMapFile()`, which in turn will look for the file pointed to by the environment variables `'NEUROPIXEL_MAP_FILE'` or `'NPIX_MAP_FILE'`. You can set these using Matlab's `setenv` function.
 
 These .mat files are expected to be in the same format as found on the [neuropixels repo](https://github.com/cortex-lab/neuropixels). For the phase 3A probe with 384 channels, the file `neuropixPhase3A_kilosortChanMap.mat` contains:
 
@@ -271,7 +271,7 @@ trialStart_partial = imec.readSyncBits_idx("trialStart", idxWindow); % nTime x 1
 
 ## Building a preprocessing pipeline
 
-If the raw `.imec.ap.bin` file must be processed in some way before running Kilosort, e.g. to remove artifacts, you can implement this efficiently by writing a transformation function that will act on chunks of the data. One example is found in `npxutils.DataProcessFn.commonAverageReference`:
+If the raw `.imec.ap.bin` file must be processed in some way before running Kilosort, e.g. to remove artifacts, you can implement this efficiently by writing a transformation function that will act on chunks of the data. One example is found in `npxutils.dataprocess.commonAverageReference`:
 
 ```matlab
 function [data, extra] = commonAverageReference(imec, data, chIds, sampleIdx) %#ok<INUSD>
@@ -307,7 +307,7 @@ Here, `outPath` should include the folder where the new datasets should be writt
 % creates /path/to/datasets/modifiedDataset.ap.bin, .ap.meta, etc.
 ```
 
-You can provide one or more function handles (e.g. ```@npxutils.DataProcessFn.commonAverageReference```) that will be applied sequentially. Other optional parameters include:
+You can provide one or more function handles (e.g. ```@npxutils.dataprocess.commonAverageReference```) that will be applied sequentially. Other optional parameters include:
 
 * `dryRun`: If true, no actual data will be modified on disk, facilitating testing or step by step debugging of the transform functions before writing data. (default false).
 * `gpuArray`: If true, the data chunks will be copied to the GPU and the transformation functions will receive and return GPU arrays.

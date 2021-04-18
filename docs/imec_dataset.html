@@ -686,7 +686,7 @@
 </code></pre></div>
 <p>These are all equivalent, in that the resulting <code>imec</code> instance will wrap both AP and LF bin and meta files. (Though it&rsquo;s okay if the LF files are missing).</p>
 <h3 id="specifying-a-channel-map">Specifying a Channel Map<a class="headerlink" href="#specifying-a-channel-map" title="Permanent link">&para;</a></h3>
-<p>When constructing the ImecDataset, you can specify a channel map. If you don&rsquo;t specify one, the default will be returned by <code>npxutils.Utils.getDefaultChannelMapFile()</code>, which in turn will look for the file pointed to by the environment variables <code>'NEUROPIXEL_MAP_FILE'</code> or <code>'NPIX_MAP_FILE'</code>. You can set these using Matlab&rsquo;s <code>setenv</code> function.</p>
+<p>When constructing the ImecDataset, you can specify a channel map. If you don&rsquo;t specify one, the default will be returned by <code>npxutils.util.getDefaultChannelMapFile()</code>, which in turn will look for the file pointed to by the environment variables <code>'NEUROPIXEL_MAP_FILE'</code> or <code>'NPIX_MAP_FILE'</code>. You can set these using Matlab&rsquo;s <code>setenv</code> function.</p>
 <p>These .mat files are expected to be in the same format as found on the <a href="https://github.com/cortex-lab/neuropixels">neuropixels repo</a>. For the phase 3A probe with 384 channels, the file <code>neuropixPhase3A_kilosortChanMap.mat</code> contains:</p>
 <div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">ld</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">load</span><span class="p">(</span><span class="s">&#39;neuropixPhase3A_kilosortChanMap.mat&#39;</span><span class="p">)</span><span class="w"></span>
 
@@ -856,7 +856,7 @@
 <span class="n">trialStart_partial</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">readSyncBits_idx</span><span class="p">(</span><span class="s">&quot;trialStart&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">idxWindow</span><span class="p">);</span><span class="w"> </span><span class="c">% nTime x 1</span><span class="w"></span>
 </code></pre></div>
 <h2 id="building-a-preprocessing-pipeline">Building a preprocessing pipeline<a class="headerlink" href="#building-a-preprocessing-pipeline" title="Permanent link">&para;</a></h2>
-<p>If the raw <code>.imec.ap.bin</code> file must be processed in some way before running Kilosort, e.g. to remove artifacts, you can implement this efficiently by writing a transformation function that will act on chunks of the data. One example is found in <code>npxutils.DataProcessFn.commonAverageReference</code>:</p>
+<p>If the raw <code>.imec.ap.bin</code> file must be processed in some way before running Kilosort, e.g. to remove artifacts, you can implement this efficiently by writing a transformation function that will act on chunks of the data. One example is found in <code>npxutils.dataprocess.commonAverageReference</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="k">function</span><span class="w"> </span><span class="nf">[data, extra] = commonAverageReference</span><span class="p">(</span>imec, data, chIds, sampleIdx<span class="p">)</span><span class="w"> </span><span class="c">%#ok&lt;INUSD&gt;</span><span class="w"></span>
 <span class="w">    </span><span class="c">% chIds are the channel ids and imec.goodChannels is a list of channel ids</span><span class="w"></span>
 <span class="w">    </span><span class="c">% so this will lookup the channel indices of those channels both in chIdx that</span><span class="w"></span>
@@ -881,7 +881,7 @@
 <div class="highlight"><pre><span></span><code><span class="p">[</span><span class="n">imecOut</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">saveTransformedDataset</span><span class="p">(</span><span class="s">&#39;/path/to/datasets/&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;stem&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;modifiedDataset&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c"> )</span><span class="w"></span>
 <span class="c">% creates /path/to/datasets/modifiedDataset.ap.bin, .ap.meta, etc.</span><span class="w"></span>
 </code></pre></div>
-<p>You can provide one or more function handles (e.g. <code>@npxutils.DataProcessFn.commonAverageReference</code>) that will be applied sequentially. Other optional parameters include:</p>
+<p>You can provide one or more function handles (e.g. <code>@npxutils.dataprocess.commonAverageReference</code>) that will be applied sequentially. Other optional parameters include:</p>
 <ul>
 <li><code>dryRun</code>: If true, no actual data will be modified on disk, facilitating testing or step by step debugging of the transform functions before writing data. (default false).</li>
 <li><code>gpuArray</code>: If true, the data chunks will be copied to the GPU and the transformation functions will receive and return GPU arrays.</li>

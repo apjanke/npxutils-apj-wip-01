@@ -91,7 +91,7 @@ ImecDataset with properties:
 >> cleanedPath = '/data/cleaned_datasets/neuropixel_01.imec.ap.bin';
 >> extraMeta = struct();
 >> extraMeta.commonAverageReferenced = true;
->> fnList = {@npxutils.DataProcessFn.commonAverageReference};
+>> fnList = {@npxutils.dataprocess.commonAverageReference};
 >> imec = imec.saveTransformedDataset(cleanedPath, 'transformAP', fnList, 'extraMeta', extraMeta);
 
 % Sym link the cleaned dataset into a separate directory for Kilosort2

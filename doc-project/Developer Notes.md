@@ -28,6 +28,14 @@ load_npxutils
 
 It can be handy to stick that code in a Favorite in your Matlab. Select Home > Favorites > New Favorite from the toolstrip.
 
+## Workflow notes
+
+### ChangeLog
+
+The [ChangeLog](https://keepachangelog.com/) for Neuropixels Utils is at `CHANGES.md` in the root of the repo.
+
+Whenever you make a significant, user-visible change to the library (especially if it's an API change!), make a note about it in `CHANGES.md` right away. Don't wait until release time to do this; it's hard to remember 
+
 ## Building the project
 
 ### Building the web site

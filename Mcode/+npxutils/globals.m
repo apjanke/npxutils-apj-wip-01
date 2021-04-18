@@ -2,7 +2,7 @@ classdef globals
     % Global library properties and settings for Neuropixel Utils
     
     properties (Constant)
-        % Path to the root directory of this Neuropixel Utils library
+        % Path to the root directory of this Neuropixel Utils library repo/installation.
         distroot = string(fileparts(fileparts(mfilename('fullpath'))));
     end
     
