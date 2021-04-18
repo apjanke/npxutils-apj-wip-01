@@ -29,6 +29,9 @@ function out = readtext(file, encoding)
 %
 % This is analagous to Matlab's readcsv and readtable, and exists because Matlab
 % doesn't provide a basic file-slurping mechanism.
+%
+% This is redundant with the readtext in npxutils.internal.util; it exists here
+% too to avoid bootstrap ordering issues.
 
 arguments
     file (1,1) string

@@ -2,9 +2,9 @@ function out = readINI(fname)
 out = struct();
 
 if ~exist(fname, 'file')
-    error('Configuration file %s not found', fname);
+    error('Configuration file not found: %s', fname);
 end
-f = fopen(fname,'r');
+f = fopen2(fname,'r');
 while ~feof(f)
     s = strtrim(fgetl(f));
     if isempty(s) || s(1)==';' || s(1)=='#'
@@ -14,8 +14,7 @@ while ~feof(f)
     [par, val] = parseLine(s);
     out.(par) = val;
 end
-
-fclose(f);
+fclose2(f);
 end
 
 function [par, val] = parseLine(s)

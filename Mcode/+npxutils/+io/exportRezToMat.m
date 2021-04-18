@@ -23,8 +23,8 @@ if isfield(rez, 'ops')
 end
 
 % sort spike times
-[~, isort]   = sort(rez.st3(:,1), 'ascend');
-rez.st3      = rez.st3(isort, :);
+[~, isort] = sort(rez.st3(:,1), 'ascend');
+rez.st3 = rez.st3(isort, :);
 
 % gather all gpuArrays
 flds = fieldnames(rez);

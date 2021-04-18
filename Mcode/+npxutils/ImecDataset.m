@@ -1520,33 +1520,21 @@ classdef ImecDataset < handle
             if ~exist(this.pathAP, 'file')
                 error('RawDataFile: %s not found', this.pathAP);
             end
-            fid = fopen(this.pathAP, 'r');
-            
-            if fid == -1
-                error('RawDataFile: Could not open %s', this.pathAP);
-            end
+            fid = fopen2(this.pathAP, 'r');
         end
         
         function fid = openLFFile(this)
             if ~exist(this.pathLF, 'file')
                 error('RawDataFile: %s not found', this.pathAP);
             end
-            fid = fopen(this.pathLF, 'r');
-            
-            if fid == -1
-                error('RawDataFile: Could not open %s', this.pathAP);
-            end
+            fid = fopen2(this.pathLF, 'r');
         end
         
         function fid = openSyncFile(this)
             if ~exist(this.pathSync, 'file')
                 error('RawDataFile: %s not found', this.pathSync);
             end
-            fid = fopen(this.pathSync, 'r');
-            
-            if fid == -1
-                error('RawDataFile: Could not open %s', this.pathSync);
-            end
+            fid = fopen2(this.pathSync, 'r');
         end
     
     end
@@ -2026,7 +2014,7 @@ classdef ImecDataset < handle
             npxutils.io.writeNPY(whiteningMatrixInv, fullfile(savePath, 'whitening_mat_inv.npy'));
             
             % write params.py
-            fid = fopen(fullfile(savePath,'params.py'), 'w');
+            fid = fopen2(fullfile(savePath,'params.py'), 'w');
             [~, fname, ext] = fileparts(this.fileAP);
             fprintf(fid,['dat_path = ''',fname ext '''\n']);
             fprintf(fid,'n_channels_dat = %i\n',this.nChannels);
@@ -2034,7 +2022,7 @@ classdef ImecDataset < handle
             fprintf(fid,'offset = 0\n');
             fprintf(fid,'sample_rate = %i\n', this.fsAP);
             fprintf(fid,'hp_filtered = False');
-            fclose(fid);
+            fclose2(fid);
             
             % write spike names column
             clusterIds = unique(spikeClusters);
@@ -2045,13 +2033,13 @@ classdef ImecDataset < handle
                 clusterNames = string(npxutils.internal.makecol(p.Results.clusterNames));
                 assert(numel(clusterNames) == nClusters, 'clusterNames must be nClusters long');
             end
-            fileID = fopen(fullfile(savePath, 'cluster_names.tsv'),'w');
-            fprintf(fileID, 'cluster_id\tname\n');
+            fid2 = fopen2(fullfile(savePath, 'cluster_names.tsv'), 'w');
+            fprintf(fid2, 'cluster_id\tname\n');
             
             for iC = 1:nClusters
-                fprintf(fileID, '%d\t%s\n', clusterIds(iC)-1, clusterNames{iC});
+                fprintf(fid2, '%d\t%s\n', clusterIds(iC)-1, clusterNames{iC});
             end
-            fclose(fileID);
+            fclose2(fid2);
             
         end
     end

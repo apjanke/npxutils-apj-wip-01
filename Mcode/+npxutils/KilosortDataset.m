@@ -2759,8 +2759,7 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
             function writeClusterMetaTSV(file_noext, field, values)
                 file = fullfile(outpath, [file_noext, '.tsv']);
                 progIncrFn(sprintf('Writing %s', file));
-                fid = fopen(file, 'w');
-                assert(fid > 0, 'Error opening %s for writing', file);
+                fid = fopen2(file, 'w');
                 
                 fprintf(fid, 'cluster_id\t%s\n', field);
                 
@@ -2769,8 +2768,7 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
                 for iC = 1:numel(cluster_ids)
                     fprintf(fid, '%d\t%s\n', cluster_ids(iC), values(iC));
                 end
-                
-                fclose(fid);
+                fclose2(fid);
             end
         end
         

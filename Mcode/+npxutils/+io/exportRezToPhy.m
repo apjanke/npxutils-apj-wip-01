@@ -347,7 +347,7 @@ if export_batchwise && isfield(rez, 'WA')
 end
 
 %% write params.py file
-fid = fopen(fullfile(savePath,'params.py'), 'w');
+fid = fopen2(fullfile(savePath,'params.py'), 'w');
 [~, fname, ext] = fileparts(rez.ops.fbinary);
 fprintf(fid,['dat_path = ''',fname ext '''\n']);
 fprintf(fid,'n_channels_dat = %i\n',rez.ops.NchanTOT);
@@ -370,25 +370,21 @@ end
 if isfield(rez.ops, 'scaleToUv')
     fprintf(fid, 'scale_to_uv = %.8f\n', rez.ops.scaleToUv);
 end
-fclose(fid);
+fclose2(fid);
 
     function writeNPY_local(vals, fname)
         writeNPY(gather(vals), fullfile(savePath, fname));
     end
 
     function writeTSV(fname, col_name, vals, fmat)
-        tsvfid = fopen(fullfile(savePath, fname),'w');
-        if tsvfid == -1
-            error('Error opening %s for writing', fname);
-        end
+        tsvfid = fopen2(fullfile(savePath, fname),'w');
         fprintf(tsvfid, 'cluster_id\t%s\r\n', col_name);
         
         fmatStr = append('%d\t', fmat, '\r\n');
         for ii = 1:numel(cluster_ids)
             fprintf(tsvfid, fmatStr, cluster_ids(ii), vals(ii));
         end
-        
-        fclose(tsvfid);
+        fclose2(tsvfid);
     end
 
 end
