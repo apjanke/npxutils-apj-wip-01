@@ -37,3 +37,5 @@ And add it to your path in Matlab:
 ## Requirements
 
 Neuropixel Utils requires Matlab R2019b or later.
+
+You will need [Kilosort](https://github.com/cortex-lab/KiloSort) and/or [Kilosort2](https://github.com/MouseLand/Kilosort/releases/tag/v2.0) installed if you want this library to be useful.
