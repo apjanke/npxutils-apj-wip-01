@@ -85,7 +85,7 @@ function make_dist
 program = "neuropixel-utils";
 distName = program + "-" + npxutils_version;
 verDistDir = fullfile("dist", distName);
-distfiles = ["build/Mcode" "docs" "examples" "README.md" "LICENSE" "CHANGES.md"];
+distfiles = ["build/Mcode" "docs" "examples" "README.md" "LICENSE" "LICENSE-ThirdParty.md" "CHANGES.md"];
 rmrf([verDistDir, distName+".tar.gz", distName+".zip"])
 if ~isfolder('dist')
   mkdir2('dist')
