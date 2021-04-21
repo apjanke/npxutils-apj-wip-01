@@ -7,7 +7,6 @@ The `npxutils.ImecDataset` class wraps one individual recording session acquired
 # Data setup
 
 ```matlab
-
 homeDir = string(java.lang.System.getProperty('user.home'));
 exDataDir = homeDir + 'work/npxutils/example-data';
 ```
@@ -20,13 +19,11 @@ You construct a npxutils.ImecDataset by pointing it at the path to your dataset.
 
 
 ```matlab
-
 imec = npxutils.ImecDataset(exDataDir + '/raw_datasets/neuropixel_01_g0_t0.imec.ap.bin');
 ```
 
 
 ```text
-
 Error using npxutils.ImecDataset (line 173)
 No AP or LF Imec file found at or in /Users/jankework/npxutils/example-data/raw_datasets/neuropixel_01_g0_t0.imec.ap.bin
 ```
@@ -38,7 +35,6 @@ Or specify the common prefix to the `.imec.`* files comprising the dataset:
 
 
 ```matlab
-
 imecB = npxutils.ImecDataset(exDataDir + '/raw_datasets/neuropixel_01_g0_t0');
 ```
 
@@ -49,7 +45,6 @@ The common prefix can be shorter as long as there is no ambiguity:
 
 
 ```matlab
-
 imecC = npxutils.ImecDataset(exDataDir + '/raw_datasets/neuropixel_01');
 ```
 
@@ -60,7 +55,6 @@ You can also point at the parent directory as long as only one `.ap.bin` file is
 
 
 ```matlab
-
 imecD = npxutils.ImecDataset(exDataDir + '/data/raw_datasets/');
 ```
 
@@ -82,7 +76,6 @@ These .mat files are expected to be in the same format as found on the [neuropix
 
 
 ```matlab
-
 ld = load('neuropixPhase3A_kilosortChanMap.mat')
 ```
 
@@ -93,7 +86,6 @@ You can construct a ChannelMap directly by pointing at the `.mat` file, although
 
 
 ```matlab
-
 probeName = 'neuropixPhase3B1';
 probeMatFilePath = npxutils.globals.distroot + '/map_files/' + probeName + '_kilosortChanMap.mat';
 chanMapObject = npxutils.ChannelMap(probeMatFilePath)
@@ -106,7 +98,6 @@ Then you can use this map for an ImecDataset using either of the following:
 
 
 ```matlab
-
 imecE = npxutils.ImecDataset('channelMap', chanMapObject);
 imecF = npxutils.ImecDataset('channelMap', probeMatFilePath);
 ```
@@ -119,7 +110,6 @@ When the ImecDataset is created, the metadata are loaded from the `.ap.meta` fil
 
 
 ```matlab
-
 meta = imec.readAPMeta()
 ```
 
@@ -130,7 +120,6 @@ The most commonly accessed metadata is stored in properties of the ImecDataset:
 
 
 ```matlab
-
 disp(imec)
 ```
 
@@ -142,7 +131,6 @@ For convenience, if you use the sync bits for individual TTL signals during your
 
 
 ```matlab
-
 imec.setSyncBitNames(1, "trialStart");
 ```
 
@@ -153,7 +141,6 @@ The full set of sync bits is found in `imec.syncBitNames`, or you can lookup the
 
 
 ```matlab
-
 idx = imec.lookupSyncBitByName("trialStart");
 ```
 
@@ -165,7 +152,6 @@ You can manually mark specific channels as bad using the `markBadChannels` funct
 
 
 ```matlab
-
 channelIds = [17 23 52];
 imec.markBadChannels(channelIds);
 ```
@@ -183,7 +169,6 @@ You can use `lookup_channelIds` to find the channel indices for a given set of c
 
 
 ```matlab
-
 [channelInds, channelIds] = imec.lookup_channelIds(channelIds)
 ```
 
@@ -194,7 +179,6 @@ One common task is marking channels as bad if their RMS voltage lies outside a r
 
 
 ```matlab
-
 goodRmsRange = [3 100]; % [low high] range of RMS in uV
 imec.markBadChannelsByRMS('rmsRange', goodRmsRange);
 ```
@@ -212,7 +196,6 @@ After making any modifications to the metadata, such as setting the sync bit nam
 
 
 ```matlab
-
 imec.writeModifiedAPMeta();
 ```
 
@@ -223,7 +206,6 @@ You can also append whatever fields you want to the meta file using the `extraMe
 
 
 ```matlab
-
 extraMeta.cleaned = true;
 extraMeta.cleaningAlgorithm = 'v1';
 imec.writeModifiedAPMeta('extraMeta', extraMeta);
@@ -238,7 +220,6 @@ The most convenient way to access the data is to request a memory map:
 
 
 ```matlab
-
 mmap = imec.memmapAP_full();
 value = mmap.Data.x(ch_index, sample_index) % access a specific sample
 ```
@@ -250,7 +231,6 @@ Equivalent functionality is available for LF files using `imec.memmapLF_full()`.
 
 
 ```matlab
-
 mmap = imec.memmapAP_full('Writiable', true);
 mmap.Data.x(ch_index, sample_index) = new_value; % overwrite a specific sample
 ```
@@ -263,7 +243,6 @@ You can also request a specific sample or time window directly:
 
 
 ```matlab
-
 idxWindow = [idxFirst idxLast];
 [partialData, sampleIdx] = imec.readAP_idx(idxWindow);
 
@@ -306,7 +285,6 @@ Good channels are plotted in black, non-connected channels in blue, and bad chan
 
 
 ```matlab
-
 % TODO: Some code that actually generates a plot here!
 ```
 
@@ -318,7 +296,6 @@ You can access the sync channel all at once using:
 
 
 ```matlab
-
 sync = imec.readSync();
 trialStartBit = imec.readSyncBit("trialStart");
 ```
@@ -330,7 +307,6 @@ Or a specific sample or time window using:
 
 
 ```matlab
-
 [partialSync, sampleIdx] = imec.readSync_idx(idxWindow);
 [partialSyncB, sampleIdxB] = imec.readSync_timeWindow(timeWindow);
 ```
@@ -342,7 +318,6 @@ You can also access the logical values of specific bits either by bit index or n
 
 
 ```matlab
-
 partial = imec.readSyncBits_idx(bits_or_names, idxWindow); %  nTime x nBits
 trialStart_partial = imec.readSyncBits_idx("trialStart", idxWindow); % nTime x 1
 ```
@@ -355,7 +330,6 @@ If the raw `.imec.ap.bin` file must be processed in some way before running Kilo
 
 
 ```matlab
-
 function [data, extra] = commonAverageReference(imec, data, chIds, sampleIdx) %#ok<INUSD>
     % chIds are the channel ids and imec.goodChannels is a list of channel ids
     % so this will lookup the channel indices of those channels both in chIdx that
@@ -384,7 +358,6 @@ Once you’ve written your transform function (or functions), you can run them o
 
 
 ```matlab
-
 imecOut = imec.saveTransformedDataset(outPath, 'transformAP', ...\
   {cell of function handles}, 'transformLF', {cell of function handles});
 ```
@@ -396,7 +369,6 @@ Here, `outPath` should include the folder where the new datasets should be writt
 
 
 ```matlab
-
 imecOut = imec.saveTransformedDataset('/path/to/datasets', 'stem', 'modifiedDataset', ...)
 % creates /path/to/datasets/modifiedDataset.ap.bin, .ap.meta, etc.
 ```
@@ -433,7 +405,6 @@ Rather than generate a copy, you can also modify a file in place if you’re sho
 
 
 ```matlab
-
 imec.modifyAPInPlace(outPath, {cell of function handles}, ...);
 imec.modifyLFInPlace(outPath, {cell of function handles}, ...);
 ```
@@ -446,7 +417,6 @@ If you have multiple separate recording files that you wish to process and sort 
 
 
 ```matlab
-
 imecList = {imec1, imec2, ...};
 imecOut = npxutils.ImecDataset.writeConcatenatedFileMatchGains(imecList, outPath, ...
         'transformAP', {cell of function handles}, ...
@@ -461,7 +431,6 @@ You can generate a copy of a dataset using:
 
 
 ```matlab
-
 [imecOut] = imec.saveTransformedDataset(outPath, 'writeAP', true, 'writeLF', true);
 ```
 
@@ -472,7 +441,6 @@ Alternatively, you can create symbolic links to the AP bin and meta files in a n
 
 
 ```matlab
-
 imecLinked = imec.symLinkAPIntoDirectory(outPath);
 ```
 
@@ -489,7 +457,6 @@ Occasionally it can be beneficial to remove certain time windows from a file, or
 
 
 ```matlab
-
 timeShifts = npxutils.TimeShiftSpec.buildToExciseGaps(idxStartList, idxStopList);
 ```
 
@@ -500,7 +467,6 @@ If you have known trial boundaries in your file (see Segmenting a Kilosort datas
 
 
 ```matlab
-
 timeShifts = tsi.computeShiftsExciseRegionsOutsideTrials('maxPauseSec', 20);
 ```
 
@@ -511,7 +477,6 @@ You can then pass along this `npxutils.TimeShiftSpec` to any of the data transfo
 
 
 ```matlab
-
 imecOut = imec.saveTransformedDataset(outPath, 'timeShiftsAP', timeShifts, ...);
 ```
 
@@ -522,7 +487,6 @@ A cell array of `npxutils.TimeShiftSpec` instances can be provided when concaten
 
 
 ```matlab
-
  imecOut = npxutils.ImecDataset.writeConcatenatedFileMatchGains(outPath, imecList, ...
         'timeShiftsAP', {timeShift1, timeShift2, ... }, ...);
 ```
@@ -535,7 +499,6 @@ If helpful, when loading a derived `ImecDataset`, you can specify the `sourceDat
 
 
 ```matlab
-
 imecProcessed = npxutils.ImecDataset.writeConcatenatedFileMatchGains(outPath, imecList);
 % ... or:
 imecProcessedB = npxutils.ImecDataset(outPath, 'sourceDatasets', {imecRaw1, imecRaw2});
