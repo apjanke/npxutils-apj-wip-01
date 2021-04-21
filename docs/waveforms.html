@@ -14,7 +14,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.2">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.1">
     
     
       
@@ -22,7 +22,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.6f955dcd.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.9299cb39.min.css">
       
         
         <link rel="stylesheet" href="assets/stylesheets/palette.ef6f36e2.min.css">
@@ -268,7 +268,6 @@
       
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
-      
         
       
       
@@ -283,7 +282,6 @@
       
         
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
   
   
     
@@ -353,13 +351,13 @@
         <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" >
       
       <label class="md-nav__link" for="__nav_7">
-        Tutorial
+        Examples (HTML)
         <span class="md-nav__icon md-icon"></span>
       </label>
-      <nav class="md-nav" aria-label="Tutorial" data-md-level="1">
+      <nav class="md-nav" aria-label="Examples (HTML)" data-md-level="1">
         <label class="md-nav__title" for="__nav_7">
           <span class="md-nav__icon md-icon"></span>
-          Tutorial
+          Examples (HTML)
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -380,8 +378,86 @@
   
   
     <li class="md-nav__item">
+      <a href="publish/html/ex01_walkthrough.html" class="md-nav__link">
+        Ex 01: Walkthrough (HTML)
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="publish/html/ex02_imecdataset.html" class="md-nav__link">
+        Ex 02: ImecDatasets (HTML)
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      <label class="md-nav__link" for="__nav_8">
+        Examples (Markdown)
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Examples (Markdown)" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          Examples (Markdown)
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="publish/md/tutorial.html" class="md-nav__link">
         Tutorial (Markdown)
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="publish/md/ex01_walkthrough.html" class="md-nav__link">
+        Ex 01: Walkthrough (Markdown)
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="publish/md/ex02_imecdataset.html" class="md-nav__link">
+        Ex 02: ImecDatasets (Markdown)
       </a>
     </li>
   
@@ -406,7 +482,6 @@
                   <div class="md-sidebar__inner">
                     
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
   
   
     
@@ -484,7 +559,6 @@
 <span class="w">                 </span><span class="n">nClusters</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
 <span class="w">                </span><span class="n">data_valid</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">384</span>×<span class="mi">2000</span>×<span class="mi">10</span><span class="w"> </span><span class="nb">int16</span><span class="p">]</span><span class="w"></span>
 </code></pre></div>
-
 <h2 id="extracting-waveforms-via-kilosortdataset">Extracting waveforms via KilosortDataset<a class="headerlink" href="#extracting-waveforms-via-kilosortdataset" title="Permanent link">&para;</a></h2>
 <p>With this functionality in place, it is very easy to extract raw waveforms from the original <code>ImecDataset</code> guided by a <code>KilosortDataset</code> to provide the spike times. From a <code>KilosortDataset</code>, you can request waveforms based on one of:</p>
 <ul>
@@ -497,7 +571,6 @@
 <span class="w">    </span><span class="s">&#39;num_waveforms&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;best_n_channels&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;car&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
 <span class="n">snippetSet</span><span class="p">.</span><span class="n">plotAtProbeLocations</span><span class="p">(</span><span class="s">&#39;alpha&#39;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
-
 <p><img alt="cluster_snippets" src="images/cluster_snippets.png" title="Cluster waveforms" /></p>
 <p>As you can see, there are other waveforms in the background corrupting these extracted waveforms. We can use the other Kilosort detected spike times and their respective templates to automatically clean these waveforms by subtracting the appropriate template at the appropriate times.</p>
 <div class="highlight"><pre><span></span><code><span class="n">snippetSet</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">ks</span><span class="p">.</span><span class="n">getWaveformsFromRawData</span><span class="p">(</span><span class="s">&#39;cluster_ids&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">cluster_id</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
@@ -505,7 +578,6 @@
 <span class="w">    </span><span class="s">&#39;subtractOtherClusters&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
 <span class="n">snippetSet</span><span class="p">.</span><span class="n">plotAtProbeLocations</span><span class="p">(</span><span class="s">&#39;alpha&#39;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
-
 <p><img alt="cluster_snippets_clean" src="images/cluster_snippets_clean.png" title="Cluster waveforms" /></p>
 <h2 id="extracting-waveforms-via-kilosorttrialsegmenteddataset">Extracting waveforms via KilosortTrialSegmentedDataset<a class="headerlink" href="#extracting-waveforms-via-kilosorttrialsegmenteddataset" title="Permanent link">&para;</a></h2>
 <p>If you have already <a href="kilosort.html#segmenting-a-kilosort-dataset-into-trials">segmented the data into trials</a>, you might wish to extract these waveforms for specific trials or even specific time windows within a trial, e.g. to check for  behaviorally-triggered probe movement.</p>
@@ -617,7 +689,7 @@
     <script id="__config" type="application/json">{"base": ".", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "assets/javascripts/workers/search.fe42c31b.min.js", "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.4ea5477f.min.js"></script>
+      <script src="assets/javascripts/bundle.7353b375.min.js"></script>
       
     
   </body>
