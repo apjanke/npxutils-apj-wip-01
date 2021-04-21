@@ -39,9 +39,14 @@ nav:
   - Analysis of Kilosort Results: analysis.md
   - Extracting Waveforms: waveforms.md
   - Acknowledgements and Support: acknowledgements.md
-  - 'Tutorial':
+  - 'Examples (HTML)':
     - 'Tutorial (HTML)': 'publish/html/tutorial.html'
+    - 'Ex 01: Walkthrough (HTML)': 'publish/html/ex01_walkthrough.html'
+    - 'Ex 02: ImecDatasets (HTML)': 'publish/html/ex02_imecdataset.html'
+  - 'Examples (Markdown)':
     - 'Tutorial (Markdown)': 'publish/md/tutorial.md'
+    - 'Ex 01: Walkthrough (Markdown)': 'publish/md/ex01_walkthrough.md'
+    - 'Ex 02: ImecDatasets (Markdown)': 'publish/md/ex02_imecdataset.md'
 
 copyright: 'Copyright &copy; 2021 &mdash; <a href="http://djoshea.com">Daniel J. O&#39;Shea</a>'
 
