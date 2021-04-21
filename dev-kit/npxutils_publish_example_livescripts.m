@@ -33,12 +33,12 @@ for i = 1:n
   %
   % Yes, we're using an undocumented Matlab internal here. Gotta have it.
   htmlFile = htmlDir + '/' + fileStem + '.html';
-  matlab.internal.liveeditor.openAndConvert(mlxFilePath, htmlFile);
-  fprintf('Exported: %s\n', htmlFile);
+  matlab.internal.liveeditor.openAndConvert(char(mlxFilePath), char(htmlFile));
+  fprintf('Exported: -> %s\n', htmlFile);
   
   % Export to Markdown/LaTeX
   latexFile = mdDir + '/' + fileStem + '.tex';
-  matlab.internal.liveeditor.openAndConvert(mlxFilePath, latexFile);
+  matlab.internal.liveeditor.openAndConvert(char(mlxFilePath), char(latexFile));
   mdFile = mdDir + '/' + fileStem + '.md';
   latexFileStemPath = mdDir + '/' + fileStem;
   npxutils.internal.livescript2markdown.latex2markdown(latexFileStemPath);
