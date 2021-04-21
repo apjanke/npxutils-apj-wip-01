@@ -8,3 +8,8 @@
 mkdocs build
 rm -rf ../docs/*
 cp -R _site/* ../docs
+
+# Restore the CNAME that we blew away earlier, or we'll lose our custom GitHub
+# Pages domain name
+
+cp ../.github/CNAME ../docs
