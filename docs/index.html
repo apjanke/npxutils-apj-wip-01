@@ -14,7 +14,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.1">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.2">
     
     
       
@@ -22,7 +22,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.9299cb39.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.6f955dcd.min.css">
       
         
         <link rel="stylesheet" href="assets/stylesheets/palette.ef6f36e2.min.css">
@@ -208,6 +208,7 @@
       
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
+      
         
       
       
@@ -222,6 +223,7 @@
       
         
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
   
   
     
@@ -330,6 +332,60 @@
   
 
     
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" >
+      
+      <label class="md-nav__link" for="__nav_7">
+        Tutorial
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Tutorial" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          Tutorial
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="publish/html/tutorial.html" class="md-nav__link">
+        Tutorial (HTML)
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="publish/md/tutorial.html" class="md-nav__link">
+        Tutorial (Markdown)
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -343,6 +399,7 @@
                   <div class="md-sidebar__inner">
                     
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
   
   
     
@@ -403,9 +460,11 @@
 <p>To get started, clone the repo:</p>
 <div class="highlight"><pre><span></span><code>git clone https://github.com/djoshea/neuropixel-utils.git
 </code></pre></div>
+
 <p>And add it to your path in Matlab:</p>
 <div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">addpath</span><span class="p">(</span><span class="s">&#39;/path/to/neuropixel-utils&#39;</span><span class="p">)</span><span class="w"></span>
 </code></pre></div>
+
 <h2 id="example-walkthrough">Example walkthrough<a class="headerlink" href="#example-walkthrough" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="c">% Create an ImecDataset pointing at a specific</span><span class="w"></span>
 <span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">channelMapFile</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;neuropixPhase3A_kilosortChanMap.mat&#39;</span><span class="p">;</span><span class="w"></span>
@@ -476,6 +535,7 @@
 <span class="c">% Inspect the raw IMEC traces</span><span class="w"></span>
 <span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">inspectAP_timeWindow</span><span class="p">([</span><span class="mi">200</span><span class="w"> </span><span class="mi">201</span><span class="p">]);</span><span class="w"> </span><span class="c">% 200-201 seconds into the recording</span><span class="w"></span>
 </code></pre></div>
+
 <p>Zoomed in view of data inspection figure. Black are good channels, blue are reference channels. Channels marked bad would be shown in red.</p>
 <p><img alt="imec_inspect" src="images/imec_inspect.png" title="Raw Imec traces" /></p>
 <div class="highlight"><pre><span></span><code><span class="c">% Run Kilosort2</span><span class="w"></span>
@@ -623,6 +683,7 @@
 <span class="c">% Plot a drift map, annotated with trial start markers</span><span class="w"></span>
 <span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="n">plotDriftmap</span><span class="p">(</span><span class="s">&#39;tsi&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">tsi</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
+
 <p><img alt="driftmap" src="images/driftmap.png" title="Cluster driftmap" /></p>
 <p>Note that the cluster structure looks distinct during a few time windows near the beginning and end of the recording, corresponding to regions when no trials were being performed (blue ticks near the bottom).</p>
 <div class="highlight"><pre><span></span><code><span class="c">% Extract raw waveforms for a specific cluster id at the 24 largest amplitude channels</span><span class="w"></span>
@@ -652,6 +713,7 @@
 <span class="c">% Plot these waveforms at their physical coordinates on the neuropixel</span><span class="w"></span>
 <span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">ss</span><span class="p">.</span><span class="n">plotAtProbeLocations</span><span class="p">()</span><span class="w"></span>
 </code></pre></div>
+
 <p><img alt="driftmap" src="images/waveforms_on_probe.png" title="Waveforms on probe" /></p>
                 
               
@@ -736,7 +798,7 @@
     <script id="__config" type="application/json">{"base": ".", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "assets/javascripts/workers/search.fe42c31b.min.js", "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.7353b375.min.js"></script>
+      <script src="assets/javascripts/bundle.4ea5477f.min.js"></script>
       
     
   </body>
