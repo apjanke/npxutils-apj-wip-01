@@ -1,7 +1,8 @@
 # Example 1: Walkthrough
 # Data setup
 
-```matlab:Code
+```matlab
+
 homeDir = string(java.lang.System.getProperty('user.home'));
 exDataDir = homeDir + 'work/npxutils/example-data';
 ksDataDir = homeDir + 'work/npxutils/kilosort';
@@ -14,7 +15,8 @@ Create an ImecDataset from a specified raw data file and probe name:
 
 
 
-```matlab:Code
+```matlab
+
 channelMapFile = 'neuropixPhase3A_kilosortChanMap.mat';
 apBinFile = exDataDir + '/Vinnie/raw_datasets/2018-08-17/Vinnie_20180817_All.imec.ap.bin';
 imec = Neuropixel.ImecDataset(apBinFile, 'channelMap', channelMapFile);
@@ -27,7 +29,8 @@ Preprocess it a bit:
 
 
 
-```matlab:Code
+```matlab
+
 % Mark individual channels as bad based on RMS voltage
 rmsBadChannels = imec.markBadChannelsByRMS('rmsRange', [3 100]);
 
@@ -44,7 +47,8 @@ Common average referencing:
 
 
 
-```matlab:Code
+```matlab
+
 % Perform common average referencing on the file and save the results
 % to a separate "cleaned" directory
 cleanedDir = exDataDir + '/cleaned_datasets';
@@ -61,7 +65,8 @@ Get it ready for sending to Kilosort:
 
 
 
-```matlab:Code
+```matlab
+
 % Symlink the cleaned dataset into a separate directory for Kilosort2
 ksPath = ksDataDir + '/Vinnie_20180817_All_cleaned.imec.ap.bin';
 imec = imec.symLinkAPIntoDirectory(ksPath);
@@ -69,14 +74,16 @@ imec = imec.symLinkAPIntoDirectory(ksPath);
 
 # Visual inspection
 
-```matlab:Code
+```matlab
+
 % Inspect the raw IMEC traces
 imec.inspectAP_timeWindow([200 201]); % 200-201 seconds into the recording
 ```
 
 # Kilosort time!
 
-```matlab:Code
+```matlab
+
 % Run Kilosort2
 npxutils.runKilosort2(imec);
 
@@ -115,7 +122,8 @@ Note that the cluster structure looks distinct during a few time windows near th
 
 
 
-```matlab:Code
+```matlab
+
 % Extract raw waveforms for a specific cluster id at the 24 largest amplitude channels
 % Clean these waveforms by subtracting the contribution of other clusters spiking within the same time window
 ss = ks.getWaveformsFromRawData('cluster_id', 255, 'num_waveforms', 100, ...

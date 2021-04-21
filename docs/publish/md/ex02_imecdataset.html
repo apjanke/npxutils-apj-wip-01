@@ -464,233 +464,150 @@
                 <h1 id="about-imecdataset">About ImecDataset<a class="headerlink" href="#about-imecdataset" title="Permanent link">&para;</a></h1>
 <p>The <code>npxutils.ImecDataset</code> class wraps one individual recording session acquired with SpikeGLX. Currently, four files with extensions <code>.imec.ap.bin</code>, <code>.imec.ap.meta</code>, <code>.imec.lf.bin</code>, and <code>.imec.lf.meta</code> comprise one ImecDataset.</p>
 <h1 id="data-setup">Data setup<a class="headerlink" href="#data-setup" title="Permanent link">&para;</a></h1>
-<p>```matlab:Code
-homeDir = string(java.lang.System.getProperty(&lsquo;user.home&rsquo;));
-exDataDir = homeDir + &lsquo;work/npxutils/example-data&rsquo;;
-<div class="highlight"><pre><span></span><code># Constructing an ImecDataset
-
-
-You construct a npxutils.ImecDataset by pointing it at the path to your dataset. How you specify the path is flexible. You can point directly at one of the files:
-
-
-
-```matlab:Code
-imec = npxutils.ImecDataset(exDataDir + &#39;/raw_datasets/neuropixel_01_g0_t0.imec.ap.bin&#39;);
-</code></pre></div></p>
-<p>```text:Output
-Error using npxutils.ImecDataset (line 173)
+<div class="highlight"><pre><span></span><code><span class="n">homeDir</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">string</span><span class="p">(</span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">System</span><span class="p">.</span><span class="n">getProperty</span><span class="p">(</span><span class="s">&#39;user.home&#39;</span><span class="p">));</span><span class="w"></span>
+<span class="n">exDataDir</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">homeDir</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#39;work/npxutils/example-data&#39;</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
+<h1 id="constructing-an-imecdataset">Constructing an ImecDataset<a class="headerlink" href="#constructing-an-imecdataset" title="Permanent link">&para;</a></h1>
+<p>You construct a npxutils.ImecDataset by pointing it at the path to your dataset. How you specify the path is flexible. You can point directly at one of the files:</p>
+<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="n">exDataDir</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#39;/raw_datasets/neuropixel_01_g0_t0.imec.ap.bin&#39;</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>Error using npxutils.ImecDataset (line 173)
 No AP or LF Imec file found at or in /Users/jankework/npxutils/example-data/raw_datasets/neuropixel_01_g0_t0.imec.ap.bin
-<div class="highlight"><pre><span></span><code>Or specify the common prefix to the `.imec.`* files comprising the dataset:
-
-
-
-```matlab:Code
-imecB = npxutils.ImecDataset(exDataDir + &#39;/raw_datasets/neuropixel_01_g0_t0&#39;);
-</code></pre></div></p>
+</code></pre></div>
+<p>Or specify the common prefix to the <code>.imec.</code>* files comprising the dataset:</p>
+<div class="highlight"><pre><span></span><code><span class="n">imecB</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="n">exDataDir</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#39;/raw_datasets/neuropixel_01_g0_t0&#39;</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
 <p>The common prefix can be shorter as long as there is no ambiguity:</p>
-<p>```matlab:Code
-imecC = npxutils.ImecDataset(exDataDir + &lsquo;/raw_datasets/neuropixel_01&rsquo;);
-<div class="highlight"><pre><span></span><code>You can also point at the parent directory as long as only one `.ap.bin` file is contained within:
-
-
-
-```matlab:Code
-imecD = npxutils.ImecDataset(exDataDir + &#39;/data/raw_datasets/&#39;);
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="n">imecC</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="n">exDataDir</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#39;/raw_datasets/neuropixel_01&#39;</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<p>You can also point at the parent directory as long as only one <code>.ap.bin</code> file is contained within:</p>
+<div class="highlight"><pre><span></span><code><span class="n">imecD</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="n">exDataDir</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#39;/data/raw_datasets/&#39;</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
 <p>These are all equivalent, in that the resulting <code>imec</code> instance will wrap both AP and LF bin and meta files. (Though it’s okay if the LF files are missing).</p>
 <h2 id="specifying-a-channel-map">Specifying a Channel Map<a class="headerlink" href="#specifying-a-channel-map" title="Permanent link">&para;</a></h2>
 <p>When constructing the ImecDataset, you can specify a channel map. If you don’t specify one, the default will be returned by <code>npxutils.util.getDefaultChannelMapFile()</code>, which in turn will look for the file pointed to by the environment variables <code>'NEUROPIXEL_MAP_FILE'</code> or <code>'NPIX_MAP_FILE'</code>. You can set these using Matlab’s <code>setenv</code> function.</p>
 <p>These .mat files are expected to be in the same format as found on the <a href="https://github.com/cortex-lab/neuropixels">neuropixels repo</a>. For the phase 3A probe with 384 channels, the file <code>neuropixPhase3A_kilosortChanMap.mat</code> contains:</p>
-<p>```matlab:Code
-ld = load(&lsquo;neuropixPhase3A_kilosortChanMap.mat&rsquo;)
-<div class="highlight"><pre><span></span><code>You can construct a ChannelMap directly by pointing at the `.mat` file, although every function within `neuropixel-utils` will also accept the filename and construct the `ChannelMap` for you:
-
-
-
-```matlab:Code
-probeName = &#39;neuropixPhase3B1&#39;;
-probeMatFilePath = npxutils.globals.distroot + &#39;/map_files/&#39; + probeName + &#39;_kilosortChanMap.mat&#39;;
-chanMapObject = npxutils.ChannelMap(probeMatFilePath)
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="n">ld</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">load</span><span class="p">(</span><span class="s">&#39;neuropixPhase3A_kilosortChanMap.mat&#39;</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<p>You can construct a ChannelMap directly by pointing at the <code>.mat</code> file, although every function within <code>neuropixel-utils</code> will also accept the filename and construct the <code>ChannelMap</code> for you:</p>
+<div class="highlight"><pre><span></span><code><span class="n">probeName</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;neuropixPhase3B1&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="n">probeMatFilePath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">globals</span><span class="p">.</span><span class="n">distroot</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#39;/map_files/&#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">probeName</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#39;_kilosortChanMap.mat&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="n">chanMapObject</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ChannelMap</span><span class="p">(</span><span class="n">probeMatFilePath</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
 <p>Then you can use this map for an ImecDataset using either of the following:</p>
-<p>```matlab:Code
-imecE = npxutils.ImecDataset(&lsquo;channelMap&rsquo;, chanMapObject);
-imecF = npxutils.ImecDataset(&lsquo;channelMap&rsquo;, probeMatFilePath);
-<div class="highlight"><pre><span></span><code># Exploring metadata
-
-
-When the ImecDataset is created, the metadata are loaded from the `.ap.meta` file. You can request the full metadata using:
-
-
-
-```matlab:Code
-meta = imec.readAPMeta()
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="n">imecE</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="s">&#39;channelMap&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">chanMapObject</span><span class="p">);</span><span class="w"></span>
+<span class="n">imecF</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="s">&#39;channelMap&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">probeMatFilePath</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<h1 id="exploring-metadata">Exploring metadata<a class="headerlink" href="#exploring-metadata" title="Permanent link">&para;</a></h1>
+<p>When the ImecDataset is created, the metadata are loaded from the <code>.ap.meta</code> file. You can request the full metadata using:</p>
+<div class="highlight"><pre><span></span><code><span class="n">meta</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">readAPMeta</span><span class="p">()</span><span class="w"></span>
+</code></pre></div>
 <p>The most commonly accessed metadata is stored in properties of the ImecDataset:</p>
-<p>```matlab:Code
-disp(imec)
-<div class="highlight"><pre><span></span><code>## Setting sync bit names
-
-
-For convenience, if you use the sync bits for individual TTL signals during your recordings, you can set their names for the recording so that subsequent processing can refer to the bits by name rather than index. You may also find it useful to store additional data in some sync bits during subsequent processing, such as marking regions of time where an artifact was detected, such that specifying the bit by name is useful. Bits are ordered like `bitget`, i.e. 1 is the least significant bit.
-
-
-
-```matlab:Code
-imec.setSyncBitNames(1, &quot;trialStart&quot;);
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="nb">disp</span><span class="p">(</span><span class="n">imec</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<h2 id="setting-sync-bit-names">Setting sync bit names<a class="headerlink" href="#setting-sync-bit-names" title="Permanent link">&para;</a></h2>
+<p>For convenience, if you use the sync bits for individual TTL signals during your recordings, you can set their names for the recording so that subsequent processing can refer to the bits by name rather than index. You may also find it useful to store additional data in some sync bits during subsequent processing, such as marking regions of time where an artifact was detected, such that specifying the bit by name is useful. Bits are ordered like <code>bitget</code>, i.e. 1 is the least significant bit.</p>
+<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="p">.</span><span class="n">setSyncBitNames</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;trialStart&quot;</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
 <p>The full set of sync bits is found in <code>imec.syncBitNames</code>, or you can lookup the bit corresponding to a given name using:</p>
-<p>```matlab:Code
-idx = imec.lookupSyncBitByName(&ldquo;trialStart&rdquo;);
-<div class="highlight"><pre><span></span><code>## Marking bad channels
-
-
-You can manually mark specific channels as bad using the `markBadChannels` function and passing a list of IDs to it:
-
-
-
-```matlab:Code
-channelIds = [17 23 52];
-imec.markBadChannels(channelIds);
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="n">idx</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">lookupSyncBitByName</span><span class="p">(</span><span class="s">&quot;trialStart&quot;</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<h2 id="marking-bad-channels">Marking bad channels<a class="headerlink" href="#marking-bad-channels" title="Permanent link">&para;</a></h2>
+<p>You can manually mark specific channels as bad using the <code>markBadChannels</code> function and passing a list of IDs to it:</p>
+<div class="highlight"><pre><span></span><code><span class="n">channelIds</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mi">17</span><span class="w"> </span><span class="mi">23</span><span class="w"> </span><span class="mi">52</span><span class="p">];</span><span class="w"></span>
+<span class="n">imec</span><span class="p">.</span><span class="n">markBadChannels</span><span class="p">(</span><span class="n">channelIds</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
 <h3 id="warning-use-channel-ids-not-indices">WARNING: Use channel IDs, not indices<a class="headerlink" href="#warning-use-channel-ids-not-indices" title="Permanent link">&para;</a></h3>
 <p>Note that like all channel lists, <code>channelIds</code> is specified using the actual unique ids of each channel (as specified in the ChannelMap), which is not necessarily their index into the channel map if the channels are not contiguously numbered.</p>
 <p>You can use <code>lookup_channelIds</code> to find the channel indices for a given set of channel ids if needed:</p>
-<p>```matlab:Code
-[channelInds, channelIds] = imec.lookup_channelIds(channelIds)
-<div class="highlight"><pre><span></span><code>One common task is marking channels as bad if their RMS voltage lies outside a reasonable range:
-
-
-
-```matlab:Code
-goodRmsRange = [3 100]; % [low high] range of RMS in uV
-imec.markBadChannelsByRMS(&#39;rmsRange&#39;, goodRmsRange);
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="p">[</span><span class="n">channelInds</span><span class="p">,</span><span class="w"> </span><span class="n">channelIds</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">lookup_channelIds</span><span class="p">(</span><span class="n">channelIds</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<p>One common task is marking channels as bad if their RMS voltage lies outside a reasonable range:</p>
+<div class="highlight"><pre><span></span><code><span class="n">goodRmsRange</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mi">3</span><span class="w"> </span><span class="mi">100</span><span class="p">];</span><span class="w"> </span><span class="c">% [low high] range of RMS in uV</span><span class="w"></span>
+<span class="n">imec</span><span class="p">.</span><span class="n">markBadChannelsByRMS</span><span class="p">(</span><span class="s">&#39;rmsRange&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">goodRmsRange</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
 <p>The remaining “good” channel ids can always be accessed using <code>imec.goodChannels</code> which will be the set of connected channels excluding the bad channels.</p>
 <h2 id="writing-modified-metadata-back-to-disk">Writing modified metadata back to disk<a class="headerlink" href="#writing-modified-metadata-back-to-disk" title="Permanent link">&para;</a></h2>
 <p>After making any modifications to the metadata, such as setting the sync bit names or marking bad channels, you can write it back to disk (in the <code>.imec.ap.meta</code> file) such that it will be reloaded automatically the next time you create an ImecDataset instance for that file.</p>
-<p>```matlab:Code
-imec.writeModifiedAPMeta();
-<div class="highlight"><pre><span></span><code>You can also append whatever fields you want to the meta file using the `extraMeta` parameter:
-
-
-
-```matlab:Code
-extraMeta.cleaned = true;
-extraMeta.cleaningAlgorithm = &#39;v1&#39;;
-imec.writeModifiedAPMeta(&#39;extraMeta&#39;, extraMeta);
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="p">.</span><span class="n">writeModifiedAPMeta</span><span class="p">();</span><span class="w"></span>
+</code></pre></div>
+<p>You can also append whatever fields you want to the meta file using the <code>extraMeta</code> parameter:</p>
+<div class="highlight"><pre><span></span><code><span class="n">extraMeta</span><span class="p">.</span><span class="n">cleaned</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+<span class="n">extraMeta</span><span class="p">.</span><span class="n">cleaningAlgorithm</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;v1&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="n">imec</span><span class="p">.</span><span class="n">writeModifiedAPMeta</span><span class="p">(</span><span class="s">&#39;extraMeta&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">extraMeta</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
 <h1 id="accessing-data">Accessing data<a class="headerlink" href="#accessing-data" title="Permanent link">&para;</a></h1>
 <h2 id="raw-memory-maps">Raw memory maps<a class="headerlink" href="#raw-memory-maps" title="Permanent link">&para;</a></h2>
 <p>The most convenient way to access the data is to request a memory map:</p>
-<p>```matlab:Code
-mmap = imec.memmapAP_full();
-value = mmap.Data.x(ch_index, sample_index) % access a specific sample
-<div class="highlight"><pre><span></span><code>Equivalent functionality is available for LF files using `imec.memmapLF_full()`. If you wish to modify the underlying data file directly, you can also request a Writeable version of the memory map:
-
-
-
-```matlab:Code
-mmap = imec.memmapAP_full(&#39;Writiable&#39;, true);
-mmap.Data.x(ch_index, sample_index) = new_value; % overwrite a specific sample
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="n">mmap</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">memmapAP_full</span><span class="p">();</span><span class="w"></span>
+<span class="n">value</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">mmap</span><span class="p">.</span><span class="n">Data</span><span class="p">.</span><span class="n">x</span><span class="p">(</span><span class="n">ch_index</span><span class="p">,</span><span class="w"> </span><span class="n">sample_index</span><span class="p">)</span><span class="w"> </span><span class="c">% access a specific sample</span><span class="w"></span>
+</code></pre></div>
+<p>Equivalent functionality is available for LF files using <code>imec.memmapLF_full()</code>. If you wish to modify the underlying data file directly, you can also request a Writeable version of the memory map:</p>
+<div class="highlight"><pre><span></span><code><span class="n">mmap</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">memmapAP_full</span><span class="p">(</span><span class="s">&#39;Writiable&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+<span class="n">mmap</span><span class="p">.</span><span class="n">Data</span><span class="p">.</span><span class="n">x</span><span class="p">(</span><span class="n">ch_index</span><span class="p">,</span><span class="w"> </span><span class="n">sample_index</span><span class="p">)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">new_value</span><span class="p">;</span><span class="w"> </span><span class="c">% overwrite a specific sample</span><span class="w"></span>
+</code></pre></div>
 <h2 id="reading-specific-time-window">Reading specific time window<a class="headerlink" href="#reading-specific-time-window" title="Permanent link">&para;</a></h2>
 <p>You can also request a specific sample or time window directly:</p>
-<p>```matlab:Code
-idxWindow = [idxFirst idxLast];
-[partialData, sampleIdx] = imec.readAP_idx(idxWindow);</p>
-<p>timeWindow = [secStart, secStop]; % in seconds
-[partialDataB, sampleIdxB] = imec.readAP_timeWindow(timeWindow);
-<div class="highlight"><pre><span></span><code>## Plotting specific time windows
+<div class="highlight"><pre><span></span><code><span class="n">idxWindow</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="n">idxFirst</span><span class="w"> </span><span class="n">idxLast</span><span class="p">];</span><span class="w"></span>
+<span class="p">[</span><span class="n">partialData</span><span class="p">,</span><span class="w"> </span><span class="n">sampleIdx</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">readAP_idx</span><span class="p">(</span><span class="n">idxWindow</span><span class="p">);</span><span class="w"></span>
 
-
-You can also quickly generate a stacked traces plot of a specific time window, optionally selecting which channels to plot. Take care to select a reasonable time window to avoid overwhelming your system. All channels are individually centered and then collectively normalized by the maximum value before plotting. You can change the global scaling factor by specifying `gain` &gt; 1.
-
-
-
-
-`imec``.``inspectAP_idxWindow``(``idxWindow``,`` ``...``)`
-
-
-
-
-`imec``.``inspectAP_timeWindow``(``timeWindow``,`` ``...``)`
-
-
-
-
-There are additional optional parameters you can specify:
-
-
-
-   -  `channels`: channel indices to plot, defaults to `imec.mappedChannels` 
-   -  `syncBits` : which sync bits to plot individually, defaults to `imec.syncBitsNamed` 
-   -  `gain`: global scaling factor, values larger then 1 will magnify the individual channels, defaults to 0.95 
-   -  `car`: perform common average referencing before plotting, defaults to false 
-   -  `downsample` : take every nth sample to speed up plotting, defaults to 1 
-
-
-
-Good channels are plotted in black, non-connected channels in blue, and bad channels in red. Sync bits are also shown in red and are not affected by the normalization gain.
-
-
-
-```matlab:Code
-% TODO: Some code that actually generates a plot here!
-</code></pre></div></p>
+<span class="n">timeWindow</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="n">secStart</span><span class="p">,</span><span class="w"> </span><span class="n">secStop</span><span class="p">];</span><span class="w"> </span><span class="c">% in seconds</span><span class="w"></span>
+<span class="p">[</span><span class="n">partialDataB</span><span class="p">,</span><span class="w"> </span><span class="n">sampleIdxB</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">readAP_timeWindow</span><span class="p">(</span><span class="n">timeWindow</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<h2 id="plotting-specific-time-windows">Plotting specific time windows<a class="headerlink" href="#plotting-specific-time-windows" title="Permanent link">&para;</a></h2>
+<p>You can also quickly generate a stacked traces plot of a specific time window, optionally selecting which channels to plot. Take care to select a reasonable time window to avoid overwhelming your system. All channels are individually centered and then collectively normalized by the maximum value before plotting. You can change the global scaling factor by specifying <code>gain</code> &gt; 1.</p>
+<p><code>imec``.``inspectAP_idxWindow``(``idxWindow``,`` ``...``)</code></p>
+<p><code>imec``.``inspectAP_timeWindow``(``timeWindow``,`` ``...``)</code></p>
+<p>There are additional optional parameters you can specify:</p>
+<ul>
+<li><code>channels</code>: channel indices to plot, defaults to <code>imec.mappedChannels</code> </li>
+<li><code>syncBits</code> : which sync bits to plot individually, defaults to <code>imec.syncBitsNamed</code> </li>
+<li><code>gain</code>: global scaling factor, values larger then 1 will magnify the individual channels, defaults to 0.95 </li>
+<li><code>car</code>: perform common average referencing before plotting, defaults to false </li>
+<li><code>downsample</code> : take every nth sample to speed up plotting, defaults to 1 </li>
+</ul>
+<p>Good channels are plotted in black, non-connected channels in blue, and bad channels in red. Sync bits are also shown in red and are not affected by the normalization gain.</p>
+<div class="highlight"><pre><span></span><code><span class="c">% TODO: Some code that actually generates a plot here!</span><span class="w"></span>
+</code></pre></div>
 <h2 id="reading-sync-channel">Reading sync channel<a class="headerlink" href="#reading-sync-channel" title="Permanent link">&para;</a></h2>
 <p>You can access the sync channel all at once using:</p>
-<p>```matlab:Code
-sync = imec.readSync();
-trialStartBit = imec.readSyncBit(&ldquo;trialStart&rdquo;);
-<div class="highlight"><pre><span></span><code>Or a specific sample or time window using:
-
-
-
-```matlab:Code
-[partialSync, sampleIdx] = imec.readSync_idx(idxWindow);
-[partialSyncB, sampleIdxB] = imec.readSync_timeWindow(timeWindow);
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="n">sync</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">readSync</span><span class="p">();</span><span class="w"></span>
+<span class="n">trialStartBit</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">readSyncBit</span><span class="p">(</span><span class="s">&quot;trialStart&quot;</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<p>Or a specific sample or time window using:</p>
+<div class="highlight"><pre><span></span><code><span class="p">[</span><span class="n">partialSync</span><span class="p">,</span><span class="w"> </span><span class="n">sampleIdx</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">readSync_idx</span><span class="p">(</span><span class="n">idxWindow</span><span class="p">);</span><span class="w"></span>
+<span class="p">[</span><span class="n">partialSyncB</span><span class="p">,</span><span class="w"> </span><span class="n">sampleIdxB</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">readSync_timeWindow</span><span class="p">(</span><span class="n">timeWindow</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
 <p>You can also access the logical values of specific bits either by bit index or name using:</p>
-<p>```matlab:Code
-partial = imec.readSyncBits_idx(bits_or_names, idxWindow); %  nTime x nBits
-trialStart_partial = imec.readSyncBits_idx(&ldquo;trialStart&rdquo;, idxWindow); % nTime x 1
-<div class="highlight"><pre><span></span><code># Building a preprocessing pipeline
+<div class="highlight"><pre><span></span><code><span class="n">partial</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">readSyncBits_idx</span><span class="p">(</span><span class="n">bits_or_names</span><span class="p">,</span><span class="w"> </span><span class="n">idxWindow</span><span class="p">);</span><span class="w"> </span><span class="c">%  nTime x nBits</span><span class="w"></span>
+<span class="n">trialStart_partial</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">readSyncBits_idx</span><span class="p">(</span><span class="s">&quot;trialStart&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">idxWindow</span><span class="p">);</span><span class="w"> </span><span class="c">% nTime x 1</span><span class="w"></span>
+</code></pre></div>
+<h1 id="building-a-preprocessing-pipeline">Building a preprocessing pipeline<a class="headerlink" href="#building-a-preprocessing-pipeline" title="Permanent link">&para;</a></h1>
+<p>If the raw <code>.imec.ap.bin</code> file must be processed in some way before running Kilosort, e.g. to remove artifacts, you can implement this efficiently by writing a transformation function that will act on chunks of the data. One example is found in <code>Neuropixel.DataProcessFn.commonAverageReference</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">function</span><span class="w"> </span><span class="nf">[data, extra] = commonAverageReference</span><span class="p">(</span>imec, data, chIds, sampleIdx<span class="p">)</span><span class="w"> </span><span class="c">%#ok&lt;INUSD&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="c">% chIds are the channel ids and imec.goodChannels is a list of channel ids</span><span class="w"></span>
+<span class="w">    </span><span class="c">% so this will lookup the channel indices of those channels both in chIdx that</span><span class="w"></span>
+<span class="w">    </span><span class="c">% are also marked as good. This prevents us from computing the reference</span><span class="w"></span>
+<span class="w">    </span><span class="c">% from the sync, reference, or bad channels.</span><span class="w"></span>
+<span class="w">    </span><span class="n">chanMask</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">lookup_channelIds</span><span class="p">(</span><span class="nb">intersect</span><span class="p">(</span><span class="n">chIds</span><span class="p">,</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">goodChannels</span><span class="p">));</span><span class="w"></span>
 
+<span class="w">    </span><span class="c">% subtract median of each channel over time</span><span class="w"></span>
+<span class="w">    </span><span class="n">data</span><span class="p">(</span><span class="n">chanMask</span><span class="p">,</span><span class="w"> </span><span class="p">:)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">bsxfun</span><span class="p">(@</span><span class="n">minus</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">(</span><span class="n">chanMask</span><span class="p">,</span><span class="w"> </span><span class="p">:),</span><span class="w"> </span><span class="nb">median</span><span class="p">(</span><span class="n">data</span><span class="p">(</span><span class="n">chanMask</span><span class="p">,</span><span class="w"> </span><span class="p">:),</span><span class="w"> </span><span class="mi">2</span><span class="p">));</span><span class="w"></span>
 
-If the raw `.imec.ap.bin` file must be processed in some way before running Kilosort, e.g. to remove artifacts, you can implement this efficiently by writing a transformation function that will act on chunks of the data. One example is found in `Neuropixel.DataProcessFn.commonAverageReference`:
-
-
-
-```matlab:Code
-function [data, extra] = commonAverageReference(imec, data, chIds, sampleIdx) %#ok&lt;INUSD&gt;
-    % chIds are the channel ids and imec.goodChannels is a list of channel ids
-    % so this will lookup the channel indices of those channels both in chIdx that
-    % are also marked as good. This prevents us from computing the reference
-    % from the sync, reference, or bad channels.
-    chanMask = imec.lookup_channelIds(intersect(chIds, imec.goodChannels));
-
-    % subtract median of each channel over time
-    data(chanMask, :) = bsxfun(@minus, data(chanMask, :), median(data(chanMask, :), 2));
-
-    % subtract median across good channels
-    data(chanMask, :) = bsxfun(@minus, data(chanMask, :), median(data(chanMask, :), 1));
-end
-</code></pre></div></p>
+<span class="w">    </span><span class="c">% subtract median across good channels</span><span class="w"></span>
+<span class="w">    </span><span class="n">data</span><span class="p">(</span><span class="n">chanMask</span><span class="p">,</span><span class="w"> </span><span class="p">:)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">bsxfun</span><span class="p">(@</span><span class="n">minus</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">(</span><span class="n">chanMask</span><span class="p">,</span><span class="w"> </span><span class="p">:),</span><span class="w"> </span><span class="nb">median</span><span class="p">(</span><span class="n">data</span><span class="p">(</span><span class="n">chanMask</span><span class="p">,</span><span class="w"> </span><span class="p">:),</span><span class="w"> </span><span class="mi">1</span><span class="p">));</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+</code></pre></div>
 <p>Essentially, your transform function can perform any modifications to the data matrix and return the resulting data matrix. Here, <code>imec</code> will be the ImecDataset being transformed, <code>data</code> will be the <code>nChannels x nTime</code> chunk of data being processed. <code>chIds</code> will be the channel ids (not necessarily their indices into data but the ids assigned by the channel map), and will typically be the full list of channel ids present in the data file. <code>sampleIdx</code> is the sample indices in the current chunk. <code>extra</code> is an optional output argument that allows you to store any additional metadata. After the transformation function has been run on every chunk of the dataset, these individual <code>extra</code> outputs will be accumulated in a cell array by chunk.</p>
 <h2 id="modifying-a-dataset-during-copy-to-new-location">Modifying a dataset during copy to new location<a class="headerlink" href="#modifying-a-dataset-during-copy-to-new-location" title="Permanent link">&para;</a></h2>
 <p>Once you’ve written your transform function (or functions), you can run them on the dataset using:</p>
-<p>```matlab:Code(Display)
-imecOut = imec.saveTransformedDataset(outPath, &lsquo;transformAP&rsquo;, &hellip;\
-  {cell of function handles}, &lsquo;transformLF&rsquo;, {cell of function handles});
-<div class="highlight"><pre><span></span><code>Here, `outPath` should include the folder where the new datasets should be written. By default, the file stem (preceeding `.ap.bin`) will match the leaf directory in `outPath`, but this can be specified manually by passing a `stem` parameter:
-
-
-
-```matlab:Code(Display)
-imecOut = imec.saveTransformedDataset(&#39;/path/to/datasets&#39;, &#39;stem&#39;, &#39;modifiedDataset&#39;, ...)
-% creates /path/to/datasets/modifiedDataset.ap.bin, .ap.meta, etc.
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="n">imecOut</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">saveTransformedDataset</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;transformAP&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c">\</span><span class="w"></span>
+<span class="w">  </span><span class="p">{</span><span class="nb">cell</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">handles</span><span class="p">},</span><span class="w"> </span><span class="s">&#39;transformLF&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="nb">cell</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">handles</span><span class="p">});</span><span class="w"></span>
+</code></pre></div>
+<p>Here, <code>outPath</code> should include the folder where the new datasets should be written. By default, the file stem (preceeding <code>.ap.bin</code>) will match the leaf directory in <code>outPath</code>, but this can be specified manually by passing a <code>stem</code> parameter:</p>
+<div class="highlight"><pre><span></span><code><span class="n">imecOut</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">saveTransformedDataset</span><span class="p">(</span><span class="s">&#39;/path/to/datasets&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;stem&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;modifiedDataset&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c">)</span><span class="w"></span>
+<span class="c">% creates /path/to/datasets/modifiedDataset.ap.bin, .ap.meta, etc.</span><span class="w"></span>
+</code></pre></div>
 <p>You can provide one or more function handles (e.g. <code>@Neuropixel.DataProcessFn.commonAverageReference</code>) that will be applied sequentially. Other optional parameters include:</p>
 <ul>
 <li><code>dryRun</code>: if true, no actual data will be modified on disk, facilitating testing or step by step debugging of the transform functions before writing data. (default false) </li>
@@ -709,64 +626,46 @@ imecOut = imec.saveTransformedDataset(&#39;/path/to/datasets&#39;, &#39;stem&#39
 <p>Ensure that <code>outPath</code> refers to separate directory so that you make a copy of the dataset rather than writing over the same location. An error will be thrown if any existing files would be overwritten by this call.</p>
 <h2 id="modifying-a-dataset-in-place">Modifying a dataset in place<a class="headerlink" href="#modifying-a-dataset-in-place" title="Permanent link">&para;</a></h2>
 <p>Rather than generate a copy, you can also modify a file in place if you’re short on disk space, but be careful, as there’s no undo if anything goes wrong. The same additional parameters are accepted, and you may wish to test your code first by passing <code>'dryRun', true</code>.</p>
-<p>```matlab:Code(Display)
-imec.modifyAPInPlace(outPath, {cell of function handles}, &hellip;);
-imec.modifyLFInPlace(outPath, {cell of function handles}, &hellip;);
-<div class="highlight"><pre><span></span><code>## Concatenating multiple files together
-
-
-If you have multiple separate recording files that you wish to process and sort together, you can concatenate them together during the copy. The code will also scale the datasets up to a common gain factor if the file gains differ from each other. This will not of course increase the resolution of low-gain files, but it will ensure that the signal amplitudes match across files with different gains.
-
-
-
-```matlab:Code(Display)
-imecList = {imec1, imec2, ...};
-imecOut = npxutils.ImecDataset.writeConcatenatedFileMatchGains(imecList, outPath, ...
-        &#39;transformAP&#39;, {cell of function handles}, ...
-        &#39;transformLF&#39;, {cell of function handles}, ...);
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="p">.</span><span class="n">modifyAPInPlace</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="nb">cell</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">handles</span><span class="p">},</span><span class="w"> </span><span class="k">...</span><span class="c">);</span><span class="w"></span>
+<span class="n">imec</span><span class="p">.</span><span class="n">modifyLFInPlace</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="nb">cell</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">handles</span><span class="p">},</span><span class="w"> </span><span class="k">...</span><span class="c">);</span><span class="w"></span>
+</code></pre></div>
+<h2 id="concatenating-multiple-files-together">Concatenating multiple files together<a class="headerlink" href="#concatenating-multiple-files-together" title="Permanent link">&para;</a></h2>
+<p>If you have multiple separate recording files that you wish to process and sort together, you can concatenate them together during the copy. The code will also scale the datasets up to a common gain factor if the file gains differ from each other. This will not of course increase the resolution of low-gain files, but it will ensure that the signal amplitudes match across files with different gains.</p>
+<div class="highlight"><pre><span></span><code><span class="n">imecList</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="n">imec1</span><span class="p">,</span><span class="w"> </span><span class="n">imec2</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c">};</span><span class="w"></span>
+<span class="n">imecOut</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">.</span><span class="n">writeConcatenatedFileMatchGains</span><span class="p">(</span><span class="n">imecList</span><span class="p">,</span><span class="w"> </span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<span class="w">        </span><span class="s">&#39;transformAP&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="nb">cell</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">handles</span><span class="p">},</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<span class="w">        </span><span class="s">&#39;transformLF&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="nb">cell</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">handles</span><span class="p">},</span><span class="w"> </span><span class="k">...</span><span class="c">);</span><span class="w"></span>
+</code></pre></div>
 <h1 id="making-copies-and-symbolic-links">Making copies and symbolic links<a class="headerlink" href="#making-copies-and-symbolic-links" title="Permanent link">&para;</a></h1>
 <p>You can generate a copy of a dataset using:</p>
-<p>```matlab:Code
-[imecOut] = imec.saveTransformedDataset(outPath, &lsquo;writeAP&rsquo;, true, &lsquo;writeLF&rsquo;, true);
-<div class="highlight"><pre><span></span><code>Alternatively, you can create symbolic links to the AP bin and meta files in a new location using:
-
-
-
-```matlab:Code
-imecLinked = imec.symLinkAPIntoDirectory(outPath);
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="p">[</span><span class="n">imecOut</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">saveTransformedDataset</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;writeAP&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;writeLF&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<p>Alternatively, you can create symbolic links to the AP bin and meta files in a new location using:</p>
+<div class="highlight"><pre><span></span><code><span class="n">imecLinked</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">symLinkAPIntoDirectory</span><span class="p">(</span><span class="n">outPath</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
 <p>This is useful for running Kilosort with varying parameters, since each run would ideally live in its own directory but there’s no need for a real copy of the raw data.</p>
 <h2 id="excising-time-windows">Excising time windows<a class="headerlink" href="#excising-time-windows" title="Permanent link">&para;</a></h2>
 <p>Occasionally it can be beneficial to remove certain time windows from a file, or to omit them while plotting data. This may be accomplished using <code>npxutils.TimeShiftSpec</code> instances to indicate which windows of time to keep and how to shift them so as to remove gaps. A <code>TimeShiftSpec</code> specifies a list of sample intervals bounded by a start and stop index in properties <code>idxStart</code> and <code>idxStop</code>. The start index in <code>idxStart</code> will be shifted to lie at sample index <code>idxShiftStart</code>. You can calculate these shifts directly, but it is typically easier to specify only the sample intervals you wish to keep and then construct the <code>TimeShiftSpec</code> using:</p>
-<p>```matlab:Code
-timeShifts = npxutils.TimeShiftSpec.buildToExciseGaps(idxStartList, idxStopList);
-<div class="highlight"><pre><span></span><code>If you have known trial boundaries in your file (see Segmenting a Kilosort dataset into trials for more information), you can also excise the regions of time far from trial boundaries using the `TrialSegmentationInfo` instance. I’ve found this to be useful to exclude time windows where the subject was asleep from further analysis.
-
-
-
-```matlab:Code
-timeShifts = tsi.computeShiftsExciseRegionsOutsideTrials(&#39;maxPauseSec&#39;, 20);
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="n">timeShifts</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">TimeShiftSpec</span><span class="p">.</span><span class="n">buildToExciseGaps</span><span class="p">(</span><span class="n">idxStartList</span><span class="p">,</span><span class="w"> </span><span class="n">idxStopList</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<p>If you have known trial boundaries in your file (see Segmenting a Kilosort dataset into trials for more information), you can also excise the regions of time far from trial boundaries using the <code>TrialSegmentationInfo</code> instance. I’ve found this to be useful to exclude time windows where the subject was asleep from further analysis.</p>
+<div class="highlight"><pre><span></span><code><span class="n">timeShifts</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">tsi</span><span class="p">.</span><span class="n">computeShiftsExciseRegionsOutsideTrials</span><span class="p">(</span><span class="s">&#39;maxPauseSec&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
 <p>You can then pass along this <code>npxutils.TimeShiftSpec</code> to any of the data transform functions. Depending on whether the <code>timeShifts</code> object was created in indices of <code>AP</code> band sample rate or <code>LF</code> band sample rate, you should pass it along as <code>timeShiftsAP</code> or <code>timeShiftsLF</code>. The conversion to the other sampling rate will be handled automatically so that the excision is performed on both datasets appropriately.</p>
-<p>```matlab:Code(Display)
-imecOut = imec.saveTransformedDataset(outPath, &lsquo;timeShiftsAP&rsquo;, timeShifts, &hellip;);
-<div class="highlight"><pre><span></span><code>A cell array of `npxutils.TimeShiftSpec` instances can be provided when concatenating multiple files:
-
-
-
-```matlab:Code(Display)
- imecOut = npxutils.ImecDataset.writeConcatenatedFileMatchGains(outPath, imecList, ...
-        &#39;timeShiftsAP&#39;, {timeShift1, timeShift2, ... }, ...);
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="n">imecOut</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">saveTransformedDataset</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;timeShiftsAP&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">timeShifts</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c">);</span><span class="w"></span>
+</code></pre></div>
+<p>A cell array of <code>npxutils.TimeShiftSpec</code> instances can be provided when concatenating multiple files:</p>
+<div class="highlight"><pre><span></span><code><span class="w"> </span><span class="n">imecOut</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">.</span><span class="n">writeConcatenatedFileMatchGains</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="n">imecList</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<span class="w">        </span><span class="s">&#39;timeShiftsAP&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">timeShift1</span><span class="p">,</span><span class="w"> </span><span class="n">timeShift2</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c"> }, ...);</span><span class="w"></span>
+</code></pre></div>
 <h2 id="referring-to-source-datasets">Referring to Source Datasets<a class="headerlink" href="#referring-to-source-datasets" title="Permanent link">&para;</a></h2>
 <p>If helpful, when loading a derived <code>ImecDataset</code>, you can specify the <code>sourceDatasets</code> parameter to provide an array of <code>ImecDataset</code> instances corresponding to the original, pre-processed source datasets. Here, this would be the set of raw datasets provided as the <code>imecList</code> argument above. For certain methods, you can then pass parameter <code>fromSourceDatasets</code>, true and the corresponding window of time from the source datasets will be plotted instead of the processed data. This will automatically handle any time shifts and excisions performed; consequently it is helpful for debugging processing pipelines to see the before and after data.</p>
-<p>```matlab:Code
-imecProcessed = npxutils.ImecDataset.writeConcatenatedFileMatchGains(outPath, imecList);
-% &hellip; or:
-imecProcessedB = npxutils.ImecDataset(outPath, &lsquo;sourceDatasets&rsquo;, {imecRaw1, imecRaw2});</p>
-<p>imecProcessed.inspectAP_timeWindow([1 2], &lsquo;fromSourceDatasets&rsquo;, true);
-```</p>
+<div class="highlight"><pre><span></span><code><span class="n">imecProcessed</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">.</span><span class="n">writeConcatenatedFileMatchGains</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="n">imecList</span><span class="p">);</span><span class="w"></span>
+<span class="c">% ... or:</span><span class="w"></span>
+<span class="n">imecProcessedB</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;sourceDatasets&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">imecRaw1</span><span class="p">,</span><span class="w"> </span><span class="n">imecRaw2</span><span class="p">});</span><span class="w"></span>
+
+<span class="n">imecProcessed</span><span class="p">.</span><span class="n">inspectAP_timeWindow</span><span class="p">([</span><span class="mi">1</span><span class="w"> </span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="s">&#39;fromSourceDatasets&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
                 
               
               

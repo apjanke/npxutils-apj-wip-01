@@ -463,95 +463,87 @@
                 
                 <h1 id="example-1-walkthrough">Example 1: Walkthrough<a class="headerlink" href="#example-1-walkthrough" title="Permanent link">&para;</a></h1>
 <h1 id="data-setup">Data setup<a class="headerlink" href="#data-setup" title="Permanent link">&para;</a></h1>
-<p>```matlab:Code
-homeDir = string(java.lang.System.getProperty(&lsquo;user.home&rsquo;));
-exDataDir = homeDir + &lsquo;work/npxutils/example-data&rsquo;;
-ksDataDir = homeDir + &lsquo;work/npxutils/kilosort&rsquo;;
-<div class="highlight"><pre><span></span><code># Create ImecDataset
-
-
-Create an ImecDataset from a specified raw data file and probe name:
-
-
-
-```matlab:Code
-channelMapFile = &#39;neuropixPhase3A_kilosortChanMap.mat&#39;;
-apBinFile = exDataDir + &#39;/Vinnie/raw_datasets/2018-08-17/Vinnie_20180817_All.imec.ap.bin&#39;;
-imec = Neuropixel.ImecDataset(apBinFile, &#39;channelMap&#39;, channelMapFile);
-disp(imec)
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="n">homeDir</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">string</span><span class="p">(</span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">System</span><span class="p">.</span><span class="n">getProperty</span><span class="p">(</span><span class="s">&#39;user.home&#39;</span><span class="p">));</span><span class="w"></span>
+<span class="n">exDataDir</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">homeDir</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#39;work/npxutils/example-data&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="n">ksDataDir</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">homeDir</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#39;work/npxutils/kilosort&#39;</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
+<h1 id="create-imecdataset">Create ImecDataset<a class="headerlink" href="#create-imecdataset" title="Permanent link">&para;</a></h1>
+<p>Create an ImecDataset from a specified raw data file and probe name:</p>
+<div class="highlight"><pre><span></span><code><span class="n">channelMapFile</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;neuropixPhase3A_kilosortChanMap.mat&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="n">apBinFile</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">exDataDir</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#39;/Vinnie/raw_datasets/2018-08-17/Vinnie_20180817_All.imec.ap.bin&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Neuropixel</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="n">apBinFile</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;channelMap&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">channelMapFile</span><span class="p">);</span><span class="w"></span>
+<span class="nb">disp</span><span class="p">(</span><span class="n">imec</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
 <p>Preprocess it a bit:</p>
-<p>```matlab:Code
-% Mark individual channels as bad based on RMS voltage
-rmsBadChannels = imec.markBadChannelsByRMS(&lsquo;rmsRange&rsquo;, [3 100]);</p>
-<p>% Specify names for the individual bits in the sync channel
-imec.setSyncBitNames([1 2 3], {&lsquo;trialInfo&rsquo;, &lsquo;trialStart&rsquo;, &lsquo;stim&rsquo;});</p>
-<p>% Save the bad channels and Sync bit names to the .imec.ap.meta file so they are loaded next time
-imec.writeModifiedAPMeta();
-<div class="highlight"><pre><span></span><code>Common average referencing:
+<div class="highlight"><pre><span></span><code><span class="c">% Mark individual channels as bad based on RMS voltage</span><span class="w"></span>
+<span class="n">rmsBadChannels</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">markBadChannelsByRMS</span><span class="p">(</span><span class="s">&#39;rmsRange&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">3</span><span class="w"> </span><span class="mi">100</span><span class="p">]);</span><span class="w"></span>
 
+<span class="c">% Specify names for the individual bits in the sync channel</span><span class="w"></span>
+<span class="n">imec</span><span class="p">.</span><span class="n">setSyncBitNames</span><span class="p">([</span><span class="mi">1</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="mi">3</span><span class="p">],</span><span class="w"> </span><span class="p">{</span><span class="s">&#39;trialInfo&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;trialStart&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;stim&#39;</span><span class="p">});</span><span class="w"></span>
 
-
-```matlab:Code
-% Perform common average referencing on the file and save the results
-% to a separate &quot;cleaned&quot; directory
-cleanedDir = exDataDir + &#39;/cleaned_datasets&#39;;
-cleanedApBinFile = cleanedDir + &#39;Vinnie_20180817_All_cleaned.imec.ap.bin&#39;;
-extraMeta = struct();
-extraMeta.commonAverageReferenced = true;
-fnList = {@npxutils.dataprocess.commonAverageReference};
-imec = imec.saveTransformedDataset(cleanedApBinFile, &#39;transformAP&#39;, fnList, &#39;extraMeta&#39;, extraMeta);
-</code></pre></div></p>
+<span class="c">% Save the bad channels and Sync bit names to the .imec.ap.meta file so they are loaded next time</span><span class="w"></span>
+<span class="n">imec</span><span class="p">.</span><span class="n">writeModifiedAPMeta</span><span class="p">();</span><span class="w"></span>
+</code></pre></div>
+<p>Common average referencing:</p>
+<div class="highlight"><pre><span></span><code><span class="c">% Perform common average referencing on the file and save the results</span><span class="w"></span>
+<span class="c">% to a separate &quot;cleaned&quot; directory</span><span class="w"></span>
+<span class="n">cleanedDir</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">exDataDir</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#39;/cleaned_datasets&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="n">cleanedApBinFile</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">cleanedDir</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#39;Vinnie_20180817_All_cleaned.imec.ap.bin&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="n">extraMeta</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">struct</span><span class="p">();</span><span class="w"></span>
+<span class="n">extraMeta</span><span class="p">.</span><span class="n">commonAverageReferenced</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+<span class="n">fnList</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{@</span><span class="n">npxutils</span><span class="p">.</span><span class="n">dataprocess</span><span class="p">.</span><span class="n">commonAverageReference</span><span class="p">};</span><span class="w"></span>
+<span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">saveTransformedDataset</span><span class="p">(</span><span class="n">cleanedApBinFile</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;transformAP&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">fnList</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;extraMeta&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">extraMeta</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
 <p>Get it ready for sending to Kilosort:</p>
-<p>```matlab:Code
-% Symlink the cleaned dataset into a separate directory for Kilosort2
-ksPath = ksDataDir + &lsquo;/Vinnie_20180817_All_cleaned.imec.ap.bin&rsquo;;
-imec = imec.symLinkAPIntoDirectory(ksPath);
-<div class="highlight"><pre><span></span><code># Visual inspection
-
-```matlab:Code
-% Inspect the raw IMEC traces
-imec.inspectAP_timeWindow([200 201]); % 200-201 seconds into the recording
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="c">% Symlink the cleaned dataset into a separate directory for Kilosort2</span><span class="w"></span>
+<span class="n">ksPath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">ksDataDir</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#39;/Vinnie_20180817_All_cleaned.imec.ap.bin&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">symLinkAPIntoDirectory</span><span class="p">(</span><span class="n">ksPath</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<h1 id="visual-inspection">Visual inspection<a class="headerlink" href="#visual-inspection" title="Permanent link">&para;</a></h1>
+<div class="highlight"><pre><span></span><code><span class="c">% Inspect the raw IMEC traces</span><span class="w"></span>
+<span class="n">imec</span><span class="p">.</span><span class="n">inspectAP_timeWindow</span><span class="p">([</span><span class="mi">200</span><span class="w"> </span><span class="mi">201</span><span class="p">]);</span><span class="w"> </span><span class="c">% 200-201 seconds into the recording</span><span class="w"></span>
+</code></pre></div>
 <h1 id="kilosort-time">Kilosort time!<a class="headerlink" href="#kilosort-time" title="Permanent link">&para;</a></h1>
-<p>```matlab:Code
-% Run Kilosort2
-npxutils.runKilosort2(imec);</p>
-<p>% Load the Kilosort2 results
-ks = npxutils.KilosortDataset();
-ks.load()</p>
-<p>% Define how the data are segmented into trials
-% (You must implement this function yourself)
-% tsi = computeTrialSegmentation(imec)</p>
-<p>% TODO: Figure out how to implement a trial segmentation function for these
-% examples so the Live Script can run through.</p>
-<p>% Segment the KilosortDataset into trials based on start and stop idx.
-% trial_ids are specified according to the data structure being merged into.
-% If a trial is included in trial_ids but not found in tsi,
-% its contents would be blank and trial_has_data(i) would be set false.
-%
-% Each of seg&rsquo;s properties are now nTrials x &hellip; cells containing the data
-% corresponding to that trial
-trial_ids = min(tsi.trialId):max(tsi.trialId);
-seg = npxutils.KilosortTrialSegmentedDataset(ks, tsi, trial_ids);
-disp(seg)</p>
-<p>% Compute useful stats about each template and cluster
-metrics = ks.getMetrics()</p>
-<p>% Plot a drift map, annotated with trial start markers
-metrics.plotDriftmap(&lsquo;tsi&rsquo;, tsi);
-<div class="highlight"><pre><span></span><code>Note that the cluster structure looks distinct during a few time windows near the beginning and end of the recording, corresponding to regions when no trials were being performed (blue ticks near the bottom).
+<div class="highlight"><pre><span></span><code><span class="c">% Run Kilosort2</span><span class="w"></span>
+<span class="n">npxutils</span><span class="p">.</span><span class="n">runKilosort2</span><span class="p">(</span><span class="n">imec</span><span class="p">);</span><span class="w"></span>
 
+<span class="c">% Load the Kilosort2 results</span><span class="w"></span>
+<span class="n">ks</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">KilosortDataset</span><span class="p">();</span><span class="w"></span>
+<span class="n">ks</span><span class="p">.</span><span class="n">load</span><span class="p">()</span><span class="w"></span>
 
+<span class="c">% Define how the data are segmented into trials</span><span class="w"></span>
+<span class="c">% (You must implement this function yourself)</span><span class="w"></span>
+<span class="c">% tsi = computeTrialSegmentation(imec)</span><span class="w"></span>
 
-```matlab:Code
-% Extract raw waveforms for a specific cluster id at the 24 largest amplitude channels
-% Clean these waveforms by subtracting the contribution of other clusters spiking within the same time window
-ss = ks.getWaveformsFromRawData(&#39;cluster_id&#39;, 255, &#39;num_waveforms&#39;, 100, ...
-  &#39;best_n_channels&#39;, 24,  &#39;subtractOtherClusters&#39;, true)
+<span class="c">% TODO: Figure out how to implement a trial segmentation function for these</span><span class="w"></span>
+<span class="c">% examples so the Live Script can run through.</span><span class="w"></span>
 
-% Plot these waveforms at their physical coordinates on the neuropixel
-ss.plotAtProbeLocations()
-</code></pre></div></p>
+<span class="c">% Segment the KilosortDataset into trials based on start and stop idx.</span><span class="w"></span>
+<span class="c">% trial_ids are specified according to the data structure being merged into.</span><span class="w"></span>
+<span class="c">% If a trial is included in trial_ids but not found in tsi,</span><span class="w"></span>
+<span class="c">% its contents would be blank and trial_has_data(i) would be set false.</span><span class="w"></span>
+<span class="c">%</span><span class="w"></span>
+<span class="c">% Each of seg&#39;s properties are now nTrials x ... cells containing the data</span><span class="w"></span>
+<span class="c">% corresponding to that trial</span><span class="w"></span>
+<span class="n">trial_ids</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">min</span><span class="p">(</span><span class="n">tsi</span><span class="p">.</span><span class="n">trialId</span><span class="p">):</span><span class="nb">max</span><span class="p">(</span><span class="n">tsi</span><span class="p">.</span><span class="n">trialId</span><span class="p">);</span><span class="w"></span>
+<span class="n">seg</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">KilosortTrialSegmentedDataset</span><span class="p">(</span><span class="n">ks</span><span class="p">,</span><span class="w"> </span><span class="n">tsi</span><span class="p">,</span><span class="w"> </span><span class="n">trial_ids</span><span class="p">);</span><span class="w"></span>
+<span class="nb">disp</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span><span class="w"></span>
+
+<span class="c">% Compute useful stats about each template and cluster</span><span class="w"></span>
+<span class="n">metrics</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">ks</span><span class="p">.</span><span class="n">getMetrics</span><span class="p">()</span><span class="w"></span>
+
+<span class="c">% Plot a drift map, annotated with trial start markers</span><span class="w"></span>
+<span class="n">metrics</span><span class="p">.</span><span class="n">plotDriftmap</span><span class="p">(</span><span class="s">&#39;tsi&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">tsi</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<p>Note that the cluster structure looks distinct during a few time windows near the beginning and end of the recording, corresponding to regions when no trials were being performed (blue ticks near the bottom).</p>
+<div class="highlight"><pre><span></span><code><span class="c">% Extract raw waveforms for a specific cluster id at the 24 largest amplitude channels</span><span class="w"></span>
+<span class="c">% Clean these waveforms by subtracting the contribution of other clusters spiking within the same time window</span><span class="w"></span>
+<span class="n">ss</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">ks</span><span class="p">.</span><span class="n">getWaveformsFromRawData</span><span class="p">(</span><span class="s">&#39;cluster_id&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;num_waveforms&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<span class="w">  </span><span class="s">&#39;best_n_channels&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="w">  </span><span class="s">&#39;subtractOtherClusters&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">)</span><span class="w"></span>
+
+<span class="c">% Plot these waveforms at their physical coordinates on the neuropixel</span><span class="w"></span>
+<span class="n">ss</span><span class="p">.</span><span class="n">plotAtProbeLocations</span><span class="p">()</span><span class="w"></span>
+</code></pre></div>
                 
               
               

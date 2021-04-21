@@ -5,7 +5,8 @@ Edit this to point at the path to where you installed the `neuropixel-utils` dis
 
 
 
-```matlab:Code
+```matlab
+
 % Load the Neuropixel Utils library
 homeDir = string(java.lang.System.getProperty('user.home'));
 npixUtilsDistRoot = fullfile(homeDir, 'local', 'repos', 'npxutils-apj-wip-01');
@@ -14,7 +15,8 @@ fprintf('Loaded Neuropixel Utils %s\n', npxutils.globals.version)
 ```
 
 
-```text:Output
+```text
+
 Loaded Neuropixel Utils 0.5.0-SNAPSHOT
 ```
 
@@ -24,7 +26,8 @@ Set the default channel map file you want to use with your data. Some standard c
 
 
 
-```matlab:Code
+```matlab
+
 setenv('NEUROPIXEL_MAP_FILE', fullfile(npxutils.globals.distroot, 'map_files', 'neuropixPhase3A_kilosortChanMap.mat'))
 ```
 
@@ -39,7 +42,8 @@ This is entirely optional; you can arrange your data however you'd like.
 
 
 
-```matlab:Code
+```matlab
+
 myExampleDataDir = fullfile(homeDir, 'work', 'npxutils', 'example-data');
 setenv('NEUROPIXEL_DATAROOT', myExampleDataDir)
 ```
@@ -51,7 +55,8 @@ Here we construct the path to the original, raw dataset as it was recorded by Sp
 
 
 
-```matlab:Code
+```matlab
+
 subject = 'Vinnie';
 dateStr = '2018-08-17';
 rawBinFile = 'Vinnie_20180817_All.imec.ap.bin';
@@ -59,7 +64,8 @@ imecFile = npxutils.generatePath(subject, 'raw_datasets', dateStr, rawBinFile)
 ```
 
 
-```text:Output
+```text
+
 imecFile = '/home/janke/work/npxutils/example-data/Vinnie/raw_datasets/2018-08-17/Vinnie_20180817_All.imec.ap.bin'
 ```
 
@@ -78,12 +84,14 @@ To construct the ImecDataset object, pass the identifying path directly to the c
 
 
 
-```matlab:Code
+```matlab
+
 imec = npxutils.ImecDataset(imecFile)
 ```
 
 
-```text:Output
+```text
+
 imec = 
   ImecDataset with properties:
 
@@ -174,12 +182,14 @@ Here we see that this option 3A probe has 384 total channels (saved in the `.ime
 
 
 
-```matlab:Code
+```matlab
+
 imec.channelMap
 ```
 
 
-```text:Output
+```text
+
 ans = 
   ChannelMap with properties:
 
@@ -216,13 +226,15 @@ We can determine the duration of the recording using the number of samples and t
 
 
 
-```matlab:Code
+```matlab
+
 durationMinutes = imec.nSamplesAP / imec.fsAP / 60;
 fprintf('Duration of recording %s is %.1f minutes.\n', imec.fileStem, durationMinutes)
 ```
 
 
-```text:Output
+```text
+
 Duration of recording Vinnie_20180817_All is 20.1 minutes.
 ```
 
@@ -238,7 +250,8 @@ You can access the raw AP data in several ways. (See the full list of methods wi
 
 
 
-```matlab:Code
+```matlab
+
 % This is broken because NeuropixelExpt doesn't exist?
 
 % NeuropixelExpt.DataLoad.setImecSyncBitNames(imec);
@@ -256,18 +269,21 @@ You can access the raw AP data in several ways. (See the full list of methods wi
 
 
 
-```matlab:Code
+```matlab
+
 rmsBadChannels = imec.markBadChannelsByRMS('rmsRange', [3 100]);
 fprintf('Marked %d channels bad based on RMS\n', numel(rmsBadChannels));
 ```
 
 
-```text:Output
+```text
+
 Marked 0 channels bad based on RMS
 ```
 
 
-```matlab:Code
+```matlab
+
 % Save the bad channels and sync bit names back to the meta file
 imec.writeModifiedAPMeta();
 
@@ -276,24 +292,28 @@ cleanedBinFile = 'Vinnie_20180817_All_cleaned.imec.ap.bin'
 ```
 
 
-```text:Output
+```text
+
 cleanedBinFile = 'Vinnie_20180817_All_cleaned.imec.ap.bin'
 ```
 
 
-```matlab:Code
+```matlab
+
 cleanedPath = npxutils.generatePath(subject, 'cleaned_datasets', dateStr, cleanedBinFile);
 
 fprintf('Writing CAR version at %s\n', cleanedPath);
 ```
 
 
-```text:Output
+```text
+
 Writing CAR version at /home/janke/work/npxutils/example-data/Vinnie/cleaned_datasets/2018-08-17/Vinnie_20180817_All_cleaned.imec.ap.bin
 ```
 
 
-```matlab:Code
+```matlab
+
 extraMeta = struct;
 extraMeta.run_clearUnusedSyncBits = true;
 extraMeta.run_detectAndMarkStimArtifactWindows = true;
@@ -310,7 +330,8 @@ imec = imec.saveTransformedDataset(cleanedPath, ...
 ```
 
 
-```text:Output
+```text
+
 Writing AP meta file Vinnie_20180817_All_cleaned.imec.ap.meta
 Writing AP bin file /home/janke/work/npxutils/example-data/Vinnie/cleaned_datasets/2018-08-17/Vinnie_20180817_All_cleaned.imec.ap.bin
 Writing contents of Vinnie_20180817_All
@@ -329,7 +350,8 @@ Error in npxutils.ImecDataset/saveTransformedDataset (line 1943)
 ```
 
 
-```matlab:Code
+```matlab
+
 % Symlink into ks directory for Kilosort's use
 ksPath = npxutils.generatePath(subject, 'ks', dateStr, cleanedBinFile);
 fprintf('Symlinking to %s\n', ksPath);

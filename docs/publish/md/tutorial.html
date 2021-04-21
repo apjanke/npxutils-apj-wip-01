@@ -463,51 +463,40 @@
                 
                 <h1 id="startup">Startup<a class="headerlink" href="#startup" title="Permanent link">&para;</a></h1>
 <p>Edit this to point at the path to where you installed the <code>neuropixel-utils</code> distribution or repo.</p>
-<p>```matlab:Code
-% Load the Neuropixel Utils library
-homeDir = string(java.lang.System.getProperty(&lsquo;user.home&rsquo;));
-npixUtilsDistRoot = fullfile(homeDir, &lsquo;local&rsquo;, &lsquo;repos&rsquo;, &lsquo;npxutils-apj-wip-01&rsquo;);
-addpath(fullfile(npixUtilsDistRoot, &lsquo;Mcode&rsquo;));
-fprintf(&lsquo;Loaded Neuropixel Utils %s\n&rsquo;, npxutils.globals.version)
-<div class="highlight"><pre><span></span><code>```text:Output
-Loaded Neuropixel Utils 0.5.0-SNAPSHOT
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="c">% Load the Neuropixel Utils library</span><span class="w"></span>
+<span class="n">homeDir</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">string</span><span class="p">(</span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">System</span><span class="p">.</span><span class="n">getProperty</span><span class="p">(</span><span class="s">&#39;user.home&#39;</span><span class="p">));</span><span class="w"></span>
+<span class="n">npixUtilsDistRoot</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">fullfile</span><span class="p">(</span><span class="n">homeDir</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;local&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;repos&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;npxutils-apj-wip-01&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="nb">addpath</span><span class="p">(</span><span class="nb">fullfile</span><span class="p">(</span><span class="n">npixUtilsDistRoot</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;Mcode&#39;</span><span class="p">));</span><span class="w"></span>
+<span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Loaded Neuropixel Utils %s\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">globals</span><span class="p">.</span><span class="n">version</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>Loaded Neuropixel Utils 0.5.0-SNAPSHOT
+</code></pre></div>
 <p>Set the default channel map file you want to use with your data. Some standard channel maps are included in the <code>map_files</code> directory in the <code>neuropixel-utils</code> distribution.</p>
-<p>```matlab:Code
-setenv(&lsquo;NEUROPIXEL_MAP_FILE&rsquo;, fullfile(npxutils.globals.distroot, &lsquo;map_files&rsquo;, &lsquo;neuropixPhase3A_kilosortChanMap.mat&rsquo;))
-<div class="highlight"><pre><span></span><code>Optional: Configure Neuropixel Utils to generate paths beneath your data root directory, based on its naming conventions.
-
-
-
-
-This is entirely optional; you can arrange your data however you&#39;d like.
-
-
-
-```matlab:Code
-myExampleDataDir = fullfile(homeDir, &#39;work&#39;, &#39;npxutils&#39;, &#39;example-data&#39;);
-setenv(&#39;NEUROPIXEL_DATAROOT&#39;, myExampleDataDir)
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="nb">setenv</span><span class="p">(</span><span class="s">&#39;NEUROPIXEL_MAP_FILE&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">fullfile</span><span class="p">(</span><span class="n">npxutils</span><span class="p">.</span><span class="n">globals</span><span class="p">.</span><span class="n">distroot</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;map_files&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;neuropixPhase3A_kilosortChanMap.mat&#39;</span><span class="p">))</span><span class="w"></span>
+</code></pre></div>
+<p>Optional: Configure Neuropixel Utils to generate paths beneath your data root directory, based on its naming conventions.</p>
+<p>This is entirely optional; you can arrange your data however you&rsquo;d like.</p>
+<div class="highlight"><pre><span></span><code><span class="n">myExampleDataDir</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">fullfile</span><span class="p">(</span><span class="n">homeDir</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;work&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;npxutils&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;example-data&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="nb">setenv</span><span class="p">(</span><span class="s">&#39;NEUROPIXEL_DATAROOT&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">myExampleDataDir</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
 <h1 id="load-raw-imec-dataset">Load Raw Imec dataset<a class="headerlink" href="#load-raw-imec-dataset" title="Permanent link">&para;</a></h1>
 <p>Here we construct the path to the original, raw dataset as it was recorded by SpikeGLX. You don&rsquo;t need to use this folder nesting structure.</p>
-<p>```matlab:Code
-subject = &lsquo;Vinnie&rsquo;;
-dateStr = &lsquo;2018-08-17&rsquo;;
-rawBinFile = &lsquo;Vinnie_20180817_All.imec.ap.bin&rsquo;;
-imecFile = npxutils.generatePath(subject, &lsquo;raw_datasets&rsquo;, dateStr, rawBinFile)
-<div class="highlight"><pre><span></span><code>```text:Output
-imecFile = &#39;/home/janke/work/npxutils/example-data/Vinnie/raw_datasets/2018-08-17/Vinnie_20180817_All.imec.ap.bin&#39;
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="n">subject</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;Vinnie&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="n">dateStr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;2018-08-17&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="n">rawBinFile</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;Vinnie_20180817_All.imec.ap.bin&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="n">imecFile</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">generatePath</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;raw_datasets&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">dateStr</span><span class="p">,</span><span class="w"> </span><span class="n">rawBinFile</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>imecFile = &#39;/home/janke/work/npxutils/example-data/Vinnie/raw_datasets/2018-08-17/Vinnie_20180817_All.imec.ap.bin&#39;
+</code></pre></div>
 <p>We then use this path to construct an ImecDataset object which will facilitate access to the raw data and load the metadata from disk. You can pass the path of the Imec dataset in several ways:</p>
 <ul>
 <li>Path to raw <code>.imec.ap.bin</code> file or <code>imec.lf.bin</code> file. </li>
 <li>Path to the containing directory, if there is only one set of <code>.bin</code> files within. </li>
 </ul>
 <p>To construct the ImecDataset object, pass the identifying path directly to the constructor.</p>
-<p>```matlab:Code
-imec = npxutils.ImecDataset(imecFile)
-<div class="highlight"><pre><span></span><code>```text:Output
-imec = 
+<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">ImecDataset</span><span class="p">(</span><span class="n">imecFile</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>imec = 
   ImecDataset with properties:
 
           bytesPerSample: 2
@@ -577,16 +566,15 @@ imec =
         syncChannelIndex: 385
             syncInAPFile: 1
             syncInLFFile: 0
-</code></pre></div></p>
+</code></pre></div>
 <h2 id="specifying-the-channel-map-manually">Specifying the channel map manually<a class="headerlink" href="#specifying-the-channel-map-manually" title="Permanent link">&para;</a></h2>
 <p>By default, the channel map will be loaded from whatever the environment variable NEUROPIXEL_MAP_FILE is set to, which we set above. If you want to manaully specify a channel map, pass it in to the ImecDataset constructor using the <code>channelMap</code> option:</p>
 <p>imec = npxutils.ImecDataset(imecFile, &lsquo;channelMap&rsquo;, &lsquo;/path/to/channelMap.mat&rsquo;);</p>
 <h2 id="explore-the-loaded-metadata">Explore the loaded metadata<a class="headerlink" href="#explore-the-loaded-metadata" title="Permanent link">&para;</a></h2>
 <p>Here we see that this option 3A probe has 384 total channels (saved in the <code>.imec.ap.bin</code> file), and that 374 of these channels are connected, namely those listed in <code>connectedChannels</code>.</p>
-<p>```matlab:Code
-imec.channelMap
-<div class="highlight"><pre><span></span><code>```text:Output
-ans = 
+<div class="highlight"><pre><span></span><code><span class="n">imec</span><span class="p">.</span><span class="n">channelMap</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>ans = 
   ChannelMap with properties:
 
                  file: &quot;/home/janke/local/repos/npxutils-apj-wip-01/map_files/neuropixPhase3A_kilosortChanMap.mat&quot;
@@ -614,96 +602,90 @@ ans =
              zspacing: [0x1 double]
                  xlim: [-9 79]
                  ylim: [0 3860]
-</code></pre></div></p>
+</code></pre></div>
 <p>We can determine the duration of the recording using the number of samples and the frequency in the Imec data:</p>
-<p>```matlab:Code
-durationMinutes = imec.nSamplesAP / imec.fsAP / 60;
-fprintf(&lsquo;Duration of recording %s is %.1f minutes.\n&rsquo;, imec.fileStem, durationMinutes)
-<div class="highlight"><pre><span></span><code>```text:Output
-Duration of recording Vinnie_20180817_All is 20.1 minutes.
-</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><span class="n">durationMinutes</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">nSamplesAP</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">fsAP</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">60</span><span class="p">;</span><span class="w"></span>
+<span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Duration of recording %s is %.1f minutes.\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">fileStem</span><span class="p">,</span><span class="w"> </span><span class="n">durationMinutes</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>Duration of recording Vinnie_20180817_All is 20.1 minutes.
+</code></pre></div>
 <h1 id="accessing-the-raw-ap-data">Accessing the raw AP data<a class="headerlink" href="#accessing-the-raw-ap-data" title="Permanent link">&para;</a></h1>
 <p>You can access the raw AP data in several ways. (See the full list of methods with <code>methods(imec)</code> or <code>doc npxutils.ImecDataset</code>). The most straightforward is to memory-map the full binary data:</p>
 <p><em>This bit is broken because it references code that doesn&rsquo;t exist in this library. Probably left over from an older version of the library and never updated? Or maybe it has an external dependency?</em></p>
-<p>```matlab:Code
-% This is broken because NeuropixelExpt doesn&rsquo;t exist?</p>
-<p>% NeuropixelExpt.DataLoad.setImecSyncBitNames(imec);</p>
-<p>% What does &ldquo;p&rdquo; refer to here?</p>
-<p>% if ~isempty(p.Results.badChannels)
-%    imec.markBadChannels(p.Results.badChannels);
-% end
-<div class="highlight"><pre><span></span><code>*This stuff works:*
+<div class="highlight"><pre><span></span><code><span class="c">% This is broken because NeuropixelExpt doesn&#39;t exist?</span><span class="w"></span>
 
+<span class="c">% NeuropixelExpt.DataLoad.setImecSyncBitNames(imec);</span><span class="w"></span>
 
+<span class="c">% What does &quot;p&quot; refer to here?</span><span class="w"></span>
 
-```matlab:Code
-rmsBadChannels = imec.markBadChannelsByRMS(&#39;rmsRange&#39;, [3 100]);
-fprintf(&#39;Marked %d channels bad based on RMS\n&#39;, numel(rmsBadChannels));
-</code></pre></div></p>
-<p>```text:Output
-Marked 0 channels bad based on RMS
-<div class="highlight"><pre><span></span><code>```matlab:Code
-% Save the bad channels and sync bit names back to the meta file
-imec.writeModifiedAPMeta();
+<span class="c">% if ~isempty(p.Results.badChannels)</span><span class="w"></span>
+<span class="c">%    imec.markBadChannels(p.Results.badChannels);</span><span class="w"></span>
+<span class="c">% end</span><span class="w"></span>
+</code></pre></div>
+<p><em>This stuff works:</em></p>
+<div class="highlight"><pre><span></span><code><span class="n">rmsBadChannels</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">markBadChannelsByRMS</span><span class="p">(</span><span class="s">&#39;rmsRange&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">3</span><span class="w"> </span><span class="mi">100</span><span class="p">]);</span><span class="w"></span>
+<span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Marked %d channels bad based on RMS\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">numel</span><span class="p">(</span><span class="n">rmsBadChannels</span><span class="p">));</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>Marked 0 channels bad based on RMS
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c">% Save the bad channels and sync bit names back to the meta file</span><span class="w"></span>
+<span class="n">imec</span><span class="p">.</span><span class="n">writeModifiedAPMeta</span><span class="p">();</span><span class="w"></span>
 
-% CAR the file and flush the unused sync bits to the cleaned_datasets folder
-cleanedBinFile = &#39;Vinnie_20180817_All_cleaned.imec.ap.bin&#39;
-</code></pre></div></p>
-<p>```text:Output
-cleanedBinFile = &lsquo;Vinnie_20180817_All_cleaned.imec.ap.bin&rsquo;
-<div class="highlight"><pre><span></span><code>```matlab:Code
-cleanedPath = npxutils.generatePath(subject, &#39;cleaned_datasets&#39;, dateStr, cleanedBinFile);
+<span class="c">% CAR the file and flush the unused sync bits to the cleaned_datasets folder</span><span class="w"></span>
+<span class="n">cleanedBinFile</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;Vinnie_20180817_All_cleaned.imec.ap.bin&#39;</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>cleanedBinFile = &#39;Vinnie_20180817_All_cleaned.imec.ap.bin&#39;
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">cleanedPath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">generatePath</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;cleaned_datasets&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">dateStr</span><span class="p">,</span><span class="w"> </span><span class="n">cleanedBinFile</span><span class="p">);</span><span class="w"></span>
 
-fprintf(&#39;Writing CAR version at %s\n&#39;, cleanedPath);
-</code></pre></div></p>
-<p>```text:Output
-Writing CAR version at /home/janke/work/npxutils/example-data/Vinnie/cleaned_datasets/2018-08-17/Vinnie_20180817_All_cleaned.imec.ap.bin
-<div class="highlight"><pre><span></span><code>```matlab:Code
-extraMeta = struct;
-extraMeta.run_clearUnusedSyncBits = true;
-extraMeta.run_detectAndMarkStimArtifactWindows = true;
-fnList = {
-    % This is broken because NeuropixelExpt doesn&#39;t exist?
-    % @NeuropixelExpt.DataClean.clearUnusedSyncBits
-    @npxutils.dataprocess.commonAverageReference
-    }&#39;;
-cleanedDataDir = fullfile(myExampleDataDir, &#39;Vinnie&#39;, &#39;cleaned_datasets&#39;);
-npxutils.io.rmrf(cleanedDataDir);
-imec = imec.saveTransformedDataset(cleanedPath, ...
-    &#39;goodChannelsOnly&#39;, false, &#39;writeSyncSeparate&#39;, false, ...
-    &#39;transformAP&#39;, fnList, &#39;extraMeta&#39;, extraMeta);
-</code></pre></div></p>
-<p>```text:Output
-Writing AP meta file Vinnie_20180817_All_cleaned.imec.ap.meta
+<span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Writing CAR version at %s\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">cleanedPath</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>Writing CAR version at /home/janke/work/npxutils/example-data/Vinnie/cleaned_datasets/2018-08-17/Vinnie_20180817_All_cleaned.imec.ap.bin
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">extraMeta</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">struct</span><span class="p">;</span><span class="w"></span>
+<span class="n">extraMeta</span><span class="p">.</span><span class="n">run_clearUnusedSyncBits</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+<span class="n">extraMeta</span><span class="p">.</span><span class="n">run_detectAndMarkStimArtifactWindows</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+<span class="n">fnList</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c">% This is broken because NeuropixelExpt doesn&#39;t exist?</span><span class="w"></span>
+<span class="w">    </span><span class="c">% @NeuropixelExpt.DataClean.clearUnusedSyncBits</span><span class="w"></span>
+<span class="w">    </span><span class="p">@</span><span class="n">npxutils</span><span class="p">.</span><span class="n">dataprocess</span><span class="p">.</span><span class="n">commonAverageReference</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="s">&#39;;</span>
+<span class="s">cleanedDataDir = fullfile(myExampleDataDir, &#39;</span><span class="n">Vinnie</span><span class="o">&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;cleaned_datasets&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="n">npxutils</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">rmrf</span><span class="p">(</span><span class="n">cleanedDataDir</span><span class="p">);</span><span class="w"></span>
+<span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">saveTransformedDataset</span><span class="p">(</span><span class="n">cleanedPath</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<span class="w">    </span><span class="s">&#39;goodChannelsOnly&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;writeSyncSeparate&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
+<span class="w">    </span><span class="s">&#39;transformAP&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">fnList</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;extraMeta&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">extraMeta</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>Writing AP meta file Vinnie_20180817_All_cleaned.imec.ap.meta
 Writing AP bin file /home/janke/work/npxutils/example-data/Vinnie/cleaned_datasets/2018-08-17/Vinnie_20180817_All_cleaned.imec.ap.bin
 Writing contents of Vinnie_20180817_All
-Copying ap file 1 / 1: Vinnie_20180817_All :    100% [<strong><em>_</em></strong><strong><em>_</em></strong>_] <br />
+Copying ap file 1 / 1: Vinnie_20180817_All :    100% [_______________]   
 Warning: AP bin file size is not an integral number of samples, file data may not be fully copied, truncating nSamplesAP
 Error using npxutils.ConcatenationInfo (line 56)
 Mismatch between time shifts and total number of samples
 Error in npxutils.ImecDataset/readInfo (line 313)
-                this.concatenationInfoAP = npxutils.ConcatenationInfo(this, &lsquo;ap&rsquo;, metaAP);
+                this.concatenationInfoAP = npxutils.ConcatenationInfo(this, &#39;ap&#39;, metaAP);
 Error in npxutils.ImecDataset (line 193)
                     this.readInfo();
 Error in npxutils.ImecDataset.writeConcatenatedFileMatchGains (line 2763)
-            imecOut = npxutils.ImecDataset(outFile, &lsquo;channelMap&rsquo;, imecList{1}.channelMapFile, &lsquo;sourceDatasets&rsquo;, cat(1, imecList{:}));
+            imecOut = npxutils.ImecDataset(outFile, &#39;channelMap&#39;, imecList{1}.channelMapFile, &#39;sourceDatasets&#39;, cat(1, imecList{:}));
 Error in npxutils.ImecDataset/saveTransformedDataset (line 1943)
             imecOut = npxutils.ImecDataset.writeConcatenatedFileMatchGains({this}, outPath, p.Results);
-<div class="highlight"><pre><span></span><code>```matlab:Code
-% Symlink into ks directory for Kilosort&#39;s use
-ksPath = npxutils.generatePath(subject, &#39;ks&#39;, dateStr, cleanedBinFile);
-fprintf(&#39;Symlinking to %s\n&#39;, ksPath);
-% And run Kilosort on the symlinked data set
-imec = imec.symLinkAPIntoDirectory(ksPath);
-fprintf(&#39;Running Kilosort2\n&#39;);
-npxutils.runKilosort2(imec);
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c">% Symlink into ks directory for Kilosort&#39;s use</span><span class="w"></span>
+<span class="n">ksPath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">npxutils</span><span class="p">.</span><span class="n">generatePath</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;ks&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">dateStr</span><span class="p">,</span><span class="w"> </span><span class="n">cleanedBinFile</span><span class="p">);</span><span class="w"></span>
+<span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Symlinking to %s\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">ksPath</span><span class="p">);</span><span class="w"></span>
+<span class="c">% And run Kilosort on the symlinked data set</span><span class="w"></span>
+<span class="n">imec</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imec</span><span class="p">.</span><span class="n">symLinkAPIntoDirectory</span><span class="p">(</span><span class="n">ksPath</span><span class="p">);</span><span class="w"></span>
+<span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Running Kilosort2\n&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="n">npxutils</span><span class="p">.</span><span class="n">runKilosort2</span><span class="p">(</span><span class="n">imec</span><span class="p">);</span><span class="w"></span>
 
-% Here&#39;s a little summary output
-info.rawPath = imecFile;
-info.cleanedPath = cleanedPath;
-info.ksPath = ksPath;
-info
-</code></pre></div></p>
+<span class="c">% Here&#39;s a little summary output</span><span class="w"></span>
+<span class="n">info</span><span class="p">.</span><span class="n">rawPath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">imecFile</span><span class="p">;</span><span class="w"></span>
+<span class="n">info</span><span class="p">.</span><span class="n">cleanedPath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">cleanedPath</span><span class="p">;</span><span class="w"></span>
+<span class="n">info</span><span class="p">.</span><span class="n">ksPath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">ksPath</span><span class="p">;</span><span class="w"></span>
+<span class="n">info</span><span class="w"></span>
+</code></pre></div>
                 
               
               
