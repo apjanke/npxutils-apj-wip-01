@@ -43,10 +43,12 @@ nav:
     - 'Tutorial (HTML)': 'publish/html/tutorial.html'
     - 'Ex 01: Walkthrough (HTML)': 'publish/html/ex01_walkthrough.html'
     - 'Ex 02: ImecDatasets (HTML)': 'publish/html/ex02_imecdataset.html'
+    - 'Ex 03: Running Kilosort (HTML)': 'publish/html/ex03_running_kilosort.html'
   - 'Examples (Markdown)':
     - 'Tutorial (Markdown)': 'publish/md/tutorial.md'
     - 'Ex 01: Walkthrough (Markdown)': 'publish/md/ex01_walkthrough.md'
     - 'Ex 02: ImecDatasets (Markdown)': 'publish/md/ex02_imecdataset.md'
+    - 'Ex 03: Running Kilosort (Markdown)': 'publish/html/ex03_running_kilosort.md'
 
 copyright: 'Copyright &copy; 2021 &mdash; <a href="http://djoshea.com">Daniel J. O&#39;Shea</a>'
 
