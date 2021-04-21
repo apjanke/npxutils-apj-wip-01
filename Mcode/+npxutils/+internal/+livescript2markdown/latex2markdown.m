@@ -1,7 +1,7 @@
 function mdfile = latex2markdown(filename,options)
 % Convert Live Script LaTeX output to Markdown
 %
-% mdfile = latex2markdown(filename, options)
+% mdfile = npxutils.internal.livescript2markdown.latex2markdown(filename, options)
 %
 % Converts a LaTeX-published Matlab LiveScript file to Markdown. Produces a .md
 % file, and if there are any images, those are saved in a *_images folder next to

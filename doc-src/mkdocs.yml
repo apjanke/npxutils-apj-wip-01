@@ -39,6 +39,9 @@ nav:
   - Analysis of Kilosort Results: analysis.md
   - Extracting Waveforms: waveforms.md
   - Acknowledgements and Support: acknowledgements.md
+  - 'Tutorial':
+    - 'Tutorial (HTML)': 'publish/html/tutorial.html'
+    - 'Tutorial (Markdown)': 'publish/md/tutorial.md'
 
 copyright: 'Copyright &copy; 2021 &mdash; <a href="http://djoshea.com">Daniel J. O&#39;Shea</a>'
 
