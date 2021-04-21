@@ -138,7 +138,3 @@ mdfile = options.outputfilename + ".md";
 fileID = fopen(mdfile,'w');
 fprintf(fileID,'%s\n',strmarkdown);
 fclose(fileID);
-
-disp("Coverting latex to markdown is complete");
-disp(mdfile);
-disp("Note: Related images are saved in " + name + "_images");

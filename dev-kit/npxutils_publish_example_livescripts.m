@@ -42,7 +42,7 @@ for i = 1:n
   mdFile = mdDir + '/' + fileStem + '.md';
   latexFileStemPath = mdDir + '/' + fileStem;
   npxutils.internal.livescript2markdown.latex2markdown(latexFileStemPath);
-  fprintf('Exported: %s\n', mdFile);
+  fprintf('Exported: -> %s\n', mdFile);
 end
 
 fprintf('All example Live Scripts published\n');
