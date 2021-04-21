@@ -3,3 +3,6 @@ function out = npxutils_repo_root
 
 thisDir = fileparts(mfilename('fullpath'));
 out = fileparts(fileparts(thisDir));
+out = string(out);
+
+end
