@@ -1,5 +1,9 @@
 function [out, transformInfo] = plotStackedTraces(tvec, data_txcxl, varargin)
+% Plot stacked traces for (I dunno, something or other???)
+%
 % data is time x channels x layers
+%
+% [out, transformInfo] = npxutils.internal.plotStackedTraces(tvec, data_txcxl, varargin)
 
 p = inputParser();
 p.addParameter('style', 'traces', @(x) ischar(x) || isstring(x));
@@ -59,8 +63,8 @@ end
 
 if isempty(traceColors) && isempty(layerColors)
     if nLayers > 1
-        %layerColors = npxutils.internal.phy_cluster_colors(nLayers);
-        layerColors = npxutils.internal.linspecer(nLayers);
+        %layerColors = npxutils.internal.graphics.phy_cluster_colors(nLayers);
+        layerColors = npxutils.internal.graphics.linspecer(nLayers);
     else
         traceColors = repmat([0 0 0], nTraces, 1);
     end
@@ -227,7 +231,7 @@ if ~isempty(p.Results.colorOverlayLabels)
     
     labelCmap = p.Results.colorOverlayMap;
     if isempty(labelCmap)
-        labelCmap = npxutils.internal.distinguishable_colors(maxLabel, {'k', 'w'});
+        labelCmap = npxutils.internal.graphics.distinguishable_colors(maxLabel, {'k', 'w'});
     end
     
     hLabel = cell(maxLabel, nLayers);

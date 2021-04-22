@@ -1,30 +1,38 @@
-% function lineStyles = linspecer(N)
-% This function creates an Nx3 array of N [R B G] colors
+function lineStyles = linspecer(N,varargin)
+% LINSPECER Create some RGB colors for some reason
+%
+% lineStyles = npxutils.internal.graphics.linspecer(N)
+%
+% This function creates an Nx3 array of N [R B G] colors.
 % These can be used to plot lots of lines with distinguishable and nice
 % looking colors.
 %
-% lineStyles = linspecer(N);  makes N colors for you to use: lineStyles(ii,:)
+% % makes N colors for you to use: lineStyles(ii,:)
+% lineStyles = npxutils.internal.graphics.linspecer(N);
 %
-% colormap(linspecer); set your colormap to have easily distinguishable
-%                      colors and a pleasing aesthetic
+% % Set your colormap to have easily distinguishable
+% % colors and a pleasing aesthetic:
+% colormap(npxutils.internal.graphics.linspecer); 
 %
-% lineStyles = linspecer(N,'qualitative'); forces the colors to all be distinguishable (up to 12)
-% lineStyles = linspecer(N,'sequential'); forces the colors to vary along a spectrum
+% % forces the colors to all be distinguishable (up to 12)
+% lineStyles = npxutils.internal.graphics.linspecer(N,'qualitative');
+% % forces the colors to vary along a spectrum
+% lineStyles = npxutils.internal.graphics.linspecer(N,'sequential');
 %
-% % Examples demonstrating the colors.
+% % Examples demonstrating the colors:
 %
-% LINE COLORS
+% % LINE COLORS
 % N=6;
 % X = linspace(0,pi*3,1000);
 % Y = bsxfun(@(x,n)sin(x+2*n*pi/N), X.', 1:N);
-% C = linspecer(N);
+% C = npxutils.internal.graphics.linspecer(N);
 % axes('NextPlot','replacechildren', 'ColorOrder',C);
 % plot(X,Y,'linewidth',5)
 % ylim([-1.1 1.1]);
 %
-% SIMPLER LINE COLOR EXAMPLE
+% % SIMPLER LINE COLOR EXAMPLE
 % N = 6; X = linspace(0,pi*3,1000);
-% C = linspecer(N)
+% C = npxutils.internal.graphics.linspecer(N)
 % hold off;
 % for ii=1:N
 %     Y = sin(X+2*ii*pi/N);
@@ -32,15 +40,16 @@
 %     hold on;
 % end
 %
-% COLORMAP EXAMPLE
+% % COLORMAP EXAMPLE
 % A = rand(15);
 % figure; imagesc(A); % default colormap
 % figure; imagesc(A); colormap(linspecer); % linspecer colormap
 %
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % by Jonathan Lansey, March 2009-2013 � Lansey at gmail.com               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+
 %% credits and where the function came from
 % The colors are largely taken from:
 % http://colorbrewer2.org and Cynthia Brewer, Mark Harrower and The Pennsylvania State University
@@ -55,9 +64,8 @@
 % for the sequential line styles.
 %
 %
-%%
 
-function lineStyles=linspecer(N,varargin)
+%%
 
 if nargin==0 % return a colormap
     lineStyles = TrialDataUtilities.Color.linspecer(64);
@@ -128,7 +136,7 @@ end
 
 function varIn = brighten(varIn,varargin) % increase the brightness
 
-if isempty(varargin),
+if isempty(varargin)
     frac = .9;
 else
     frac = varargin{1};
@@ -151,6 +159,7 @@ for ii=1:size(vIn,1)
     vOut{ii} = vIn(ii,:);
 end
 end
+
 %%
 % colorm returns a colormap which is really good for creating informative
 % heatmap style figures.

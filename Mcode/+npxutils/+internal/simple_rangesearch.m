@@ -1,5 +1,8 @@
 function idx = simple_rangesearch(sorted_list, lookups, window)
-% simple alternative to rangesearch where sorted_list is a 1d sorted list. Finds indices of sorted_list that are within lookups(i) + window(1) : lookups(i) + window(2)
+% Simple alternative to rangesearch where sorted_list is a 1d sorted list.
+%
+% Finds indices of sorted_list that are within lookups(i) + window(1) :
+% lookups(i) + window(2)
 
 N = numel(sorted_list);
 sorted_list = cast(sorted_list, 'like', window);

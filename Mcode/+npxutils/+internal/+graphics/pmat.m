@@ -1,5 +1,7 @@
 function [h, hcbar] = pmat(m, varargin)
-% visualize a matrix using pcolor
+% Visualize a matrix using pcolor
+%
+% [h, hcbar] = npxutils.internal.graphics.pmat(m, varargin)
 
 p = inputParser();
 p.addParameter('x', [], @(x) isvector(x));
@@ -53,7 +55,7 @@ Y = addRowCol(Y);
 h = pcolor(X,Y, m);
 
 set(h, 'EdgeColor', 'none');
-npxutils.internal.cmocean('haline');
+npxutils.internal.graphics.cmocean('haline');
 
 if p.Results.addColorbar
     hcbar = colorbar;

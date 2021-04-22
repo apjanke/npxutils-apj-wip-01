@@ -1,4 +1,4 @@
-function colors = distinguishable_colors(n_colors,bg,func)
+function colors = distinguishable_colors(n_colors, bg, func)
 % DISTINGUISHABLE_COLORS: pick colors that are maximally perceptually distinct
 %
 % When plotting a set of lines, you may want to distinguish them by color.
@@ -22,14 +22,17 @@ function colors = distinguishable_colors(n_colors,bg,func)
 % removing lines.
 %
 % Syntax:
-%   colors = distinguishable_colors(n_colors)
+%
+%   colors = npxutils.internal.graphics.distinguishable_colors(n_colors)
+%
 % Specify the number of colors you want as a scalar, n_colors. This will
 % generate an n_colors-by-3 matrix, each row representing an RGB
 % color triple. If you don't precisely know how many you will need in
 % advance, there is no harm (other than execution time) in specifying
 % slightly more than you think you will need.
 %
-%   colors = distinguishable_colors(n_colors,bg)
+%   colors = npxutils.internal.graphics.distinguishable_colors(n_colors,bg)
+%
 % This syntax allows you to specify the background color, to make sure that
 % your colors are also distinguishable from the background. Default value
 % is white. bg may be specified as an RGB triple or as one of the standard
@@ -40,19 +43,20 @@ function colors = distinguishable_colors(n_colors,bg,func)
 % will only produce colors that are distinguishable from both white and
 % black.
 %
-%   colors = distinguishable_colors(n_colors,bg,rgb2labfunc)
+%   colors = npxutils.internal.graphics.distinguishable_colors(n_colors,bg,rgb2labfunc)
+%
 % By default, distinguishable_colors uses the image processing toolbox's
 % color conversion functions makecform and applycform. Alternatively, you
 % can supply your own color conversion function.
 %
 % Example:
-%   c = distinguishable_colors(25);
+%   c = npxutils.internal.graphics.distinguishable_colors(25);
 %   figure
 %   image(reshape(c,[1 size(c)]))
 %
 % Example using the file exchange's 'colorspace':
 %   func = @(x) colorspace('RGB->Lab',x);
-%   c = distinguishable_colors(25,'w',func);
+%   c = npxutils.internal.graphics.distinguishable_colors(25,'w',func);
 
 % Copyright 2010-2011 by Timothy E. Holy
 

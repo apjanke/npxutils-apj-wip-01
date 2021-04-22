@@ -164,7 +164,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
             colormap = zeros(nLabels, 3);
             unique_labels = setdiff(unique(overlay_labels(:)), 0);
             label_found = ismember(1:nLabels, unique_labels);
-            colormap(label_found, :) = npxutils.internal.distinguishable_colors(nnz(label_found), backgroundColor);
+            colormap(label_found, :) = npxutils.internal.graphics.distinguishable_colors(nnz(label_found), backgroundColor);
         end
         
         function this = selectClusters(this, cluster_ids)
@@ -401,7 +401,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                         'AlignVertexCenters', true, p.Results.plotArgs{:}); % [snippets for ch1; snippets for ch2; ... ]
                     % split handles by channel
                     handlesIndiv(:, iClu) = mat2cell(hthis, repmat(nSnippetsThis, nChannelsMaxPerCluster, 1), 1);
-                    npxutils.internal.hideInLegend(hthis);
+                    npxutils.internal.graphics.hideInLegend(hthis);
                     hold(axh, 'on');
                 end
                 
@@ -417,11 +417,11 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                 end
                 
                 if p.Results.showMean
-                    npxutils.internal.showFirstInLegend(handlesMean(1, iClu), sprintf('cluster %d', this_cluster_id));
+                    npxutils.internal.graphics.showFirstInLegend(handlesMean(1, iClu), sprintf('cluster %d', this_cluster_id));
                 elseif p.Results.showMedian
-                    npxutils.internal.showFirstInLegend(handlesMedian(1, iClu), sprintf('cluster %d', this_cluster_id));
+                    npxutils.internal.graphics.showFirstInLegend(handlesMedian(1, iClu), sprintf('cluster %d', this_cluster_id));
                 else
-                    npxutils.internal.showFirstInLegend(handlesIndiv{1, iClu}, sprintf('cluster %d', this_cluster_id));
+                    npxutils.internal.graphics.showFirstInLegend(handlesIndiv{1, iClu}, sprintf('cluster %d', this_cluster_id));
                 end
                 %
                 %                 for iC = 1:nChannelsMaxPerCluster
@@ -430,7 +430,7 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                 %                     if p.Results.showIndividual
                 %                         handlesIndiv{iC, iClu} = plot(axh, tvec + xc(iC), dmat, 'Color', [cmap(cmapIdx, :), p.Results.alpha], ...
                 %                             'AlignVertexCenters', true, p.Results.plotArgs{:});
-                %                         npxutils.internal.hideInLegend(handlesIndiv{iC, iClu});
+                %                         npxutils.internal.graphics.hideInLegend(handlesIndiv{iC, iClu});
                 %                         hold(axh, 'on');
                 %                     end
                 %                     if p.Results.showMean
@@ -445,14 +445,14 @@ classdef SnippetSet < handle & matlab.mixin.Copyable
                 %                     end
                 %                     if iC == 1
                 %                         if p.Results.showMean
-                %                             npxutils.internal.showFirstInLegend(handlesMean(iC, iClu), sprintf('cluster %d', this_cluster_id));
+                %                             npxutils.internal.graphics.showFirstInLegend(handlesMean(iC, iClu), sprintf('cluster %d', this_cluster_id));
                 %                         elseif p.Results.showMedian
-                %                             npxutils.internal.showFirstInLegend(handlesMedian(iC, iClu), sprintf('cluster %d', this_cluster_id));
+                %                             npxutils.internal.graphics.showFirstInLegend(handlesMedian(iC, iClu), sprintf('cluster %d', this_cluster_id));
                 %                         else
-                %                             npxutils.internal.showFirstInLegend(handlesIndiv{iC, iClu}, sprintf('cluster %d', this_cluster_id));
+                %                             npxutils.internal.graphics.showFirstInLegend(handlesIndiv{iC, iClu}, sprintf('cluster %d', this_cluster_id));
                 %                         end
                 %                     else
-                %                         npxutils.internal.hideInLegend(handlesMean(iC, iClu));
+                %                         npxutils.internal.graphics.hideInLegend(handlesMean(iC, iClu));
                 %                     end
                 %                 end
                 %

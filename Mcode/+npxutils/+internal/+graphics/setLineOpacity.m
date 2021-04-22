@@ -1,5 +1,7 @@
 function setLineOpacity(s, alpha)
-% setLineOpacity(hLine, alpha)
+% Set line opacity
+%
+% npxutils.internal.graphics.setLineOpacity(hLine, alpha)
 
 for i = 1:numel(s)
     if ~verLessThan('matlab', '8.4')

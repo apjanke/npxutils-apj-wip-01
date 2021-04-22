@@ -1,8 +1,12 @@
 function C = xcorrAB(A, B, maxlag)
-% like xcorr but computed between all the columns of A and the columns of B.
-% A and B must have the same number of rows
+% Like xcorr but computed between all the columns of A and the columns of B.
+%
+% C = npxutils.internal.xcorrAB(A, B, maxlag)
+%
+% A and B must have the same number of rows.
 %
 % C is 2*maxlag-1 x size(A, 2)*size(B, 2).
+%
 % You may want to call reshape(C, [], size(A, 2), size(B, 2)) to make the
 % output more straightforward to use
 

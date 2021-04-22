@@ -1083,7 +1083,7 @@ classdef KilosortMetrics < handle
                 [cmap, cmap_base] = amplitudeCmap(cluAmpNormalized);
                 cmap_lims = [0 cluAmpMax];
             else
-                cmap = npxutils.internal.distinguishable_colors(nClu, [1 1 1; 0 1 0]);
+                cmap = npxutils.internal.graphics.distinguishable_colors(nClu, [1 1 1; 0 1 0]);
                 cmap_base = cmap;
                 if nClu == 1
                     cmap_lims = [1 2];
@@ -1204,7 +1204,7 @@ classdef KilosortMetrics < handle
             end
             
             function [cmap, cmap_base] = amplitudeCmap(amp)
-                cmap_base = npxutils.internal.cmocean('thermal');
+                cmap_base = npxutils.internal.graphics.cmocean('thermal');
                 N = size(cmap_base, 1);
                 lerp = @(x, a, b) x*(b-a) + a; % map x from [0 1] to [a b]
                 cmap_ind = round(lerp(amp, 1, N));
@@ -1216,7 +1216,7 @@ classdef KilosortMetrics < handle
                 % %                 sat = lerp(amp, 0, 0.9);
                 % %                 cmap_hsl(:, 2) = sat;
                 %                 cmap_hsl(:, 3) = lum;
-                %                 cmap = npxutils.internal.hsl2rgb(cmap_hsl);
+                %                 cmap = npxutils.internal.graphics.hsl2rgb(cmap_hsl);
             end
         end
         
@@ -1351,7 +1351,7 @@ classdef KilosortMetrics < handle
                     driftTimes = driftEvents(:, 1);
                     if p.Results.plotDriftEventTicks
                         hold on;
-                        npxutils.internal.rugplot(driftTimes + xOffset, 'side', 'top', 'Color', [1 0.2 0.2]);
+                        npxutils.internal.graphics.rugplot(driftTimes + xOffset, 'side', 'top', 'Color', [1 0.2 0.2]);
                     end
                 else
                     driftTimes = [];
@@ -1371,7 +1371,7 @@ classdef KilosortMetrics < handle
                     uinds = unique(cIndex);
                     uinds = setdiff(uinds, [NaN 0]);
                     N = numel(uinds);
-                    cmap = npxutils.internal.colorcet('C2', 'N', N);
+                    cmap = npxutils.internal.graphics.colorcet('C2', 'N', N);
                     for iC = 1:N
                         mask_this = cIndex == uinds(iC);
                         if ~any(mask_this), continue; end
@@ -1665,7 +1665,7 @@ classdef KilosortMetrics < handle
             h.MarkerFaceAlpha = 0.4;
             h.MarkerEdgeAlpha = 0.7;
             if ~isempty(color)
-                colormap(npxutils.internal.phy_cluster_colors());
+                colormap(npxutils.internal.graphics.phy_cluster_colors());
             end
             
             valueLabel = p.Results.valueLabel;
@@ -1770,16 +1770,16 @@ classdef KilosortMetrics < handle
         end
         
         function cmap = getDefaultLinearColormap(this, N) %#ok<INUSL>
-            %             cmap = npxutils.internal.colorcet('CBL2', 'N', N);
-            cmap = npxutils.internal.cmocean('thermal', N);
+            %             cmap = npxutils.internal.graphics.colorcet('CBL2', 'N', N);
+            cmap = npxutils.internal.graphics.cmocean('thermal', N);
         end
         
         function cmap = getDefaultBatchColormap(this, nBatch)
             if nargin < 2
                 nBatch = this.nBatchesComputed;
             end
-            cmap = npxutils.internal.colorcet('d6', 'N', nBatch);
-            %             cmap = npxutils.internal.cmocean('haline', nBatch);
+            cmap = npxutils.internal.graphics.colorcet('d6', 'N', nBatch);
+            %             cmap = npxutils.internal.graphics.cmocean('haline', nBatch);
         end
         
         function cmap = getDefaultCategoricalColormap(this, nItems) %#ok<INUSL>
@@ -1787,10 +1787,10 @@ classdef KilosortMetrics < handle
                 nItems = 10;
             end
             if nItems <= 10
-                cmap = npxutils.internal.seaborn_color_palette('colorblind');
+                cmap = npxutils.internal.graphics.seaborn_color_palette('colorblind');
                 cmap = cmap(1:nItems, :);
             else
-                cmap = npxutils.internal.distinguishable_colors(nItems);
+                cmap = npxutils.internal.graphics.distinguishable_colors(nItems);
             end
         end
         
@@ -1920,9 +1920,9 @@ classdef KilosortMetrics < handle
                         
                     end
                     if iC == 1
-                        npxutils.internal.showFirstInLegend(h, templateLabels{iT});
+                        npxutils.internal.graphics.showFirstInLegend(h, templateLabels{iT});
                     else
-                        npxutils.internal.hideInLegend(h);
+                        npxutils.internal.graphics.hideInLegend(h);
                     end
                     hold(axh, 'on');
                 end
@@ -2217,11 +2217,11 @@ classdef KilosortMetrics < handle
                 if exist('turbo', 'file')
                     colormap = turbo(numel(clusterInds));
                 else
-                    colormap = npxutils.internal.turbomap(numel(clusterInds));
+                    colormap = npxutils.internal.graphics.turbomap(numel(clusterInds));
                 end
                 %                     colormap = cbrewer('div', 'Spectral', numel(clusterInds));
                 %                 % color by cluster amplitude
-                %                 colormap = cmocean('haline', numel(clusterInds));
+                %                 colormap = npxutils.internal.graphics.cmocean('haline', numel(clusterInds));
                 % %                 colormap = npxutils.internal.evalColorMapAt(colormap, linspace(0, 1, numel(clusterInds)));
                 %                 [~, sortIdx] = sort(m.cluster_amplitude(clusterInds), 'ascend');
                 %                 [~, cmapSort] = ismember(1:numel(clusterInds), sortIdx);
@@ -2578,7 +2578,7 @@ classdef KilosortMetrics < handle
             p.addParameter('timeInSeconds', true, @islogical);
             
             p.addParameter('waveform_window', [-40 41], @isvector); % Number of samples before and after spiketime to include in waveform
-            p.addParameter('cluster_colormap', npxutils.internal.distinguishable_colors(numel(cluster_ids)), @(x) ismatrix(x));
+            p.addParameter('cluster_colormap', npxutils.internal.graphics.distinguishable_colors(numel(cluster_ids)), @(x) ismatrix(x));
             p.parse(varargin{:});
             waveform_window = p.Results.waveform_window;
             

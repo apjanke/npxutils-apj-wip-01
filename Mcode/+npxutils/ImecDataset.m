@@ -956,7 +956,7 @@ classdef ImecDataset < handle
                 end
                 
                 if strcmp(p.Results.markSampleMode, 'rug')
-                    npxutils.internal.rugplot(markTimes, 'side', 'top', 'Color', p.Results.markSampleColor, 'expand_limits', true);
+                    npxutils.internal.graphics.rugplot(markTimes, 'side', 'top', 'Color', p.Results.markSampleColor, 'expand_limits', true);
                 else
                     for iM = 1:numel(markTimes)
                         xline(markTimes(iM), 'Color', p.Results.markSampleColor);

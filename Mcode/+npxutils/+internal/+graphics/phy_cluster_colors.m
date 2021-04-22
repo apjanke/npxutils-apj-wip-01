@@ -1,4 +1,7 @@
 function cmap = phy_cluster_colors(N)
+% I don't know what this is, but it looks graphics-related
+%
+% cmap = npxutils.internal.graphics.phy_cluster_colors(N)
 
 % copied from phy.utils._color.ColorSelector
 cmap = [
@@ -16,7 +19,8 @@ cmap = [
     95, 188, 122
     129, 173, 190
     231, 107, 119
-    ] / 255;
+    ] ...
+    ./ 255;
 
 if nargin > 0
     nmap = size(cmap, 1);
@@ -24,4 +28,6 @@ if nargin > 0
         cmap = repmat(cmap, ceil(N / nmap), 1);
     end
     cmap = cmap(1:N, :);
+end
+
 end

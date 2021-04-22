@@ -6,10 +6,10 @@ if nargin == 0
     xlim([-4 4]);
     ylim([-4 4]);
     hold on;
-    npxutils.internal.rugplot(pos(:, 1), 'side', 'top', 'Color', 'r');
-    npxutils.internal.rugplot(pos(:, 2), 'side', 'right', 'Color', 'g');
-    npxutils.internal.rugplot(pos(:, 3), 'side', 'bottom', 'Color', 'c');
-    npxutils.internal.rugplot(pos(:, 4), 'side', 'left', 'Color', 'm');
+    npxutils.internal.graphics.rugplot(pos(:, 1), 'side', 'top', 'Color', 'r');
+    npxutils.internal.graphics.rugplot(pos(:, 2), 'side', 'right', 'Color', 'g');
+    npxutils.internal.graphics.rugplot(pos(:, 3), 'side', 'bottom', 'Color', 'c');
+    npxutils.internal.graphics.rugplot(pos(:, 4), 'side', 'left', 'Color', 'm');
     return;
 end
 

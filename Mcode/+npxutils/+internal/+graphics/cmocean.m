@@ -1,20 +1,20 @@
 function cmap = cmocean(ColormapName,varargin)
-% cmocean returns perceptually-uniform colormaps created by Kristen Thyng.
+% npxutils.internal.graphics.cmocean returns perceptually-uniform colormaps created by Kristen Thyng.
 %
 %% Syntax
 %
-%  cmocean
-%  cmap = cmocean('ColormapName')
-%  cmap = cmocean('-ColormapName')
-%  cmap = cmocean(...,NLevels)
-%  cmap = cmocean(...,'pivot',PivotValue)
-%  cmocean(...)
+%  npxutils.internal.graphics.cmocean
+%  cmap = npxutils.internal.graphics.cmocean('ColormapName')
+%  cmap = npxutils.internal.graphics.cmocean('-ColormapName')
+%  cmap = npxutils.internal.graphics.cmocean(...,NLevels)
+%  cmap = npxutils.internal.graphics.cmocean(...,'pivot',PivotValue)
+%  npxutils.internal.graphics.cmocean(...)
 %
 %% Description
 %
-% cmocean without any inputs displays the options for colormaps.
+% npxutils.internal.graphics.cmocean without any inputs displays the options for colormaps.
 %
-% cmap = cmocean('ColormapName') returns a 256x3 colormap. ColormapName can be any of
+% cmap = npxutils.internal.graphics.cmocean('ColormapName') returns a 256x3 colormap. ColormapName can be any of
 % of the following:
 %
 %          SEQUENTIAL:                DIVERGING:
@@ -33,18 +33,18 @@ function cmap = cmocean(ColormapName,varargin)
 %          'amp'
 %          'tempo'
 %
-% cmap = cmocean('-ColormapName') a minus sign preceeding any ColormapName flips the
+% cmap = npxutils.internal.graphics.cmocean('-ColormapName') a minus sign preceeding any ColormapName flips the
 % order of the colormap.
 %
-% cmap = cmocean(...,NLevels) specifies a number of levels in the colormap.  Default
+% cmap = npxutils.internal.graphics.cmocean(...,NLevels) specifies a number of levels in the colormap.  Default
 % value is 256.
 %
-% cmap = cmocean(...,'pivot',PivotValue) centers a diverging colormap such that white
+% cmap = npxutils.internal.graphics.cmocean(...,'pivot',PivotValue) centers a diverging colormap such that white
 % corresponds to a given value and maximum extents are set using current caxis limits.
 % If no PivotValue is set, 0 is assumed. Early versions of this function used 'zero'
 % as the syntax for 'pivot',0 and the old syntax is still supported.
 %
-% cmocean(...) without any outputs sets the current colormap to the current axes.
+% npxutils.internal.graphics.cmocean(...) without any outputs sets the current colormap to the current axes.
 %
 %% Examples
 % Using this sample plot:
@@ -54,36 +54,36 @@ function cmap = cmocean(ColormapName,varargin)
 %
 % Set the colormap to 'algae':
 %
-%   cmocean('algae')
+%   npxutils.internal.graphics.cmocean('algae')
 %
 % Same as above, but with an inverted algae colormap:
 %
-%   cmocean('-algae')
+%   npxutils.internal.graphics.cmocean('-algae')
 %
 % Set the colormap to a 12-level 'solar':
 %
-%   cmocean('solar',12)
+%   npxutils.internal.graphics.cmocean('solar',12)
 %
 % Get the RGB values of a 5-level thermal colormap:
 %
-%   RGB = cmocean('thermal',5)
+%   RGB = npxutils.internal.graphics.cmocean('thermal',5)
 %
 % Some of those values are below zero and others are above. If this dataset represents
 % anomalies, perhaps a diverging colormap is more appropriate:
 %
-%   cmocean('balance')
+%   npxutils.internal.graphics.cmocean('balance')
 %
 % It's unlikely that 1.7776 is an interesting value about which the data values
 % diverge.  If you want to center the colormap on zero using the current color
 % axis limits, simply include the 'pivot' option:
 %
-%   cmocean('balance','pivot',0)
+%   npxutils.internal.graphics.cmocean('balance','pivot',0)
 %
 %% Author Info
 % This function was written by Chad A. Greene of the Institute for Geophysics at the
 % University of Texas at Austin (UTIG), June 2016, using colormaps created by Kristen
 % Thyng of Texas A&M University, Department of Oceanography. More information on the
-% cmocean project can be found at http://matplotlib.org/cmocean/.
+% npxutils.internal.graphics.cmocean project can be found at http://matplotlib.org/cmocean/.
 %
 %% Citing this colormap:
 % If you find an occasion to cite these colormaps for any reason, or if you just want
@@ -154,7 +154,7 @@ end
 
 %% Load RGB values and interpolate to NLevels:
 
-cmap = cmoceanRawRGB(ColormapName); % a subfunction provided below with RGB values of all maps.
+cmap = npxutils.internal.graphics.cmoceanRawRGB(ColormapName); % a subfunction provided below with RGB values of all maps.
 
 % Interpolate if necessary:
 if NLevels~=size(cmap,1);
@@ -196,7 +196,7 @@ end
 
 
 
-function RGB = cmoceanRawRGB(cmapName)
+function RGB = npxutils.internal.graphics.cmoceanRawRGB(cmapName)
 
 
 switch lower(cmapName(1:3))

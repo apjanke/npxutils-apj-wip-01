@@ -684,17 +684,17 @@ classdef KilosortDataset < handle & matlab.mixin.Copyable
                 s.nClusters, s.nClustersAboveThresh, s.thresh);
             
             h = plot(sort(s.fr, 'descend'), '-', 'Color', p.Results.color);
-            npxutils.internal.showFirstInLegend(h, ks.pathLeaf);
+            npxutils.internal.graphics.showFirstInLegend(h, ks.pathLeaf);
             if any(s.fr_cutoff_only)
                 hold on
                 h = plot(sort(s.fr_plus_cutoff, 'descend'), '--', 'Color', p.Results.color);
-                npxutils.internal.hideInLegend(h);
+                npxutils.internal.graphics.hideInLegend(h);
             end
             xlabel('Cluster');
             ylabel('# spikes');
             hold on
             h = yline(s.thresh, 'Color', 'r');
-            npxutils.internal.hideInLegend(h);
+            npxutils.internal.graphics.hideInLegend(h);
             hold off;
             box off;
             grid on;
