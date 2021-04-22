@@ -2335,12 +2335,12 @@ classdef KilosortMetrics < handle
     end
     
     methods % Pairwise cluster comparison
-        function ss = inspect_spike_heatmap(this, spike_ind, varargin)
+        function ss = plot_spike_heatmap(this, spike_ind, varargin)
             ss = this.ks.getWaveformsFromRawData('spike_idx', spike_ind, 'best_n_channels', 24, varargin{:});
             ss.plotHeatmapWithTemplates(1);
         end
         
-        function ss = inspect_spike_overlay(this, spike_ind, varargin)
+        function ss = plot_spike_overlay(this, spike_ind, varargin)
             p = inputParser();
             p.addParameter('overlay_all_clusters', false, @islogical);
             p.KeepUnmatched = true;
@@ -2564,7 +2564,7 @@ classdef KilosortMetrics < handle
             end
         end
         
-        function out = inspectSampleIdx_highlightClusterWaveforms(this, sampleIdx, cluster_ids, varargin)
+        function out = plotSampleIdx_highlightClusterWaveforms(this, sampleIdx, cluster_ids, varargin)
             p = inputParser();
             p.addParameter('channel_ids', this.channelMap.channelIdsMapped, @isvector);
             p.addParameter('channel_ids_by_cluster', [], @ismatrix); % specify this manually

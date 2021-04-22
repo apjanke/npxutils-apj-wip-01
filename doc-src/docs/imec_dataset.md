@@ -230,8 +230,8 @@ timeWindow = [secStart, secStop]; % in seconds
 You can also quickly generate a stacked traces plot of a specific time window, optionally selecting which channels to plot. Take care to select a reasonable time window to avoid overwhelming your system. All channels are individually centered and then collectively normalized by the maximum value before plotting. You can change the global scaling factor by specifying `gain` > 1.
 
 ```matlab
-imec.inspectAP_idxWindow(idxWindow, ...)
-imec.inspectAP_timeWindow(timeWindow, ...)
+imec.plotAP_idxWindow(idxWindow, ...)
+imec.plotAP_timeWindow(timeWindow, ...)
 ```
 
 There are additional optional parameters you can specify:
@@ -395,6 +395,5 @@ If helpful, when loading a derived `ImecDataset`, you can specify the `sourceDat
 imecProcessed = npxutils.ImecDataset.writeConcatenatedFileMatchGains(outPath, imecList, ... );
 
 imecProcessed = npxutils.ImecDataset(outPath, 'sourceDatasets', {imecRaw1, imecRaw2});
-imecProcessed.inspectAP_timeWindow([1 2], 'fromSourceDatasets', true);
+imecProcessed.plotAP_timeWindow([1 2], 'fromSourceDatasets', true);
 ```
-

@@ -771,25 +771,25 @@ classdef ImecDataset < handle
             assert(all(tf, 'all'), 'Some channel ids not found');
         end
         
-        function inspectAP_timeWindow(this, timeWindowSec, varargin)
+        function plotAP_timeWindow(this, timeWindowSec, varargin)
             idxWindow = this.closestSampleAPForTime(timeWindowSec);
-            this.inspectAP_idxWindow(idxWindow, 'timeInSeconds', true, varargin{:});
+            this.plotAP_idxWindow(idxWindow, 'timeInSeconds', true, varargin{:});
         end
         
-        function inspectAP_idxWindow(this, idxWindow, varargin)
-            this.internal_inspect_idxWindow(idxWindow, 'band', 'ap', varargin{:});
+        function plotAP_idxWindow(this, idxWindow, varargin)
+            this.internal_plotIdxWindow(idxWindow, 'band', 'ap', varargin{:});
         end
         
-        function inspectLF_idxWindow(this, idxWindow, varargin)
-            this.internal_inspect_idxWindow(idxWindow, 'band', 'lf', varargin{:});
+        function plotLF_idxWindow(this, idxWindow, varargin)
+            this.internal_plotIdxWindow(idxWindow, 'band', 'lf', varargin{:});
         end
         
-        function inspectLF_timeWindow(this, timeWindowSec, varargin)
+        function plotLF_timeWindow(this, timeWindowSec, varargin)
             idxWindow = this.closestSampleLFForTime(timeWindowSec);
-            this.inspectLF_idxWindow(idxWindow, 'timeInSeconds', true, varargin{:});
+            this.plotLF_idxWindow(idxWindow, 'timeInSeconds', true, varargin{:});
         end
         
-        function internal_inspect_idxWindow(this, idxWindow, varargin)
+        function internal_plotIdxWindow(this, idxWindow, varargin)
             p = inputParser();
             p.addParameter('band', 'ap', @ischar);
             p.addParameter('channels', this.mappedChannels, @(x) isempty(x) || isvector(x));
@@ -967,8 +967,8 @@ classdef ImecDataset < handle
             hold off;
         end
         
-        function inspectSync_idxWindow(this, idxWindow, varargin)
-            this.inspectAP_idxWindow(idxWindow, 'channels', [], 'showSync', true, varargin{:});
+        function plotSync_idxWindow(this, idxWindow, varargin)
+            this.plotAP_idxWindow(idxWindow, 'channels', [], 'showSync', true, varargin{:});
         end
     end
     
@@ -1944,8 +1944,9 @@ classdef ImecDataset < handle
         end
         
         function writeFolderForPhy(this, savePath, varargin)
-            % writes the files needed for Phy template-gui to be able to inspect this file in Phy
-            % essentially by generating a synthetic Kilosort output
+            % writes the files needed for Phy template-gui to be able to
+            % inspect this file in Phy essentially by generating a
+            % synthetic Kilosort output
             
             p = inputParser();
             p.addParameter('spikeTimes', [1 2], @(x) isempty(x) || isvector(x));

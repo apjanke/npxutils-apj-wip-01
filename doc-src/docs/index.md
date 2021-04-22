@@ -99,7 +99,7 @@ ImecDataset with properties:
 >> imec = imec.symLinkAPIntoDirectory(ksPath);
 
 % Inspect the raw IMEC traces
->> imec.inspectAP_timeWindow([200 201]); % 200-201 seconds into the recording
+>> imec.plotAP_timeWindow([200 201]); % 200-201 seconds into the recording
 ```
 
 Zoomed in view of data inspection figure. Black are good channels, blue are reference channels. Channels marked bad would be shown in red.
