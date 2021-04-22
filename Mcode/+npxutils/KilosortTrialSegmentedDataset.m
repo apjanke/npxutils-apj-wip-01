@@ -4,7 +4,7 @@ classdef KilosortTrialSegmentedDataset < handle & matlab.mixin.Copyable
     properties
         dataset % KilosortDataset
         
-        % optional modes indicating which mode of segmentation is used
+        % Optional modes indicating which mode of segmentation is used.
         is_segmented_by_trials logical = true;
         is_segmented_by_clusters logical = true;
         
@@ -19,12 +19,12 @@ classdef KilosortTrialSegmentedDataset < handle & matlab.mixin.Copyable
         % nTrials x 1
         trial_stop (:,1) uint64
         
-        % cluster ids corresponding to each column of the {nTrials, nClusters} properties
+        % Cluster ids corresponding to each column of the {nTrials, nClusters} properties
         cluster_ids (:,1) uint32
         
         cluster_groups (:,1) categorical
         
-        % sync channel segmented by trials
+        % Sync channel segmented by trials
         sync (:,1) cell
         
         syncBitNames (:,1) string

@@ -12,20 +12,20 @@ classdef ClusterStabilitySummary < handle & matlab.mixin.Copyable
         
         % Sample idx of each trial start window, used for x axis in plotting.
         idxStart(:,1) uint64
-        % Sampling rate
+        % Sampling rate.
         fs(1,1)
-        % Time bin width in ms
+        % Time bin width in ms.
         tBinWidth(1,1)
         
         % Id of each cluster (nClusters x 1).
         cluster_ids(:,1) uint32
         
-        % nTrials x nClusters x nTime bins
+        % nTrials x nClusters x nTime bins.
         rates(:,:)
         
-        % Where the file splits occur
+        % Where the file splits occur.
         fileBoundaries(:,1) uint64
-        % The names of the split files
+        % The names of the split files.
         fileNames(:,1) string
     end
     
@@ -36,7 +36,7 @@ classdef ClusterStabilitySummary < handle & matlab.mixin.Copyable
         nClusters
         % Number of time bins.
         nTimeBins
-        % Distinct non-missing condition Ids
+        % Distinct non-missing condition Ids.
         condition_list
         conditionIndInList
     end

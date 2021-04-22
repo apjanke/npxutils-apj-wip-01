@@ -1,9 +1,10 @@
 function path = generatePath(subject, type, date, fileStem, varargin)
 % Get the path to a file for given subject/type/etc.
 %
-% path = generatePath(subject, type, date, fileStem, ...)
+% path = npxutils.generatePath(subject, type, date, fileStem, ...)
 %
 % Options:
+%
 %   dataRoot (string) - data root path; defaults to using the
 %       NEUROPIXEL_DATAROOT environment variable.
 %

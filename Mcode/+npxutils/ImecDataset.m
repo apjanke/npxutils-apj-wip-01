@@ -9,6 +9,7 @@ classdef ImecDataset < handle
     % This is a handle object, so it is pass-by-reference.
     
     properties (Constant)
+        % Number of bytes per sample.
         bytesPerSample = 2;
     end
     
@@ -23,12 +24,14 @@ classdef ImecDataset < handle
         % Number of channels.
         nChannels = NaN;
         
-        fileTypeAP = 'ap'; % Typically ap or ap_CAR
-        fileTypeLF = 'lf'; % Typically lf or lf_CAR
+        % Typically ap or ap_CAR
+        fileTypeAP = 'ap';
+        % Typically lf or lf_CAR
+        fileTypeLF = 'lf';
         
-        % Number of samples in the AP file
+        % Number of samples in the AP file.
         nSamplesAP = 0;
-        % Number of samples in the LF file
+        % Number of samples in the LF file.
         nSamplesLF = 0;
         % ??? Maybe the frequency of samples in the AP file, in samples per second?
         fsAP = NaN;
@@ -44,7 +47,8 @@ classdef ImecDataset < handle
         adcBits = 10;
         
         snsShankMap (1,1) string;
-        channelMap = []; % Can be stored using set channelMap
+        % Can be stored using set channelMap
+        channelMap = [];
         
         % See markBadChannels
         badChannels (:, 1) uint32
@@ -59,7 +63,7 @@ classdef ImecDataset < handle
     end
     
     properties
-        % Will be cached after loading, can also be cleared by user
+        % Will be cached after loading, can also be cleared by user.
         syncRaw uint16 = [];
     end
     

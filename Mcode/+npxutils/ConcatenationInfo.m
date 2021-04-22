@@ -14,7 +14,8 @@ classdef ConcatenationInfo < handle
     
     properties(Dependent)
         nDatasets
-        samples % nDatasets x 1 number of samples in resultant file, factoring in time shifts
+        % nDatasets x 1 number of samples in resultant file, factoring in time shifts
+        samples (:,1)
         startIdx
         stopIdx
         

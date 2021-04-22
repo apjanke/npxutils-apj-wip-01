@@ -6,11 +6,11 @@ classdef ClusterMergeInfo < handle
     end
     
     properties (SetAccess=protected)
-        % list of sets of cluster_ids, with only one cluster
+        % List of sets of cluster_ids, with only one cluster.
         merges (:,1) cell = {};
     end
     
-    properties(Dependent)
+    properties (Dependent)
         new_cluster_ids
         nMerges
     end

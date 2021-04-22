@@ -43,7 +43,7 @@ classdef ClusterRatingInfo < handle & matlab.mixin.Copyable
     
     methods
         function this = ClusterRatingInfo(varargin)
-            % Construct a new object
+            % Construct a new object.
             %
             % obj = npxutils.ClusterRatingInfo(...)
             %

@@ -5,6 +5,8 @@ function rezFull = runKilosort2(imec, varargin)
 %
 % Imec (npxutils.ImecDataset) is the IMEC data set.
 %
+% This is probably broken.
+%
 % Options:
 %   saveDir
 %   workingDir - path to working dir for intermediate files. Should be on a 

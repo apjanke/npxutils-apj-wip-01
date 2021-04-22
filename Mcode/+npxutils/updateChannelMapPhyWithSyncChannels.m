@@ -1,5 +1,7 @@
 function updateChannelMapPhyWithSyncChannels(imec)
 % Update the channel map file so that phy shows the sync channel as well.
+%
+% npxutils.updateChannelMapPhyWithSyncChannels(imec)
 
 savePath = imec.pathRoot;
 map = imec.channelMap;
