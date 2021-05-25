@@ -39,3 +39,7 @@ And add it to your path in Matlab:
 Neuropixel Utils requires Matlab R2019b or later.
 
 You will need [Kilosort](https://github.com/cortex-lab/KiloSort) and/or [Kilosort2](https://github.com/MouseLand/Kilosort/releases/tag/v2.0) installed if you want this library to be useful.
+
+Requires Linux. May also work on Windows 10 with [Developer Mode enabled](https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development), but this is currently experimental.
+
+Requires a CUDA-capable NVIDIA GPU (for Kilosort).
