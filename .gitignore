@@ -5,6 +5,13 @@
 # should be checked into the source tree so your code can still run straight from the
 # repo without a build step; they are not just distribution artifacts.
 
+# Npxutils-specific stuff
+
+examples/example-data/Vinnie-excerpt/cleaned_datasets
+examples/example-data/Vinnie-excerpt/ks
+
+# Generic stuff
+
 # Build dirs and artifacts
 /build
 /dist
@@ -20,6 +27,7 @@ M-doc/
 _site
 
 # Editor and IDE droppings
+*.asv
 .idea
 ~*
 *.m~
